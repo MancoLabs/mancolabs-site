@@ -16,24 +16,15 @@ A single-page marketing site covering services, selected work, background, and a
 | Styles | CSS3 (external stylesheet) |
 | Fonts | Inter, DM Sans via Google Fonts |
 | Form | Web3Forms |
-| Hosting | Cloudflare Pages |
+| Hosting | Cloudflare Pages — auto-deploys on push to `main` |
 
 ## Project Structure
 
 ```
 mancolabs-site/
-├── index.html   # Single-page site
-└── style.css    # All styles
+├── index.html
+└── style.css
 ```
-
-## Deployment
-
-The site is deployed on **Cloudflare Pages** via GitHub integration.
-
-1. Push to `main` — Cloudflare Pages builds and deploys automatically.
-2. Custom domain is configured in the Cloudflare Pages dashboard under **Custom domains**.
-
-To deploy manually: drag and drop both files into the Cloudflare Pages direct upload interface.
 
 ## Contact
 

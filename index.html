@@ -1,26 +1,18 @@
-<!--
-  MANCO LABS — single-file site template (HTML + CSS + JS)
-  ────────────────────────────────────────────────────────
-  HOW TO GO LIVE (≈10 minutes):
-  1. Deploy this file to Cloudflare Pages or Netlify (drag-and-drop the file, or push to GitHub and connect).
-  2. Point mancolabs.dev at the deployment (your host's "custom domain" step).
-  3. Make the contact form live: create a free Web3Forms key at web3forms.com,
-     then replace YOUR_WEB3FORMS_ACCESS_KEY below (search for it). That's it.
-     (If you host on Netlify instead, you can swap the form for Netlify Forms — see the comment by the form.)
-  4. Add a booking link: create a free Cal.com or Calendly link and paste it where you see https://calendar.app.google/dEzn8KtDqeCAZYYE8.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manco Labs: Front-end Modernization & Design Systems</title>
+  <meta name="description" content="Manco Labs modernizes aging product front-ends and ships cohesive, well-documented design systems, backed by real full-stack, cloud, and integration experience." />
 
-  EDIT POINTS are marked with EDITME. Everything is honest by default — fill in real
-  outcomes/screenshots for client work only AFTER it ships. Don't add testimonials you don't have yet.
--->
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Manco Labs: Front-end Modernization & Design Systems</title>
-<meta name="description" content="Manco Labs modernizes aging product front-ends and ships cohesive, well-documented design systems, backed by real full-stack, cloud, and integration experience." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="style.css" />
+<body>
 
 <header id="header">
   <div class="wrap nav">
@@ -29,7 +21,6 @@
       <a class="link" href="#services">Services</a>
       <a class="link" href="#work">Work</a>
       <a class="link" href="#about">About</a>
-      <!-- EDITME: paste your Cal.com / Calendly link in place of https://calendar.app.google/dEzn8KtDqeCAZYYE8 (here and in the contact section) -->
       <a class="btn" href="https://calendar.app.google/dEzn8KtDqeCAZYYE8" target="_blank" rel="noopener">Book a call</a>
     </nav>
     <button class="menu-toggle" id="menuToggle" aria-label="Menu"><span></span><span></span><span></span></button>
@@ -50,7 +41,6 @@
       </div>
       <div class="stack-strip reveal-load d5">
         <span class="stack-label">Working with</span>
-        <!-- EDITME: trim this to the stack you want to lead with -->
         <span class="chip">React</span>
         <span class="chip">TypeScript</span>
         <span class="chip">Design systems</span>
@@ -118,9 +108,6 @@
         <h2>Founding clients.</h2>
         <span class="num">/ 02 · Selected work</span>
       </div>
-      <!-- HONESTY NOTE: these are early engagements. Keep the "Now building" status until each site
-           actually launches, then swap in real screenshots + measurable outcomes. Never invent metrics
-           or testimonials. Add a third card only once you have real work to show (e.g., the gym site). -->
       <div class="work-grid reveal">
 
         <div class="work-card">
@@ -133,7 +120,7 @@
               <span class="chip">Web design</span>
               <span class="chip">Front-end</span>
             </div>
-            <!-- EDITME after launch: add live link + outcome, e.g. "Launched Mar 2026 · live at …" -->
+            <!-- After launch: add live link and outcome -->
           </div>
         </div>
 
@@ -147,7 +134,7 @@
               <span class="chip">Web design</span>
               <span class="chip">Accessibility</span>
             </div>
-            <!-- EDITME after launch: add live link + outcome -->
+            <!-- After launch: add live link and outcome -->
           </div>
         </div>
 
@@ -203,22 +190,12 @@
           <h2 style="margin-top:18px">Have an aging front-end? <em>Let's fix it.</em></h2>
           <p>Tell me a little about your product and which kind of help fits. I read every message and reply personally.</p>
           <div class="contact-direct">
-            <!-- EDITME: your real email on the domain -->
             <a href="mailto:hello@mancolabs.dev"><span class="lbl">Email</span> hello@mancolabs.dev</a>
-            <!-- EDITME: your booking link -->
             <a href="https://calendar.app.google/dEzn8KtDqeCAZYYE8" target="_blank" rel="noopener"><span class="lbl">Or</span> Book a 30-min intro call →</a>
-            <!-- EDITME: your GitHub -->
             <a href="https://github.com/MancoLabs/mancolabs-site" target="_blank" rel="noopener"><span class="lbl">Code</span> GitHub →</a>
           </div>
         </div>
 
-        <!--
-          CONTACT FORM — wired for Web3Forms (free). To activate:
-          1) Get a free access key at https://web3forms.com
-          2) Replace YOUR_WEB3FORMS_ACCESS_KEY in the JS below.
-          Prefer Netlify Forms instead? Add  netlify  and  name="contact"  to this <form>,
-          add a hidden  <input type="hidden" name="form-name" value="contact">  and remove the JS handler.
-        -->
         <form id="contactForm" action="https://api.web3forms.com/submit" method="POST">
           <input type="hidden" name="access_key" value="068306a2-55e7-4c19-ac86-ede0b6ce2396" />
           <input type="hidden" name="subject" value="Contact Form - Manco Labs" />
@@ -268,6 +245,7 @@
       </div>
     </div>
   </section>
+
 </main>
 
 <footer>
@@ -287,11 +265,14 @@
   // Nav border on scroll
   const header = document.getElementById("header");
   const onScroll = () => header.classList.toggle("scrolled", window.scrollY > 12);
-  onScroll(); window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
 
   // Reveal on scroll
   const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+    });
   }, { threshold: 0.12 });
   document.querySelectorAll(".reveal").forEach(el => io.observe(el));
 
@@ -319,3 +300,6 @@
     }
   });
 </script>
+
+</body>
+</html>
