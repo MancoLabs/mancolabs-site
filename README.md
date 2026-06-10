@@ -22,8 +22,8 @@ A single-page marketing site covering services, selected work, background, and a
 
 ```
 mancolabs-site/
-├── manco-labs-website.html   # Single-page site
-└── manco-labs-website.css    # All styles
+├── index.html   # Single-page site
+└── style.css    # All styles
 ```
 
 ## Deployment
