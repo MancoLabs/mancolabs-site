@@ -1,0 +1,321 @@
+<!--
+  MANCO LABS — single-file site template (HTML + CSS + JS)
+  ────────────────────────────────────────────────────────
+  HOW TO GO LIVE (≈10 minutes):
+  1. Deploy this file to Cloudflare Pages or Netlify (drag-and-drop the file, or push to GitHub and connect).
+  2. Point mancolabs.dev at the deployment (your host's "custom domain" step).
+  3. Make the contact form live: create a free Web3Forms key at web3forms.com,
+     then replace YOUR_WEB3FORMS_ACCESS_KEY below (search for it). That's it.
+     (If you host on Netlify instead, you can swap the form for Netlify Forms — see the comment by the form.)
+  4. Add a booking link: create a free Cal.com or Calendly link and paste it where you see CALENDAR_LINK.
+
+  EDIT POINTS are marked with EDITME. Everything is honest by default — fill in real
+  outcomes/screenshots for client work only AFTER it ships. Don't add testimonials you don't have yet.
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Manco Labs: Front-end Modernization & Design Systems</title>
+<meta name="description" content="Manco Labs modernizes aging product front-ends and ships cohesive, well-documented design systems, backed by real full-stack, cloud, and integration experience." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="manco-labs-website.css" />
+
+<header id="header">
+  <div class="wrap nav">
+    <a href="#top" class="brand"><span class="dot"></span>Manco Labs</a>
+    <nav class="navlinks" id="navlinks">
+      <a class="link" href="#services">Services</a>
+      <a class="link" href="#work">Work</a>
+      <a class="link" href="#about">About</a>
+      <!-- EDITME: paste your Cal.com / Calendly link in place of CALENDAR_LINK (here and in the contact section) -->
+      <a class="btn" href="CALENDAR_LINK" target="_blank" rel="noopener">Book a call</a>
+    </nav>
+    <button class="menu-toggle" id="menuToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow reveal-load d1">Front-end modernization · Design systems</p>
+      <h1 class="reveal-load d2">I modernize aging front-ends and ship <em>design systems</em> teams can actually maintain.</h1>
+      <p class="lead reveal-load d3">Manco Labs is the independent practice of a design-led front-end specialist and full-stack engineer. I bring in-house-level ownership to your product, without the in-house headcount, and document everything so you're never locked in to me.</p>
+      <div class="hero-cta reveal-load d4">
+        <a class="btn" href="#services">See how I can help</a>
+        <a class="btn ghost" href="#work">View work</a>
+      </div>
+      <div class="stack-strip reveal-load d5">
+        <span class="stack-label">Working with</span>
+        <!-- EDITME: trim this to the stack you want to lead with -->
+        <span class="chip">React</span>
+        <span class="chip">TypeScript</span>
+        <span class="chip">Design systems</span>
+        <span class="chip">Django</span>
+        <span class="chip">PostgreSQL</span>
+        <span class="chip">AWS</span>
+        <span class="chip">API integration</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="sec" id="services">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2>Three ways to work together.</h2>
+        <span class="num">/ 01 · Services</span>
+      </div>
+      <div class="offers reveal">
+
+        <div class="offer">
+          <span class="onum">A</span>
+          <span class="tag">Fixed fee · 1–2 wks</span>
+          <h3>Modernization Assessment &amp; Migration Roadmap</h3>
+          <p>A low-risk way to de-risk a rebuild before you commit budget. I audit your current stack and UX, recommend a target framework, and hand back a prioritized roadmap.</p>
+          <ul>
+            <li>Stack &amp; UX audit</li>
+            <li>Framework recommendation</li>
+            <li>Phased, prioritized migration plan</li>
+          </ul>
+        </div>
+
+        <div class="offer">
+          <span class="onum">B</span>
+          <span class="tag">Fixed fee / milestones</span>
+          <h3>Design System Build &amp; Rollout</h3>
+          <p>Tokens, components, and documentation that bring consistency across your product, with a clean handoff so your team can own and extend it.</p>
+          <ul>
+            <li>Tokens &amp; component library</li>
+            <li>Brand-aligned UI standards</li>
+            <li>Documentation &amp; team handoff</li>
+          </ul>
+        </div>
+
+        <div class="offer">
+          <span class="onum">C</span>
+          <span class="tag">Retainer / hourly</span>
+          <h3>Embedded Senior Dev &amp; AI Advisory</h3>
+          <p>Ongoing full-stack feature work and modernization as a fractional front-end lead, with practical guidance on where AI actually fits in your roadmap.</p>
+          <ul>
+            <li>Feature development, front to back</li>
+            <li>Fractional front-end leadership</li>
+            <li>AI-integration roadmapping</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section class="sec" id="work">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2>Founding clients.</h2>
+        <span class="num">/ 02 · Selected work</span>
+      </div>
+      <!-- HONESTY NOTE: these are early engagements. Keep the "Now building" status until each site
+           actually launches, then swap in real screenshots + measurable outcomes. Never invent metrics
+           or testimonials. Add a third card only once you have real work to show (e.g., the gym site). -->
+      <div class="work-grid reveal">
+
+        <div class="work-card">
+          <div class="work-thumb"><span class="glyph">minicine?</span></div>
+          <div class="work-body">
+            <span class="work-status">● Founding client · Now building</span>
+            <h3>minicine?</h3>
+            <p>A Shreveport microcinema that grew into a community stage for local musicians and artists. Run from the heart of founder David Nelson, minicine? never had a rigid schedule, just an open door. The site honors that same spirit.</p>
+            <div class="work-meta">
+              <span class="chip">Web design</span>
+              <span class="chip">Front-end</span>
+            </div>
+            <!-- EDITME after launch: add live link + outcome, e.g. "Launched Mar 2026 · live at …" -->
+          </div>
+        </div>
+
+        <div class="work-card">
+          <div class="work-thumb"><span class="glyph">ABZ</span></div>
+          <div class="work-body">
+            <span class="work-status">● Founding client · Now building</span>
+            <h3>ABZ Health &amp; Recovery</h3>
+            <p>ABZ Health and Recovery believes every path to sobriety is personal. The site reflects their approach: compassionate, direct, and built to make it as easy as possible for someone to take that first step and ask for help.</p>
+            <div class="work-meta">
+              <span class="chip">Web design</span>
+              <span class="chip">Accessibility</span>
+            </div>
+            <!-- EDITME after launch: add live link + outcome -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="sec" id="about">
+    <div class="wrap">
+      <div class="sec-head reveal" style="margin-bottom:38px">
+        <p class="eyebrow">Background</p>
+        <span class="num" style="color:#8d8473">/ 03 · About</span>
+      </div>
+      <div class="about-grid reveal">
+        <div class="about-bio">
+          <h2>Design taste, real engineering depth.</h2>
+          <p>Most front-end people lean one way: design <em>or</em> systems. I've shipped both. At <strong>Cervey</strong>, I led the modernization of a product suite, set the design standards that lifted UX across the platform, planned the framework migration, and documented the whole system so the team could maintain it.</p>
+          <p>Before that, at <strong>Emergent Enforcement Solutions</strong>, I built a CJIS-compliant full-stack application end to end: real backend, cloud, and integration work, not just interfaces. That combination is what I bring to Manco Labs: front-end you can be proud of, on top of engineering you can rely on.</p>
+          <div class="about-stack">
+            <span class="chip">JavaScript / TypeScript</span>
+            <span class="chip">React</span>
+            <span class="chip">HTML / CSS</span>
+            <span class="chip">Design systems</span>
+            <span class="chip">Python / Django</span>
+            <span class="chip">PostgreSQL</span>
+            <span class="chip">AWS</span>
+            <span class="chip">REST APIs</span>
+          </div>
+        </div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-role">Cervey</div>
+            <div class="tl-meta">Front-end / Product · Most recent</div>
+            <p>Led modernization of the product suite and established platform-wide design standards. Evaluated and planned framework migration, implemented a unified, brand-aligned design system, produced thorough documentation, and contributed to AI-integration roadmapping.</p>
+          </div>
+          <div class="tl-item">
+            <div class="tl-role">Emergent Enforcement Solutions, Senior Software Developer</div>
+            <div class="tl-meta">Mansfield, LA · 01/2023 – 08/2023</div>
+            <p>Built a full-stack application for processing police lidar-gun video so CJIS-compliant workers could adjudicate violations. Engineered FTP servers to relay video to cloud storage, parsed manufacturer DLLs, integrated a DMV license-plate query API with regex auto-fill, and built the adjudicator interface. Django, PostgreSQL, and AWS, working alongside a junior developer.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="sec" id="contact">
+    <div class="wrap">
+      <div class="contact-grid reveal">
+        <div class="contact-side">
+          <p class="eyebrow">Get in touch</p>
+          <h2 style="margin-top:18px">Have an aging front-end? <em>Let's fix it.</em></h2>
+          <p>Tell me a little about your product and which kind of help fits. I read every message and reply personally.</p>
+          <div class="contact-direct">
+            <!-- EDITME: your real email on the domain -->
+            <a href="mailto:hello@mancolabs.dev"><span class="lbl">Email</span> hello@mancolabs.dev</a>
+            <!-- EDITME: your booking link -->
+            <a href="CALENDAR_LINK" target="_blank" rel="noopener"><span class="lbl">Or</span> Book a 20-min intro call →</a>
+            <!-- EDITME: your GitHub -->
+            <a href="https://github.com/" target="_blank" rel="noopener"><span class="lbl">Code</span> GitHub →</a>
+          </div>
+        </div>
+
+        <!--
+          CONTACT FORM — wired for Web3Forms (free). To activate:
+          1) Get a free access key at https://web3forms.com
+          2) Replace YOUR_WEB3FORMS_ACCESS_KEY in the JS below.
+          Prefer Netlify Forms instead? Add  netlify  and  name="contact"  to this <form>,
+          add a hidden  <input type="hidden" name="form-name" value="contact">  and remove the JS handler.
+        -->
+        <form id="contactForm" action="https://api.web3forms.com/submit" method="POST">
+          <input type="hidden" name="access_key" value="068306a2-55e7-4c19-ac86-ede0b6ce2396" />
+          <input type="hidden" name="subject" value="Contact Form - Manco Labs" />
+          <div class="row2">
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" required />
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" required />
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="company">Company</label>
+              <input id="company" name="company" type="text" />
+            </div>
+            <div class="field">
+              <label for="service">What fits best?</label>
+              <select id="service" name="service">
+                <option>Modernization assessment</option>
+                <option>Design system build</option>
+                <option>Embedded / ongoing dev</option>
+                <option>Not sure yet</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="budget">Rough budget (optional)</label>
+            <select id="budget" name="budget">
+              <option>Prefer not to say</option>
+              <option>Under $2k</option>
+              <option>$2k – $5k</option>
+              <option>$5k – $15k</option>
+              <option>$15k+</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="message">Project details</label>
+            <textarea id="message" name="message" required></textarea>
+          </div>
+          <button class="btn" type="submit" style="justify-self:start">Send message</button>
+          <p id="formMsg" role="status" aria-live="polite"></p>
+          <p class="form-note">Prefer email? Reach me directly at hello@mancolabs.dev.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <a href="#top" class="brand"><span class="dot"></span>Manco Labs</a>
+    <span class="copy">Manco Labs LLC · © 2026 · Built front to back.</span>
+  </div>
+</footer>
+
+<script>
+  // Mobile menu
+  const toggle = document.getElementById("menuToggle");
+  const links = document.getElementById("navlinks");
+  toggle.addEventListener("click", () => links.classList.toggle("open"));
+  links.querySelectorAll("a").forEach(a => a.addEventListener("click", () => links.classList.remove("open")));
+
+  // Nav border on scroll
+  const header = document.getElementById("header");
+  const onScroll = () => header.classList.toggle("scrolled", window.scrollY > 12);
+  onScroll(); window.addEventListener("scroll", onScroll, { passive: true });
+
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+  // Contact form
+  const form = document.getElementById("contactForm");
+  const msg = document.getElementById("formMsg");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msg.className = ""; msg.textContent = "Sending…";
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      });
+      const out = await res.json();
+      if (out.success) {
+        msg.className = "ok"; msg.textContent = "✓ Thanks, I'll be in touch shortly.";
+        form.reset();
+      } else {
+        msg.className = "err"; msg.textContent = "Something went wrong. Email hello@mancolabs.dev instead.";
+      }
+    } catch {
+      msg.className = "err"; msg.textContent = "Network error. Email hello@mancolabs.dev instead.";
+    }
+  });
+</script>
