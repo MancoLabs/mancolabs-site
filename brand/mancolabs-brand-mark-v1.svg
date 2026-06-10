@@ -1,0 +1,11 @@
+<svg width="100%" viewBox="0 0 680 310" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Manco Labs brand mark</title>
+  <desc>Manco Labs flask icon with wordmark and tagline</desc>
+
+  <path d="M 308,112 C 320,121 358,104 373,112 L 386,138 Q 389,145 377,145 L 303,145 Q 291,145 295,138 Z" fill="rgb(250, 249, 245)"/>
+  <path d="M 323,45 L 323,80 L 295,138 Q 291,145 303,145 L 377,145 Q 389,145 386,138 L 357,80 L 357,45" fill="none" stroke="rgb(250, 249, 245)" stroke-width="3.5" stroke-linejoin="round"/>
+
+  <line x1="240" y1="172" x2="440" y2="172" stroke="rgba(222, 220, 209, 0.15)"/>
+  <text x="340" y="210" font-family="Inter, sans-serif" font-size="28" font-weight="500" text-anchor="middle" fill="rgb(250, 249, 245)">Manco Labs</text>
+  <text x="340" y="234" font-family="DM Sans, sans-serif" font-size="13" font-weight="400" text-anchor="middle" fill="rgb(194, 192, 182)">SOFTWARE STUDIO</text>
+</svg>
