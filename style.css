@@ -190,6 +190,15 @@ header.scrolled { border-bottom: 1px solid var(--line); }
   letter-spacing: 0.1em;
   color: var(--ink-faint);
 }
+.offer .price {
+  position: absolute;
+  top: 46px;
+  right: 28px;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
 
 /* ── WORK ────────────────────────────────── */
 .work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
