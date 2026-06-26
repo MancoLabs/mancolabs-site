@@ -201,7 +201,7 @@ header.scrolled { border-bottom: 1px solid var(--line); }
 }
 
 /* ── WORK ────────────────────────────────── */
-.work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.work-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 
 .work-card {
   border: 1px solid var(--line-strong);
