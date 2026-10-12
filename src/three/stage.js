@@ -10,6 +10,11 @@ const CAM_Z = 12;
 const FOV = 30;
 const SCENES = { hero: HeroScene, lost: LostScene };
 
+// The live scene only replaces the poster after this many smooth frames in a row.
+const WARM_FRAMES = 12;
+const SMOOTH_DT = 1 / 40;
+const WARM_TIMEOUT = 5;
+
 export class Stage {
   constructor(post) {
     this.post = post;
@@ -19,7 +24,8 @@ export class Stage {
     this.aboutActive = false;
     this.running = false;
     this.ready = false;
-    this.watch = { acc: 0, n: 0, strikes: 0 };
+    this.warm = { streak: 0, elapsed: 0 };
+    this.watch = { dts: [], acc: 0, strikes: 0 };
   }
 
   handle(msg) {
@@ -28,7 +34,7 @@ export class Stage {
       case 'resize': return this.resize(msg);
       case 'layout': this.scene3?.setLayout(msg.layout); return;
       case 'frame': Object.assign(this.state, msg.state); return;
-      case 'pointer': this.scene3?.setPointer(msg.x, msg.y, msg.t, msg.tilt, msg.down); return;
+      case 'pointer': this.scene3?.setPointer(msg.x, msg.y, msg.t, msg.down); return;
       case 'palette': this.scene3?.setPalette(msg.palette); this.about?.setPalette(msg.palette); return;
       case 'check': this.scene3?.setCheck?.(msg); return;
       case 'active': this.mainActive = msg.value; return this.sync();
@@ -65,7 +71,14 @@ export class Stage {
       this.scene3.setLayout(layout);
       this.scene.add(this.scene3.root);
       this.scene3.update(0, 0, this.state, this.view);
+
+      // Compile every shader and upload every texture now, including parts that
+      // only appear later (the laptop, the services effects), so nothing has to
+      // compile in the middle of a scroll.
+      const restore = this.scene3.showAllForCompile?.();
       await renderer.compileAsync(this.scene, this.camera);
+      restore?.();
+      for (const t of this.scene3.textures?.() || []) renderer.initTexture?.(t);
 
       this.frames = 0;
       this.sync();
@@ -101,7 +114,8 @@ export class Stage {
     this.updateView(width, height);
   }
 
-  // Run the loop only while something visible needs drawing.
+  // Run the loop only while something visible needs drawing. Pausing keeps the
+  // scene and everything on the GPU, so resuming is immediate.
   sync() {
     if (!this.renderer) return;
     const want = this.mainActive || (this.aboutActive && !!this.about);
@@ -109,18 +123,21 @@ export class Stage {
     this.running = want;
     if (want) {
       this.last = performance.now();
-      this.watch = { acc: 0, n: 0, strikes: 0 };
+      this.resumedAt = this.ready ? performance.now() : null;
+      this.watch = { dts: [], acc: 0, strikes: 0 };
       this.renderer.setAnimationLoop((now) => this.frame(now));
     } else {
       // One last frame with the latest scroll position, then stop.
       this.scene3.update(this.time, 0, this.state, this.view);
       this.renderer.render(this.scene, this.camera);
       this.renderer.setAnimationLoop(null);
+      this.post({ type: 'loop', running: false });
     }
   }
 
   frame(now) {
-    const dt = Math.min(0.05, (now - this.last) / 1000);
+    const raw = (now - this.last) / 1000;
+    const dt = Math.min(0.05, raw);
     this.last = now;
     if (!this.poster) this.time += dt;
     if (this.mainActive || !this.ready) {
@@ -129,20 +146,37 @@ export class Stage {
     }
     if (this.aboutActive) this.about?.render(this.time, dt);
     this.frames++;
-    if (!this.ready && this.frames >= 3) {
+    if (this.resumedAt != null) {
+      this.post({ type: 'loop', running: true, resumeMs: Math.round(performance.now() - this.resumedAt) });
+      this.resumedAt = null;
+    }
+    if (!this.ready) this.warmUp(raw);
+    else if (!this.poster) this.watchdog(raw);
+  }
+
+  // Wait for a run of smooth frames before swapping the poster for the live scene.
+  warmUp(dt) {
+    const w = this.warm;
+    if (this.frames <= 3) return;
+    w.elapsed += dt;
+    w.streak = dt < SMOOTH_DT || this.poster ? w.streak + 1 : 0;
+    if (w.streak >= WARM_FRAMES) {
       this.ready = true;
       this.post({ type: 'ready', backend: this.backend });
+    } else if (w.elapsed > WARM_TIMEOUT) {
+      this.post({ type: 'slow', fps: Math.round(1 / Math.max(dt, 1e-3)) });
     }
-    if (!this.poster && this.frames > 90) this.watchdog(dt);
   }
 
   // Lower the resolution if frames run long; give up (poster mode) if even that fails.
   watchdog(dt) {
     const w = this.watch;
+    if (dt > 0.25) return; // a paused or backgrounded tab, not a slow frame
+    w.dts.push(dt);
     w.acc += dt;
-    w.n++;
     if (w.acc < 2) return;
-    const avg = w.acc / w.n;
+    const sorted = [...w.dts].sort((a, b) => a - b);
+    const avg = w.acc / w.dts.length;
     const fps = 1 / avg;
     if (avg > 1 / 42 && this.dpr > 1) {
       this.dpr = Math.max(1, this.dpr - 0.25);
@@ -154,10 +188,20 @@ export class Stage {
       w.strikes = 0;
     }
     if (this.wantStats) {
-      this.post({ type: 'stats', fps: Math.round(fps), backend: this.backend, dpr: this.dpr, drawCalls: this.renderer.info.render.drawCalls });
+      this.post({
+        type: 'stats',
+        fps: Math.round(fps),
+        p95: Math.round(sorted[Math.floor(sorted.length * 0.95)] * 1000 * 10) / 10,
+        maxMs: Math.round(sorted.at(-1) * 1000),
+        slow: w.dts.filter((d) => d > 1 / 30).length,
+        frames: w.dts.length,
+        backend: this.backend,
+        dpr: this.dpr,
+        drawCalls: this.renderer.info.render.drawCalls,
+      });
     }
+    w.dts = [];
     w.acc = 0;
-    w.n = 0;
   }
 
   dispose() {

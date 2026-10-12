@@ -170,7 +170,10 @@ p { text-wrap: pretty; }
 .menu-open .menu-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 @media (max-width: 880px) {
-  .js .menu-toggle { display: inline-flex; }
+  .js .menu-toggle { display: inline-flex; margin-right: -10px; }
+  /* The open menu is fixed-position, so take its <nav> out of the row: that
+     keeps the toggle centered against the right edge instead of mid-row. */
+  .js .nav > nav { position: absolute; }
   .js .navlinks {
     position: fixed;
     inset: 72px 0 auto 0;
@@ -226,38 +229,36 @@ main, .site-footer { position: relative; z-index: 1; }
   z-index: 0;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.7s ease;
+  transition: opacity 0.6s ease;
 }
 [data-3d="live"] .stage-canvas { opacity: 1; }
 
 .hero-poster, .hero-poster img { position: absolute; inset: 0; width: 100%; height: 100%; }
 .hero-poster img { object-fit: cover; object-position: center top; }
-.hero-poster { transition: opacity 0.7s ease; }
+.hero-poster { transition: opacity 0.6s ease; }
 [data-3d="live"] .hero-poster { opacity: 0; }
 
-.assembly-anchor .ill { transition: opacity 0.7s ease; }
+.assembly-anchor .ill { transition: opacity 0.6s ease; }
 [data-3d="live"] .assembly-anchor .ill { opacity: 0; }
 /* Papers fly behind this text on the way to the laptop; a halo in the page
    color keeps every letter readable without drawing a box. */
 [data-3d="live"] .statement-text { text-shadow: 0 0 2px var(--bg), 0 0 6px var(--bg), 0 0 14px var(--bg), 0 0 24px var(--bg); }
 
-.tilt-toggle {
-  position: absolute;
-  right: 20px;
-  bottom: 20px;
-  z-index: 2;
-  min-height: 44px;
-  padding: 0.6em 1em;
-  font-family: var(--mono);
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--text);
-  background: var(--header-bg);
-  border: 1.5px solid var(--field-border);
-  border-radius: 999px;
-  cursor: pointer;
+/* Phones: the papers live in their own band under the headline, fully on
+   screen on load and never under the header or behind text. */
+.hero-band { display: none; }
+@media (max-width: 699px) {
+  .hero-band { display: block; position: relative; height: clamp(104px, 16svh, 150px); margin: 18px calc(50% - 50vw) 0; }
+  .band-poster, .band-poster img { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .band-poster img { object-fit: cover; }
+  .band-poster { transition: opacity 0.6s ease; }
+  [data-3d="live"] .band-poster { opacity: 0; }
+  .hero-poster { display: none; }
+  .hero { align-items: start; padding-block: 28px 40px; }
+  .hero h1 { font-size: clamp(2.25rem, 9.6vw, 2.6rem); margin-top: 18px; }
+  .hero .lead { margin-top: 18px; }
+  .hero-cta { margin-top: 26px; }
 }
-.tilt-toggle[aria-pressed="true"] { background: var(--btn-bg); color: var(--btn-text); border-color: var(--btn-bg); }
 
 /* Social share image capture (?og), used by scripts/render-posters.mjs. */
 .og-mode .skip, .og-mode .site-header, .og-mode .site-footer,
@@ -322,7 +323,7 @@ main, .site-footer { position: relative; z-index: 1; }
 .stage-lede { font-size: 1.15rem; margin-top: 20px; max-width: 42ch; }
 .stage .ticks { margin-top: 22px; color: var(--text-2); }
 .stage-visual { margin: 0; aspect-ratio: 5 / 4; display: grid; place-items: center; }
-.stage-visual .ill { transition: opacity 0.7s ease; }
+.stage-visual .ill { transition: opacity 0.6s ease; }
 [data-3d="live"] .stage-visual .ill { opacity: 0; }
 
 .extras { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: clamp(24px, 4vw, 40px); }
@@ -476,7 +477,7 @@ main, .site-footer { position: relative; z-index: 1; }
 
 /* The laptop beside the form. In 3D the real laptop takes its place. */
 .check-visual { margin: 0; aspect-ratio: 5 / 4; display: grid; place-items: center; }
-.cv-device { position: relative; width: 100%; transition: opacity 0.7s ease; }
+.cv-device { position: relative; width: 100%; transition: opacity 0.6s ease; }
 [data-3d="live"] .cv-device { opacity: 0; }
 .check-screen {
   position: absolute;
@@ -758,7 +759,7 @@ main, .site-footer { position: relative; z-index: 1; }
 .lost { min-height: calc(100svh - 72px - 130px); display: grid; align-items: center; padding-block: 64px; }
 .lost-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(28px, 5vw, 72px); align-items: center; }
 .lost-anchor { margin: 0; aspect-ratio: 1; max-width: 360px; justify-self: center; display: grid; place-items: center; }
-.lost-anchor .ill { width: 70%; transition: opacity 0.7s ease; }
+.lost-anchor .ill { width: 70%; transition: opacity 0.6s ease; }
 [data-3d="live"] .lost-anchor .ill { opacity: 0; }
 @media (max-width: 760px) {
   .lost-grid { grid-template-columns: 1fr; }

@@ -6,6 +6,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
+// The phone address bar sliding in and out must never re-measure the page.
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 export function initMotion() {
   initHeadlines();

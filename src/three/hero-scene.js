@@ -75,7 +75,8 @@ export class HeroScene {
     this.root = new Group();
     this.mobile = mobile;
     this.seed = seed;
-    [this.cols, this.rows] = mobile ? [8, 6] : [12, 8];
+    // Phones get a smaller set that fits in the band under the headline.
+    [this.cols, this.rows] = mobile ? [6, 4] : [12, 8];
     this.count = this.cols * this.rows;
 
     this.u = {
@@ -170,6 +171,7 @@ export class HeroScene {
     mat.colorNode = mix(lit, bg, fog);
     mat.opacityNode = tex.a;
     mat.alphaTest = 0.5;
+    mat.alphaToCoverage = true; // smooth cut-out edges where multisampling is on
 
     this.papers = new InstancedMesh(geo, mat, n);
     this.papers.instanceMatrix.setUsage(DynamicDrawUsage);
@@ -293,6 +295,7 @@ export class HeroScene {
     iconMat.colorNode = itex.rgb;
     iconMat.opacityNode = itex.a;
     iconMat.alphaTest = 0.5;
+    iconMat.alphaToCoverage = true;
     this.iconMesh = new InstancedMesh(new PlaneGeometry(0.92, 0.92), iconMat, 4);
     this.iconMesh.instanceMatrix.setUsage(DynamicDrawUsage);
     this.iconMesh.frustumCulled = false;
@@ -396,38 +399,54 @@ export class HeroScene {
     this.checkTex.needsUpdate = true;
   }
 
-  // Positions are stored relative to the hero box, so the field scrolls with the page.
+  // Positions are stored relative to a page box (the hero, or on phones the
+  // band under the headline), so the papers scroll with the page.
   setLayout(layout) {
     this.layout = layout;
     const rnd = mulberry32(this.seed);
     const { hero, keepOut } = layout;
+    const band = this.mobile ? layout.band : null;
     const n = this.count;
     const types = [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3];
-    const minPx = this.mobile ? 42 : 58, maxPx = this.mobile ? 76 : 108;
+    const minPx = band ? 38 : 58, maxPx = band ? 56 : 108;
+    // Phones: a jittered grid inside the band, so every paper is fully on screen.
+    const bandCols = 8, bandRows = Math.ceil(n / 8);
+    const cells = [...Array(bandCols * bandRows).keys()].sort(() => rnd() - 0.5);
     this.items = [];
     for (let i = 0; i < n; i++) {
       const type = types[Math.floor(rnd() * types.length)];
       const aspect = PAPER_ASPECT[type];
-      const depth = lerp(-3.4, 1.3, rnd() ** 0.85);
+      const depth = band ? lerp(-0.8, 0.5, rnd()) : lerp(-3.4, 1.3, rnd() ** 0.85);
       const size = lerp(minPx, maxPx, rnd());
-      const hPx = type === 3 ? size * 1.35 : size;
+      const hPx = type === 3 ? size * (band ? 1.15 : 1.35) : size;
       const wPx = hPx * aspect;
       let u = 0, v = 0;
-      for (let a = 0; a < 60; a++) {
-        u = -0.05 + rnd() * 1.1;
-        v = -0.06 + rnd() * 1.12;
-        const px = hero.x + u * hero.w, py = hero.y + v * hero.h;
-        const m = Math.max(wPx, hPx) * 0.6 + 40;
-        const inside = px > keepOut.x - m && px < keepOut.x + keepOut.w + m && py > keepOut.y - m && py < keepOut.y + keepOut.h + m;
-        if (!inside) break;
+      if (band) {
+        const cell = cells[i];
+        const cu = (cell % bandCols + 0.5 + (rnd() - 0.5) * 0.7) / bandCols;
+        const cv = (Math.floor(cell / bandCols) + 0.5 + (rnd() - 0.5) * 0.5) / bandRows;
+        const half = Math.max(wPx, hPx) * 0.55 + 6;
+        u = Math.min(1 - half / band.w, Math.max(half / band.w, cu));
+        v = Math.min(1 - half / band.h, Math.max(half / band.h, cv));
+      } else {
+        for (let a = 0; a < 60; a++) {
+          u = -0.05 + rnd() * 1.1;
+          v = -0.06 + rnd() * 1.12;
+          const px = hero.x + u * hero.w, py = hero.y + v * hero.h;
+          const m = Math.max(wPx, hPx) * 0.6 + 40;
+          const inside = px > keepOut.x - m && px < keepOut.x + keepOut.w + m && py > keepOut.y - m && py < keepOut.y + keepOut.h + m;
+          if (!inside) break;
+        }
       }
-      const e = new Euler((rnd() - 0.5) * 1.2, (rnd() - 0.5) * 1.2, (rnd() - 0.5) * 2.4);
-      if (rnd() < 0.12) e.x += Math.PI;
+      const e = band
+        ? new Euler((rnd() - 0.5) * 0.7, (rnd() - 0.5) * 0.7, (rnd() - 0.5) * 1.4)
+        : new Euler((rnd() - 0.5) * 1.2, (rnd() - 0.5) * 1.2, (rnd() - 0.5) * 2.4);
+      if (!band && rnd() < 0.12) e.x += Math.PI;
       this.items.push({
-        type, u, v, depth, wPx, hPx,
+        type, u, v, depth, wPx, hPx, inBand: !!band,
         q: new Quaternion().setFromEuler(e),
         axis: new Vector3(rnd() - 0.5, rnd() - 0.5, rnd() - 0.5).normalize(),
-        spin: (0.04 + rnd() * 0.12) * (rnd() < 0.5 ? -1 : 1),
+        spin: (band ? 0.015 + rnd() * 0.035 : 0.04 + rnd() * 0.12) * (rnd() < 0.5 ? -1 : 1),
         ph: [rnd() * 6.28, rnd() * 6.28, rnd() * 6.28, rnd() * 6.28],
         arc: 0.4 + rnd() * 1.1,
         off: new Vector3(), vel: new Vector3(),
@@ -453,14 +472,14 @@ export class HeroScene {
     });
   }
 
-  setPointer(x, y, t, tilt) {
+  setPointer(x, y, t) {
     const p = this.pointer;
     if (x == null) { p.active = false; return; }
     if (p.active && t > p.lastT) {
       const speed = Math.hypot(x - p.lastX, y - p.lastY) / Math.max(8, t - p.lastT); // px per ms
-      p.energy = Math.min(1, Math.max(p.energy, speed * (tilt ? 1.2 : 0.9)));
+      p.energy = Math.min(1, Math.max(p.energy, speed * 0.9));
     }
-    p.active = true; p.tilt = tilt;
+    p.active = true;
     p.x = x; p.y = y; p.lastX = x; p.lastY = y; p.lastT = t;
   }
 
@@ -520,7 +539,6 @@ export class HeroScene {
     ptr.energy *= Math.exp(-dt * 2.2);
     const radius = this.mobile ? 150 : 210;
     const push = ptr.active ? (0.3 + ptr.energy) * 52 : 0;
-    const heroTop = hero.y - sy;
 
     for (let i = 0; i < this.count; i++) {
       const it = this.items[i];
@@ -529,13 +547,15 @@ export class HeroScene {
       this.morph[i] = p;
 
       // Free-floating pose
-      const parallax = it.depth < 0 ? -it.depth * 0.06 : -it.depth * 0.05;
-      const px = hero.x + it.u * hero.w;
-      const py = heroTop + it.v * hero.h + sy * parallax;
+      const box = it.inBand ? this.layout.band : hero;
+      const parallax = it.inBand ? 0 : it.depth < 0 ? -it.depth * 0.06 : -it.depth * 0.05;
+      const px = box.x + it.u * box.w;
+      const py = box.y - sy + it.v * box.h + sy * parallax;
       const pos = this.toWorld(px, py, it.depth, view, this._p);
-      pos.x += Math.sin(time * 0.13 + it.ph[0]) * 0.1 + Math.sin(time * 0.07 + it.ph[2]) * 0.06;
-      pos.y += Math.sin(time * 0.11 + it.ph[1]) * 0.12;
-      pos.z += Math.sin(time * 0.09 + it.ph[3]) * 0.2;
+      const sway = it.inBand ? 0.3 : 1;
+      pos.x += (Math.sin(time * 0.13 + it.ph[0]) * 0.1 + Math.sin(time * 0.07 + it.ph[2]) * 0.06) * sway;
+      pos.y += Math.sin(time * 0.11 + it.ph[1]) * 0.12 * sway;
+      pos.z += Math.sin(time * 0.09 + it.ph[3]) * 0.2 * sway;
 
       if (push && p < 1) {
         const dx = px - ptr.x, dy = py - ptr.y;
@@ -612,6 +632,23 @@ export class HeroScene {
       link.reveal.value = smooth(0.32 + i * 0.04, 0.64 + i * 0.04, auto) * (1 - exitHide);
     });
     this.auto.visible = any > 0.001;
+  }
+
+  // Make every part visible for one compile pass, so no shader compiles mid-scroll.
+  showAllForCompile() {
+    const parts = [this.papers, this.laptop, this.pieceMesh, this.auto];
+    const before = parts.map((o) => o.visible);
+    const bodyY = this.body.scale.y;
+    parts.forEach((o) => { o.visible = true; });
+    this.body.scale.y = 1;
+    return () => {
+      parts.forEach((o, i) => { o.visible = before[i]; });
+      this.body.scale.y = bodyY;
+    };
+  }
+
+  textures() {
+    return [this.atlas, this.screenTex, this.gridTex, this.checkTex, this.iconTex];
   }
 
   dispose() {

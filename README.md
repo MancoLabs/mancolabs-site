@@ -163,14 +163,15 @@ The hero's floating paperwork and the laptop it assembles into are decoration on
 
 ### How it loads
 
-1. **First paint:** the HTML and a static poster image of the scene. The poster is about 10 KB on phones and 24 KB on desktop.
+1. **First paint:** the HTML and a static poster image of the scene. Desktop gets a full-hero poster (about 24 KB). Phones get a small poster of just the paper band (a few KB), and never download the desktop one.
 2. **Before first paint:** an inline script in `partials/head.html` decides whether this device should even try. It sets `data-3d` on `<html>` to `pending` or `off`.
 3. **After load, once the browser is idle:** `src/main.js` imports `src/three/boot.js` (2 KB) and GSAP (39 KB).
 4. **GPU check:** `boot.js` checks for a real GPU, then starts the renderer:
-   - in a **Web Worker** with an OffscreenCanvas when the browser supports it (Chrome, Edge, Firefox, Safari 16.4+), so three.js never blocks the page;
-   - on the **main thread** otherwise.
+   - **Web Worker, WebGL 2 (the default).** Used whenever the browser can hand a canvas to a worker (Chrome, Edge, Firefox, Safari 16.4+), so three.js never blocks the page. WebGPU inside a worker caused scroll stutter on some machines, so the worker always uses WebGL 2. It looks identical.
+   - **Main thread, WebGPU if available, otherwise WebGL 2.** Used by browsers that can't hand a canvas to a worker.
    The renderer bundle is about 200 KB compressed.
-5. **Crossfade:** after three frames render, `data-3d` becomes `live` and the canvas crossfades in over the poster.
+5. **Warm-up:** every shader is compiled and every texture uploaded before the first visible frame, including parts that only appear later (the laptop, the services effects). The live scene replaces the poster only after 12 smooth frames in a row (each under 25 ms). It then crossfades in over 600 ms. If it can't get smooth within 5 seconds, the poster stays.
+6. **Pausing:** rendering stops when the 3D parts of the page are off screen or the tab is hidden. The scene and everything on the GPU stay loaded, so it resumes on the next frame with no warm-up or crossfade.
 
 Layout is identical in every state. The laptop is always fitted inside a page box that holds a matching drawing in poster mode. Switching modes never moves anything on the page.
 
@@ -178,7 +179,7 @@ Layout is identical in every state. The laptop is always fitted inside a page bo
 
 `frameState()` in `boot.js` works out, every frame, which box the laptop should fill and how far each stage has progressed. The page marks three boxes:
 
-1. **`[data-anchor="assembly"]`:** where the papers assemble into the laptop. Progress is scrubbed to scroll with GSAP ScrollTrigger.
+1. **`[data-anchor="assembly"]`:** where the papers assemble into the laptop. On desktop, progress is scrubbed to scroll with GSAP ScrollTrigger. On touch devices it plays on its own over about 1.3 seconds once the laptop box is about a third into view, and plays in reverse if you scroll back above that point. Scroll-scrubbing stutters with touch momentum scrolling. The Fix, Build, and Automate effects work the same way on touch devices: each plays through when its row reaches the reading area.
 2. **`[data-anchor="story"]`:** the Fix / Build / Automate rows.
    - **Desktop:** the laptop is held in the middle of the right-hand column while the rows scroll past.
    - **Phones:** it stays at the top of the screen, and the text fades as it slides up underneath, so the two never overlap.
@@ -207,7 +208,8 @@ Layout is identical in every state. The laptop is always fitted inside a page bo
 - **Draw calls:** all papers are a single instanced mesh. Their flutter and shading run in TSL shaders, and their positions are computed in the worker.
 - **Colors:** every color comes from the CSS variables, read at runtime by `src/three/palette.js`. The paper artwork and the laptop screen are drawn from those colors (`textures.js`), so there are no image downloads. Switching the device to dark mode repaints the scene.
 - **Pointer:** a mouse or trackpad gently pushes nearby papers aside, and they drift back.
-- **Tilt:** on phones, a "Tilt to play" button asks for motion permission. Nothing reads the motion sensors until the visitor taps it.
+- **Phones:** 24 smaller papers live in their own band under the headline (`.hero-band`), fully on screen on load and never under the header or behind text. Desktop keeps 96 papers framing the text.
+- **Address bar:** the phone address bar sliding in and out never re-measures anything. ScrollTrigger runs with `ignoreMobileResize`, and the 3D code uses a stable 100svh height.
 
 ### Files
 
@@ -230,7 +232,8 @@ Add these to the URL:
 |---|---|
 | `?3d=off` | Force the poster |
 | `?3d=on` | Skip the device checks (the GPU check still runs) |
-| `?3d=force-webgl` | Use the WebGL 2 backend instead of WebGPU |
+| `?3d=force-webgl` | Use WebGL 2 everywhere, including the main thread |
+| `?3d=force-webgpu` | Use WebGPU inside the worker (off by default; for testing only) |
 | `?mainthread` | Render on the main thread instead of a worker |
 | `?poster` / `?og` | Frozen frames used by `npm run posters` |
 
@@ -250,7 +253,7 @@ Run `npm run posters` after you change the hero text, the hero layout, the color
 | Magnetic buttons | `src/anim/motion.js` | Any element with `data-magnetic` leans toward the mouse. Mouse and trackpad only. |
 | Scroll progress | `.scroll-progress` in `partials/header.html` | A 2px bar under the header. Driven by CSS scroll timelines where supported, and by a tiny scroll listener elsewhere (Firefox). |
 | About background | `src/three/about-backdrop.js` | Slow noise in the palette's dark greens with a soft glow near the cursor. It has its own canvas inside the section, rendered by the same worker. It's capped so the section's smallest text keeps at least 4.5:1 contrast. |
-| Developer view | `src/devview.js` | Open it with the Konami code (up, up, down, down, left, right, left, right, B, A) or seven quick taps on the header logo on the home page. On the home page the logo scrolls to the top instead of reloading. It shows a 12-column grid (4 on phones), labeled component outlines, and live stats: page FPS, renderer and thread, 3D FPS, draw calls, pixel ratio, LCP, and CLS. Escape or Close closes it. It loads only when triggered. |
+| Developer view | `src/devview.js` | Open it with the Konami code (up, up, down, down, left, right, left, right, B, A) or seven quick taps on the header logo on the home page. On the home page the logo scrolls to the top instead of reloading. It shows a 12-column grid (4 on phones), labeled component outlines, and live stats: page FPS, the renderer actually in use and its thread, whether the 3D loop is running or paused, 3D FPS, 3D frame time (95th percentile and worst), frames over 33 ms, draw calls, pixel ratio, LCP, and CLS. Escape or Close closes it. It loads only when triggered. |
 | 404 | `404.html`, `src/three/lost-scene.js` | One lost invoice floats over the page. Push it with the mouse, or tap near it on a phone, and it bounces off the screen edges. In poster mode it's a drawing. |
 
 `src/anim/motion.js` loads after the page is idle, and never with reduced motion.
@@ -333,7 +336,7 @@ git push origin main          # Cloudflare builds and deploys
 - [ ] **Link previews:** refresh them with LinkedIn Post Inspector or the Facebook Sharing Debugger, so they pick up `og.jpg`.
 - [ ] **Search Console:** submit `https://mancolabs.dev/sitemap.xml` in Google Search Console.
 - [ ] **PageSpeed:** run PageSpeed Insights on the live site, mobile and desktop. Its lab machines may not have a real GPU, in which case it measures the poster version (correctly).
-- [ ] **Real devices:** go through the checks below on your iPhone and an Android phone. Tilt to play only works over HTTPS, so production is the first place you can try it.
+- [ ] **Real devices:** go through the checks below on your iPhone and an Android phone.
 
 **If something's wrong:** in Cloudflare, go to **Deployments**, pick the previous deployment, and choose **Rollback to this deployment**. It's instant.
 
@@ -341,10 +344,9 @@ git push origin main          # Cloudflare builds and deploys
 
 These need real hardware; WebKit on Windows isn't Safari.
 - [ ] **Fonts:** headings are bold. The Windows WebKit test build couldn't use variable-font weights.
-- [ ] **3D:** the papers drift. The developer view (seven logo taps) shows the renderer (WebGPU on recent Safari, otherwise WebGL 2) and `worker` as the thread.
+- [ ] **3D:** the papers drift in their band under the headline. The developer view (seven logo taps) shows `WebGL 2` and `worker`, frame times (p95 should stay under about 20 ms), and few or no frames over 33 ms.
 - [ ] **Scrolling:** the assembly into the laptop is smooth. In the services section, the laptop stays at the top, the text fades beneath it, and nothing overlaps.
 - [ ] **Website check:** a check runs, and "Want these fixed?" fills in the contact form.
-- [ ] **Tilt:** the "Tilt to play" button asks for motion permission and then moves the papers (iPhone, HTTPS only).
 - [ ] **Transitions:** tapping a work card grows it into the case study (Safari 18.2 and newer).
 - [ ] **Dark mode:** switch the phone to dark mode and reload.
 - [ ] **Reduce Motion:** turn on Reduce Motion (iPhone: Settings > Accessibility > Motion). You should get the poster only and no heading animations.

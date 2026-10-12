@@ -6,6 +6,9 @@ import { readPalette } from './palette.js';
 const root = document.documentElement;
 const params = new URLSearchParams(location.search);
 const POSTER = params.has('poster') || params.has('og');
+// Phones and tablets: timed animations instead of scroll-scrubbing, which
+// stutters with touch momentum scrolling.
+const TOUCH = matchMedia('(pointer: coarse)').matches;
 
 let teardown = null;
 let host = null;
@@ -24,10 +27,10 @@ export async function startStage() {
 // prepare(ctx) runs after the GPU check and returns hooks:
 //   layout()      page measurements for the scene
 //   started()     right after the renderer is created
-//   wire()        once the first frames are on screen
+//   wire()        once the live scene is on screen
 //   onMessage(m)  scene-specific messages from the renderer
 async function launch({ scene, prepare }) {
-  const ctx = { cleanups: [], done: false, canvas: null, coarse: matchMedia('(pointer: coarse)').matches };
+  const ctx = { cleanups: [], done: false, canvas: null, coarse: TOUCH };
   const off = (reason) => {
     if (ctx.done) return;
     ctx.done = true;
@@ -43,17 +46,35 @@ async function launch({ scene, prepare }) {
   teardown = off;
 
   const gpu = await probeGPU();
-  if (!gpu.ok) return off(gpu.reason);
+  const canvas = (ctx.canvas = document.createElement('canvas'));
+  // Which renderer, and where:
+  //   worker + WebGL 2   the default: smooth, and nothing runs on the main thread
+  //   main thread        browsers that can't hand a canvas to a worker; WebGPU if available
+  // WebGPU inside a worker caused scroll stutter on some machines, so it's only
+  // used there when explicitly requested with ?3d=force-webgpu.
+  const canWorker = !params.has('mainthread') && typeof Worker !== 'undefined' && 'transferControlToOffscreen' in canvas;
+  let useWorker = false;
+  let forceWebGL = true;
+  if (canWorker && params.get('3d') === 'force-webgpu' && gpu.webgpu) {
+    useWorker = true;
+    forceWebGL = false;
+  } else if (canWorker && gpu.webgl2) {
+    useWorker = true;
+  } else if (gpu.webgpu || gpu.webgl2) {
+    forceWebGL = !gpu.webgpu || params.get('3d') === 'force-webgl';
+  } else {
+    return off(gpu.reason);
+  }
+
   const hooks = await prepare(ctx);
   if (!hooks || ctx.done) return;
 
-  const canvas = (ctx.canvas = document.createElement('canvas'));
   canvas.className = 'stage-canvas';
   canvas.setAttribute('aria-hidden', 'true');
   document.body.prepend(canvas);
   const dpr = Math.min(window.devicePixelRatio || 1, POSTER ? 3 : ctx.coarse ? 1.5 : 2);
   ctx.size = () => ({ width: canvas.clientWidth, height: canvas.clientHeight });
-  ctx.forceWebGL = gpu.forceWebGL;
+  ctx.forceWebGL = forceWebGL;
 
   const startTimer = setTimeout(() => off('the renderer took too long to start'), 15000);
   ctx.cleanups.push(() => clearTimeout(startTimer));
@@ -65,6 +86,7 @@ async function launch({ scene, prepare }) {
       root.setAttribute('data-3d', 'live');
       root.dataset.renderer = msg.backend;
       root.dataset.renderThread = host.mode;
+      root.dataset.renderLoop = 'running';
       if (POSTER) root.dataset.posterReady = 'true';
       else {
         wireCommon(ctx, hooks);
@@ -73,7 +95,10 @@ async function launch({ scene, prepare }) {
     } else if (msg.type === 'slow') off(`frame rate too low (${msg.fps} fps)`);
     else if (msg.type === 'error') off(msg.message);
     else if (msg.type === 'stats') window.dispatchEvent(new CustomEvent('stage:stats', { detail: { ...msg, thread: host?.mode } }));
-    else hooks.onMessage?.(msg);
+    else if (msg.type === 'loop') {
+      root.dataset.renderLoop = msg.running ? 'running' : 'paused';
+      window.dispatchEvent(new CustomEvent('stage:loop', { detail: msg }));
+    } else hooks.onMessage?.(msg);
   };
 
   const init = {
@@ -83,11 +108,10 @@ async function launch({ scene, prepare }) {
     dpr,
     palette: readPalette(),
     layout: hooks.layout(),
-    forceWebGL: gpu.forceWebGL,
+    forceWebGL,
     poster: POSTER,
   };
 
-  const useWorker = !params.has('mainthread') && typeof Worker !== 'undefined' && 'transferControlToOffscreen' in canvas;
   try {
     if (useWorker) {
       const worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
@@ -109,6 +133,8 @@ async function launch({ scene, prepare }) {
 }
 
 function wireCommon(ctx, hooks) {
+  // The canvas is 100lvh and the body only changes size when the layout really
+  // does, so a phone's address bar sliding in and out never lands here.
   let resizeTimer = 0;
   const ro = new ResizeObserver(() => {
     clearTimeout(resizeTimer);
@@ -136,6 +162,18 @@ function wireCommon(ctx, hooks) {
   });
 }
 
+// A viewport height that ignores the phone address bar (100svh).
+function stableViewport() {
+  const probe = document.createElement('div');
+  probe.setAttribute('aria-hidden', 'true');
+  probe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none';
+  document.body.append(probe);
+  let vh = probe.offsetHeight || innerHeight;
+  const ro = new ResizeObserver(() => { vh = probe.offsetHeight || innerHeight; });
+  ro.observe(probe);
+  return { get: () => vh, dispose: () => { ro.disconnect(); probe.remove(); } };
+}
+
 // ── Home page ─────────────────────────────────
 function startHero() {
   const heroEl = document.querySelector('[data-stage="hero"]');
@@ -147,9 +185,12 @@ function startHero() {
   return launch({
     scene: 'hero',
     prepare: async (ctx) => {
-      const { gsap } = await gsapReady;
+      const { gsap, ScrollTrigger } = await gsapReady;
       // Let the hero's entrance animation settle so the text box is measured in place.
       await Promise.all(heroEl.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => {})));
+      const viewport = stableViewport();
+      ctx.cleanups.push(viewport.dispose);
+      const bandEl = heroEl.querySelector('.hero-band');
 
       const measure = () => {
         const sy = window.scrollY;
@@ -157,26 +198,49 @@ function startHero() {
           const r = el.getBoundingClientRect();
           return { x: r.left, y: r.top + sy, w: r.width, h: r.height };
         };
-        const parts = [...heroEl.querySelectorAll('.hero-inner > :not(.hero-cta), .hero-cta > *')]
+        const parts = [...heroEl.querySelectorAll('.hero-inner > :not(.hero-cta):not(.hero-band), .hero-cta > *')]
           .filter((el) => el.offsetParent !== null)
           .map(box);
         const k = parts.reduce(
           (a, b) => ({ x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), r: Math.max(a.r, b.x + b.w), b: Math.max(a.b, b.y + b.h) }),
           { x: Infinity, y: Infinity, r: -Infinity, b: -Infinity },
         );
-        return { hero: box(heroEl), keepOut: { x: k.x, y: k.y, w: k.r - k.x, h: k.b - k.y }, assembly: box(anchorEl) };
+        return {
+          hero: box(heroEl),
+          keepOut: { x: k.x, y: k.y, w: k.r - k.x, h: k.b - k.y },
+          assembly: box(anchorEl),
+          band: bandEl && bandEl.offsetParent !== null ? box(bandEl) : null,
+        };
       };
 
-      // Scroll-scrubbed assembly progress. Poster captures stay frozen at the start.
+      // Assembly progress. Desktop: scrubbed to scroll. Touch: plays on its own
+      // (about 1.3 s) when you pass the trigger, and in reverse when you go back.
+      // Poster captures stay frozen at the start.
       const proxy = { assemble: 0 };
       if (!POSTER) {
-        const tween = gsap.to(proxy, {
-          assemble: 1,
-          ease: 'none',
-          scrollTrigger: { trigger: statementEl, start: 'top 85%', endTrigger: anchorEl, end: 'center 52%', scrub: 0.8 },
-        });
-        tween.progress(tween.scrollTrigger.progress);
-        ctx.cleanups.push(() => { tween.scrollTrigger?.kill(); tween.kill(); });
+        if (TOUCH) {
+          let tween = null;
+          const playTo = (to) => {
+            tween?.kill();
+            tween = gsap.to(proxy, { assemble: to, duration: 1.35 * Math.abs(to - proxy.assemble), ease: 'none' });
+          };
+          const st = ScrollTrigger.create({
+            trigger: anchorEl,
+            start: 'top 72%',
+            onEnter: () => playTo(1),
+            onLeaveBack: () => playTo(0),
+          });
+          if (st.progress > 0 || window.scrollY > st.start) proxy.assemble = 1;
+          ctx.cleanups.push(() => { st.kill(); tween?.kill(); });
+        } else {
+          const tween = gsap.to(proxy, {
+            assemble: 1,
+            ease: 'none',
+            scrollTrigger: { trigger: statementEl, start: 'top 85%', endTrigger: anchorEl, end: 'center 52%', scrub: 0.8 },
+          });
+          tween.progress(tween.scrollTrigger.progress);
+          ctx.cleanups.push(() => { tween.scrollTrigger?.kill(); tween.kill(); });
+        }
       }
 
       // The laptop's path: assembly box, then held beside (desktop) or above
@@ -201,9 +265,10 @@ function startHero() {
 
       const frameState = () => {
         const now = performance.now();
-        const k = 1 - Math.exp(-Math.min(0.1, (now - lastFrame) / 1000) * 10);
+        const dt = Math.min(0.1, (now - lastFrame) / 1000);
         lastFrame = now;
-        const vh = innerHeight;
+        const k = 1 - Math.exp(-dt * 10);
+        const vh = viewport.get();
         const box = (el) => { const r = el.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; };
         const A = box(anchorEl);
         let laptop = { ...A, s: 1 };
@@ -221,9 +286,18 @@ function startHero() {
           story.exit = span > 0 ? clamp01(past / span) : past > 0 ? 1 : 0;
           const focus = desktop ? vh * 0.5 : pinY + V.h + (vh - pinY - V.h) * 0.45;
           rows.forEach((row, i) => {
-            const r = row.getBoundingClientRect();
             const key = ['fix', 'build', 'auto'][i];
-            if (key) story[key] += (clamp01((focus - r.top) / r.height) - story[key]) * k;
+            if (!key) return;
+            const r = row.getBoundingClientRect();
+            if (TOUCH) {
+              // Touch: each stage plays through on its own once its row reaches
+              // the reading area, and rewinds if you scroll back above it.
+              const target = r.top < focus ? 1 : 0;
+              const step = dt / 1.3;
+              story[key] = target > story[key] ? Math.min(1, story[key] + step) : Math.max(0, story[key] - step);
+            } else {
+              story[key] += (clamp01((focus - r.top) / r.height) - story[key]) * k;
+            }
           });
           if (desktop) {
             // Glide between boxes in the right-hand column; shrink while passing behind the cards.
@@ -356,44 +430,6 @@ function startHero() {
             root.addEventListener('pointerleave', leave);
             ctx.cleanups.push(() => { removeEventListener('pointermove', move); root.removeEventListener('pointerleave', leave); });
           }
-
-          const tiltBtn = heroEl.querySelector('.tilt-toggle');
-          // Motion sensors only work on HTTPS (or localhost), so don't offer tilt elsewhere.
-          if (tiltBtn && ctx.coarse && window.isSecureContext && 'DeviceOrientationEvent' in window) {
-            let tilting = false;
-            const onTilt = (e) => {
-              if (e.gamma == null) return;
-              const clamp = (v) => Math.max(-1, Math.min(1, v));
-              pending = {
-                x: innerWidth / 2 + clamp(e.gamma / 30) * innerWidth * 0.45,
-                y: innerHeight * 0.45 + clamp((e.beta - 40) / 30) * innerHeight * 0.35,
-                t: e.timeStamp,
-                tilt: true,
-              };
-            };
-            const toggle = async () => {
-              if (tilting) {
-                removeEventListener('deviceorientation', onTilt);
-                tilting = false;
-                pending = { x: null };
-              } else {
-                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                  const answer = await DeviceOrientationEvent.requestPermission().catch(() => 'denied');
-                  if (answer !== 'granted') return;
-                }
-                addEventListener('deviceorientation', onTilt);
-                tilting = true;
-              }
-              tiltBtn.setAttribute('aria-pressed', String(tilting));
-            };
-            tiltBtn.hidden = false;
-            tiltBtn.addEventListener('click', toggle);
-            ctx.cleanups.push(() => {
-              tiltBtn.hidden = true;
-              tiltBtn.removeEventListener('click', toggle);
-              removeEventListener('deviceorientation', onTilt);
-            });
-          }
         },
       };
     },
@@ -459,27 +495,35 @@ const lerpBox = (a, b, t) => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) *
 async function loadGsap() {
   const [{ gsap }, { ScrollTrigger }] = await Promise.all([import('gsap'), import('gsap/ScrollTrigger')]);
   gsap.registerPlugin(ScrollTrigger);
+  // The phone address bar sliding in and out must never re-measure the page.
+  ScrollTrigger.config({ ignoreMobileResize: true });
   return { gsap, ScrollTrigger };
 }
 
-// A real GPU only. Software renderers make the page slower, not nicer.
+// Real GPU support only. Software renderers make the page slower, not nicer.
 async function probeGPU() {
-  if (params.get('3d') === 'force-webgl') return { ok: true, forceWebGL: true };
+  if (params.get('3d') === 'force-webgl') return { webgl2: true, webgpu: false };
+  let webgpu = false;
   if (navigator.gpu) {
     try {
       const adapter = await navigator.gpu.requestAdapter();
-      const fallback = adapter?.info?.isFallbackAdapter ?? adapter?.isFallbackAdapter;
-      if (adapter && !fallback) return { ok: true, forceWebGL: false };
+      webgpu = !!adapter && !(adapter.info?.isFallbackAdapter ?? adapter.isFallbackAdapter);
     } catch {
-      // fall through to the WebGL 2 check
+      webgpu = false;
     }
   }
   const probe = document.createElement('canvas');
   const gl = probe.getContext('webgl2', { failIfMajorPerformanceCaveat: true });
-  if (!gl) return { ok: false, reason: 'no hardware WebGL 2 or WebGPU' };
-  const info = gl.getExtension('WEBGL_debug_renderer_info');
-  const name = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
-  gl.getExtension('WEBGL_lose_context')?.loseContext();
-  if (/swiftshader|llvmpipe|softpipe|software|basic render/i.test(name)) return { ok: false, reason: `software renderer (${name})` };
-  return { ok: true, forceWebGL: true };
+  let webgl2 = !!gl;
+  let reason = gl ? '' : 'no hardware WebGL 2 or WebGPU';
+  if (gl) {
+    const info = gl.getExtension('WEBGL_debug_renderer_info');
+    const name = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+    if (/swiftshader|llvmpipe|softpipe|software|basic render/i.test(name)) {
+      webgl2 = false;
+      reason = `software renderer (${name})`;
+    }
+  }
+  return { webgl2, webgpu, reason };
 }

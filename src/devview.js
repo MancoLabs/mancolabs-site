@@ -54,8 +54,9 @@ function open() {
   closeBtn.addEventListener('click', close);
   const dl = el('dl');
   for (const [key, label] of [
-    ['fps', 'Page FPS'], ['renderer', 'Renderer'], ['thread', '3D runs on'], ['gfps', '3D FPS'],
-    ['calls', 'Draw calls'], ['dpr', '3D pixel ratio'], ['viewport', 'Viewport'], ['lcp', 'LCP'], ['cls', 'CLS'],
+    ['fps', 'Page FPS'], ['renderer', 'Renderer'], ['thread', '3D runs on'], ['loop', '3D loop'], ['gfps', '3D FPS'],
+    ['p95', '3D frame p95 / max'], ['slow', 'Frames over 33 ms'], ['calls', 'Draw calls'], ['dpr', '3D pixel ratio'],
+    ['viewport', 'Viewport'], ['lcp', 'LCP'], ['cls', 'CLS'],
   ]) {
     const dd = el('dd', '', '...');
     dl.append(el('dt', '', label), dd);
@@ -103,19 +104,24 @@ function open() {
       const d = document.documentElement.dataset;
       rows.renderer.textContent = d['3d'] === 'live' ? d.renderer : d['3d'] === 'pending' ? 'starting…' : 'poster (no 3D)';
       rows.thread.textContent = d['3d'] === 'live' ? d.renderThread : 'n/a';
+      rows.loop.textContent = d['3d'] === 'live' ? d.renderLoop || 'running' : 'n/a';
     }
     raf = requestAnimationFrame(count);
   };
   raf = requestAnimationFrame(count);
 
   const onStats = (e) => {
+    // The renderer reports what it is actually using, so trust it over the page's guess.
+    rows.renderer.textContent = e.detail.backend;
     rows.gfps.textContent = String(e.detail.fps);
+    rows.p95.textContent = `${e.detail.p95} / ${e.detail.maxMs} ms`;
+    rows.slow.textContent = `${e.detail.slow} of ${e.detail.frames}`;
     rows.calls.textContent = String(e.detail.drawCalls);
     rows.dpr.textContent = String(e.detail.dpr);
   };
   addEventListener('stage:stats', onStats);
   dispatchEvent(new CustomEvent('stage:want-stats', { detail: true }));
-  if (document.documentElement.dataset['3d'] !== 'live') rows.gfps.textContent = rows.calls.textContent = rows.dpr.textContent = 'n/a';
+  if (document.documentElement.dataset['3d'] !== 'live') rows.gfps.textContent = rows.p95.textContent = rows.slow.textContent = rows.calls.textContent = rows.dpr.textContent = 'n/a';
 
   const observers = [];
   try {

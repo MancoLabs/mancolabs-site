@@ -59,7 +59,7 @@ export class LostScene {
     this.layout = layout;
   }
 
-  setPointer(x, y, t, tilt, down) {
+  setPointer(x, y, t, down) {
     const p = this.pointer;
     if (x == null) { p.active = false; return; }
     if (p.active && t > p.lastT) p.speed = Math.hypot(x - p.lastX, y - p.lastY) / ((t - p.lastT) / 1000);
