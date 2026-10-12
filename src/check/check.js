@@ -27,6 +27,9 @@ const CATS = [
   ['seo', 'SEO'],
 ];
 const CACHE_MS = 30 * 60 * 1000;
+// Every score 90 or above: the site is in good shape, so the list reads as
+// optional polish rather than problems to fix.
+const isStrong = (scores) => CATS.every(([key]) => scores[key] >= 90);
 const SELF_URL = 'https://mancolabs.dev/';
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -233,11 +236,15 @@ export function initCheck(section) {
       }
     }
 
+    const strong = isStrong(scores);
     const list = issues.length
       ? h('ol', { class: 'issues' }, ...issues.map((i) => h('li', {}, h('strong', { text: i.title }), h('p', { text: i.body }))))
       : h('p', { class: 'issues-none', text: 'Nothing major to fix. Nice work.' });
+    const intro = strong && issues.length
+      ? [h('p', { class: 'issues-intro', text: "Your site is in good shape. None of these are urgent. They're small things that could make it a little better." })]
+      : [];
 
-    const cta = h('a', { class: 'btn', href: '#contact', text: issues.length ? 'Want these fixed? Free consultation.' : 'Want a second opinion? Free consultation.' });
+    const cta = h('a', { class: 'btn', href: '#contact', text: issues.length && !strong ? 'Want these fixed? Free consultation.' : 'Want a second opinion? Free consultation.' });
     cta.addEventListener('click', (e) => {
       e.preventDefault();
       prefillContact(host, result);
@@ -250,7 +257,8 @@ export function initCheck(section) {
       h('h3', { id: 'checkResultsTitle', tabindex: '-1', text: `Results for ${host}` }),
       h('p', { class: 'results-note', text: 'Mobile test by Google PageSpeed Insights. Scores can move a few points between runs.' }),
       gauges,
-      h('h4', { text: 'Top things to fix' }),
+      h('h4', { text: strong ? 'Minor suggestions' : 'Top things to fix' }),
+      ...intro,
       list,
       cta,
     );
@@ -260,18 +268,20 @@ export function initCheck(section) {
     const message = document.getElementById('message');
     const service = document.getElementById('service');
     if (!message) return;
+    const strong = isStrong(scores);
     const text = [
       `I ran the free website check on ${host}.`,
       `Performance ${scores.performance}, Accessibility ${scores.accessibility}, Best practices ${scores.bestPractices}, SEO ${scores.seo}.`,
-      ...(issues.length ? ['', 'Top issues:', ...issues.map((i) => `- ${i.title}`)] : []),
+      ...(issues.length ? ['', strong ? 'Minor suggestions:' : 'Top issues:', ...issues.map((i) => `- ${i.title}`)] : []),
       '',
-      "I'd like help with these.",
+      strong ? "I'd like a second opinion." : "I'd like help with these.",
     ].join('\n');
     if (!message.value.trim() || message.value === message.dataset.prefill) {
       message.value = text;
       message.dataset.prefill = text;
     }
-    if (service) service.value = 'Fix something';
+    // A strong site isn't necessarily broken, so leave the service as it is.
+    if (service && !strong) service.value = 'Fix something';
   }
 
   form.addEventListener('submit', (e) => {

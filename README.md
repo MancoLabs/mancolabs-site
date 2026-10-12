@@ -373,8 +373,10 @@ These need real hardware; WebKit on Windows isn't Safari.
 
 A visitor types an address. The page runs Google PageSpeed Insights (v5, mobile, all four categories) straight from the browser and shows:
 - four score rings, each with its number and a word ("Good", "Needs work", "Poor");
-- the top three issues in plain English;
-- a "Want these fixed? Free consultation." button. It fills in the contact form with the address, scores, and issues, then moves to it.
+- the top three issues in plain English, under "Top things to fix";
+- a "Want these fixed? Free consultation." button. It fills in the contact form with the address, scores, and issues, picks "Fix something" as the service, then moves to it.
+
+When all four scores are 90 or above, the same list is framed as polish instead: the heading reads "Minor suggestions", a line says none of it is urgent, the button reads "Want a second opinion? Free consultation.", and the prefilled message asks for a second opinion without changing the service.
 
 **Files:**
 

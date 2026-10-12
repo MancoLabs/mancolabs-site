@@ -493,6 +493,7 @@ main, .site-footer { position: relative; z-index: 1; }
 .issues strong { display: block; font-weight: 600; }
 .issues p { margin-top: 4px; color: var(--text-2); }
 .issues-none { margin-top: 10px; color: var(--text-2); }
+.issues-intro { margin-top: 8px; color: var(--text-2); max-width: 56ch; }
 .check-results .btn { margin-top: 26px; }
 
 /* The laptop beside the form. In 3D the real laptop takes its place. */
