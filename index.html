@@ -1,214 +1,415 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manco Labs: Technology & Automation Consulting for Small Business</title>
-  <meta name="description" content="Manco Labs helps small and mid-sized businesses find where technology, automation, and AI can save time and money, then builds it. Honest assessment, real ownership, no lock-in." />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/svg+xml" href="brand/mancolabs-logo.svg" />
-  <link rel="stylesheet" href="style.css" />
+  <!-- @include head.html -->
+  <title>Manco Labs | Local tech help for Shreveport-Bossier businesses</title>
+  <meta name="description" content="Affordable software help for Shreveport-Bossier businesses. I fix websites, build new ones and custom tools, and automate the busywork. Free consultation." />
+  <link rel="canonical" href="https://mancolabs.dev/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Manco Labs" />
+  <meta property="og:title" content="Manco Labs | Local tech help for Shreveport-Bossier businesses" />
+  <meta property="og:description" content="I fix, build, and automate the software your business runs on. Free consultation." />
+  <meta property="og:url" content="https://mancolabs.dev/" />
+  <!-- [PLACEHOLDER] og:image and twitter:image: rendered from the hero scene in stage 3. -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "Manco Labs",
+    "legalName": "Manco Labs LLC",
+    "url": "https://mancolabs.dev/",
+    "logo": "https://mancolabs.dev/logo.png",
+    "email": "hello@mancolabs.dev",
+    "telephone": "+1-318-642-4582",
+    "address": { "@type": "PostalAddress", "addressLocality": "Shreveport", "addressRegion": "LA", "addressCountry": "US" },
+    "areaServed": [
+      { "@type": "City", "name": "Shreveport, LA" },
+      { "@type": "City", "name": "Bossier City, LA" }
+    ],
+    "founder": { "@type": "Person", "name": "Ethan Manco" }
+  }
+  </script>
 </head>
 
 <body>
+<!-- @include laptop-sprite.html -->
+<!-- @include header.html -->
 
-<header id="header">
-  <div class="wrap nav">
-    <a href="#top" class="brand"><svg viewBox="287 41 106 109" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M 308,112 C 320,121 358,104 373,112 L 386,138 Q 389,145 377,145 L 303,145 Q 291,145 295,138 Z" fill="#7AAD80" opacity="0.4"/>
-    <path d="M 323,45 L 323,80 L 295,138 Q 291,145 303,145 L 377,145 Q 389,145 386,138 L 357,80 L 357,45" stroke="#7AAD80" stroke-width="8" stroke-linejoin="round"/>
-  </svg>Manco Labs</a>
-    <nav class="navlinks" id="navlinks">
-      <a class="link" href="#services">Services</a>
-      <a class="link" href="#work">Work</a>
-      <a class="link" href="#about">About</a>
-      <a class="btn" href="https://calendar.app.google/dEzn8KtDqeCAZYYE8" target="_blank" rel="noopener">Book a call</a>
-    </nav>
-    <button class="menu-toggle" id="menuToggle" aria-label="Menu"><span></span><span></span><span></span></button>
-  </div>
-</header>
-
-<main id="top">
+<main id="main">
 
   <!-- HERO -->
-  <section class="hero">
-    <div class="wrap">
-      <p class="eyebrow reveal-load d1">Operations & AI consulting · Design & build</p>
-      <h1 class="reveal-load d2">I find where technology and automation can help your business, then <em>build it.</em></h1>
-      <p class="lead reveal-load d3">Manco Labs is the solo practice of a developer and operations consultant with real full-stack depth. I take ownership of the work from assessment to delivery, without the overhead of an in-house hire, and document everything so you're never locked in.</p>
-      <div class="hero-cta reveal-load d4">
-        <a class="btn" href="#services">See how I can help</a>
-        <a class="btn ghost" href="#work">View work</a>
-      </div>
-      <div class="stack-strip reveal-load d5">
-        <span class="stack-label">Working with</span>
-        <span class="chip">React</span>
-        <span class="chip">TypeScript</span>
-        <span class="chip">Django</span>
-        <span class="chip">PostgreSQL</span>
-        <span class="chip">AWS</span>
-        <span class="chip">API integration</span>
-        <span class="chip">AI agents</span>
-        <span class="chip">Workflow automation</span>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-stage" aria-hidden="true"><!-- Stage 3: hero poster + 3D canvas mount here. --></div>
+    <div class="wrap hero-inner">
+      <p class="eyebrow rise" style="--i:0">Shreveport-Bossier's local tech help</p>
+      <h1 id="hero-title" class="rise" style="--i:1">I fix, build, and automate the software your business <em>runs on.</em></h1>
+      <p class="lead rise" style="--i:2">Websites, online booking, email, spreadsheets, and the tools in between. Affordable help from someone local, with honest advice. Sometimes that means telling you that you don't need anything.</p>
+      <div class="hero-cta rise" style="--i:3">
+        <a class="btn" href="#contact">Get a free consultation</a>
+        <a class="btn ghost" href="tel:+13186424582">Call (318) 642-4582</a>
       </div>
     </div>
   </section>
 
-  <!-- SERVICES -->
-  <section class="sec" id="services">
+  <!-- STATEMENT (stage 3: the papers assemble into a laptop behind this) -->
+  <div class="statement">
+    <div class="wrap">
+      <p class="reveal">Most small businesses run on paper, sticky notes, and a spreadsheet only one person understands. <strong>I turn that into tools that just work.</strong></p>
+    </div>
+  </div>
+
+  <!-- SERVICES (stage 4: the three stages become a pinned scroll story) -->
+  <section class="services sec" id="services" aria-labelledby="services-title">
     <div class="wrap">
       <div class="sec-head reveal">
-        <h2>Three ways to work together.</h2>
-        <span class="num">/ 01 · Services</span>
+        <p class="eyebrow">Services</p>
+        <h2 id="services-title">Fix, build, automate.</h2>
+        <p class="sec-lede">Plain prices and plain English. Here's what I do and what it costs.</p>
       </div>
-      <div class="offers reveal">
 
-        <div class="offer">
-          <span class="onum">A</span>
-          <span class="tag">Fixed fee · 30 days</span>
-          <span class="price">$1,400</span>
-          <h3>Operations &amp; AI Assessment</h3>
-          <p>A 30-day look at how your business actually runs. I map your workflows, identify where technology, automation, and AI can save real time and money, and hand back a prioritized roadmap. The goal is an honest answer about what you actually need, including when AI is not the right fit. Low commitment by design, so you have a clear plan before committing to any build.</p>
-          <ul>
-            <li>Workflow and operations audit</li>
-            <li>Prioritized roadmap of opportunities</li>
-            <li>Recommendations covering automation, training, and where AI fits (or does not)</li>
+      <ol class="stages" role="list">
+        <li class="stage" id="fix">
+          <div class="stage-copy">
+            <h3 class="stage-title">Fix</h3>
+            <ul class="prices" role="list" aria-label="Price">
+              <li>$50 an hour</li>
+            </ul>
+            <p class="stage-lede">Something broken, slow, or hard to use on a phone? I find the problem and fix it.</p>
+            <ul class="ticks">
+              <li>Broken pages and error messages</li>
+              <li>Slow websites</li>
+              <li>Plugin cleanup</li>
+              <li>Email and contact form problems</li>
+              <li>Layouts that break on phones</li>
+              <li>Bugs in apps you already use</li>
+            </ul>
+          </div>
+          <figure class="stage-visual" aria-hidden="true">
+            <svg class="ill" viewBox="0 0 600 380" focusable="false">
+              <use href="#ill-laptop"/>
+              <defs><clipPath id="clip-fix"><rect x="102" y="34" width="396" height="270" rx="4"/></clipPath></defs>
+              <g clip-path="url(#clip-fix)">
+                <rect class="ill-screen" x="102" y="34" width="396" height="270"/>
+                <rect class="ill-bar" x="102" y="34" width="396" height="26"/>
+                <circle class="ill-accent" cx="120" cy="47" r="5"/>
+                <rect class="ill-ink" x="132" y="44" width="44" height="6" rx="3"/>
+                <rect class="ill-muted" x="392" y="44" width="22" height="6" rx="3"/>
+                <rect class="ill-muted" x="422" y="44" width="22" height="6" rx="3"/>
+                <rect class="ill-muted" x="452" y="44" width="28" height="6" rx="3"/>
+                <rect class="ill-ink" x="124" y="84" width="150" height="13" rx="3"/>
+                <rect class="ill-ink" x="124" y="103" width="104" height="13" rx="3"/>
+                <rect class="ill-muted" x="124" y="128" width="140" height="6" rx="3"/>
+                <rect class="ill-muted" x="124" y="140" width="120" height="6" rx="3"/>
+                <rect class="ill-btn" x="124" y="158" width="62" height="18" rx="3"/>
+                <rect class="ill-dash" x="298" y="80" width="178" height="104" rx="3"/>
+                <rect class="ill-block" x="318" y="80" width="178" height="34"/>
+                <rect class="ill-block-alt" x="284" y="114" width="178" height="36" opacity="0.6"/>
+                <rect class="ill-block" x="306" y="150" width="178" height="34"/>
+                <rect class="ill-glitch" x="250" y="121" width="64" height="4"/>
+                <rect class="ill-glitch" x="420" y="170" width="50" height="3"/>
+                <rect class="ill-card" x="124" y="204" width="110" height="80" rx="3"/>
+                <rect class="ill-card" x="250" y="216" width="110" height="80" rx="3" transform="rotate(5 305 256)"/>
+                <rect class="ill-card" x="366" y="204" width="110" height="80" rx="3"/>
+              </g>
+              <circle class="ill-badge" cx="508" cy="34" r="22"/>
+              <path class="ill-check" d="M497 34l7 7 14-14"/>
+            </svg>
+          </figure>
+        </li>
+
+        <li class="stage" id="build">
+          <div class="stage-copy">
+            <h3 class="stage-title">Build</h3>
+            <ul class="prices" role="list" aria-label="Prices">
+              <li>Websites from $500</li>
+              <li>Custom tools: free quote</li>
+            </ul>
+            <p class="stage-lede">A new website that loads fast and works on every phone. Or a custom tool built around the way your business actually runs.</p>
+            <ul class="ticks">
+              <li>New websites, built to be fast and easy to use</li>
+              <li>Custom tools and internal apps</li>
+              <li>Everything written down, so you're never stuck</li>
+            </ul>
+          </div>
+          <figure class="stage-visual" aria-hidden="true">
+            <svg class="ill" viewBox="0 0 600 380" focusable="false">
+              <use href="#ill-laptop"/>
+              <defs>
+                <clipPath id="clip-build"><rect x="102" y="34" width="396" height="270" rx="4"/></clipPath>
+                <pattern id="dots-build" width="14" height="14" patternUnits="userSpaceOnUse"><circle class="ill-dot" cx="2" cy="2" r="1.2"/></pattern>
+              </defs>
+              <g clip-path="url(#clip-build)">
+                <rect class="ill-screen" x="102" y="34" width="396" height="270"/>
+                <rect x="102" y="34" width="396" height="270" fill="url(#dots-build)"/>
+                <rect class="ill-bar" x="102" y="34" width="396" height="26"/>
+                <circle class="ill-accent" cx="120" cy="47" r="5"/>
+                <rect class="ill-ink" x="132" y="44" width="44" height="6" rx="3"/>
+                <rect class="ill-muted" x="392" y="44" width="22" height="6" rx="3"/>
+                <rect class="ill-muted" x="422" y="44" width="22" height="6" rx="3"/>
+                <rect class="ill-muted" x="452" y="44" width="28" height="6" rx="3"/>
+                <rect class="ill-ink" x="124" y="84" width="150" height="13" rx="3"/>
+                <rect class="ill-ink" x="124" y="103" width="104" height="13" rx="3"/>
+                <rect class="ill-muted" x="124" y="128" width="140" height="6" rx="3"/>
+                <rect class="ill-muted" x="124" y="140" width="120" height="6" rx="3"/>
+                <rect class="ill-btn" x="124" y="158" width="62" height="18" rx="3"/>
+                <rect class="ill-block" x="298" y="80" width="178" height="104" rx="3"/>
+                <rect class="ill-card" x="124" y="204" width="110" height="80" rx="3"/>
+                <rect class="ill-card" x="245" y="204" width="110" height="80" rx="3"/>
+                <rect class="ill-dash" x="366" y="204" width="110" height="80" rx="3"/>
+                <rect class="ill-shadow" x="384" y="166" width="110" height="80" rx="3" transform="rotate(-7 439 206)"/>
+                <rect class="ill-card-lift" x="378" y="158" width="110" height="80" rx="3" transform="rotate(-7 433 198)"/>
+                <rect class="ill-muted" x="392" y="176" width="60" height="6" rx="3" transform="rotate(-7 433 198)"/>
+                <rect class="ill-muted" x="392" y="188" width="44" height="6" rx="3" transform="rotate(-7 433 198)"/>
+              </g>
+              <path class="ill-cursor" d="M470 224v22l5.5-5.2 4.3 9.6 3.6-1.6-4.2-9.4h7.6z"/>
+            </svg>
+          </figure>
+        </li>
+
+        <li class="stage" id="automate">
+          <div class="stage-copy">
+            <h3 class="stage-title">Automate</h3>
+            <ul class="prices" role="list" aria-label="Price">
+              <li>Free quote</li>
+            </ul>
+            <p class="stage-lede">If you or your staff type the same thing twice, there's probably a better way.</p>
+            <ul class="ticks">
+              <li>Connect tools that don't talk to each other</li>
+              <li>Spreadsheets that do the math for you</li>
+              <li>Online forms and booking that replace paper</li>
+              <li>No more entering the same data twice</li>
+            </ul>
+          </div>
+          <figure class="stage-visual" aria-hidden="true">
+            <svg class="ill" viewBox="0 0 760 380" focusable="false">
+              <path class="ill-link-soft" d="M56 128v90"/>
+              <path class="ill-link-soft" d="M704 128v90"/>
+              <path class="ill-link" d="M86 96c40 0 52 30 82 30"/>
+              <path class="ill-link" d="M86 250c40 0 52-34 82-34"/>
+              <path class="ill-link" d="M674 96c-40 0-52 30-82 30"/>
+              <path class="ill-link" d="M674 250c-40 0-52-34-82-34"/>
+              <use href="#ill-laptop" x="80" width="600" height="380"/>
+              <defs><clipPath id="clip-auto"><rect x="182" y="34" width="396" height="270" rx="4"/></clipPath></defs>
+              <g clip-path="url(#clip-auto)">
+                <rect class="ill-screen" x="182" y="34" width="396" height="270"/>
+                <rect class="ill-bar" x="182" y="34" width="78" height="270"/>
+                <circle class="ill-accent" cx="200" cy="54" r="6"/>
+                <rect class="ill-muted" x="194" y="78" width="54" height="6" rx="3"/>
+                <rect class="ill-muted" x="194" y="94" width="44" height="6" rx="3"/>
+                <rect class="ill-muted" x="194" y="110" width="50" height="6" rx="3"/>
+                <rect class="ill-ink" x="278" y="52" width="120" height="11" rx="3"/>
+                <rect class="ill-card" x="278" y="78" width="90" height="52" rx="3"/>
+                <rect class="ill-card" x="378" y="78" width="90" height="52" rx="3"/>
+                <rect class="ill-card" x="478" y="78" width="82" height="52" rx="3"/>
+                <rect class="ill-ink" x="288" y="92" width="38" height="10" rx="2"/>
+                <rect class="ill-ink" x="388" y="92" width="30" height="10" rx="2"/>
+                <rect class="ill-ink" x="488" y="92" width="34" height="10" rx="2"/>
+                <rect class="ill-muted" x="288" y="110" width="56" height="5" rx="2.5"/>
+                <rect class="ill-muted" x="388" y="110" width="50" height="5" rx="2.5"/>
+                <rect class="ill-muted" x="488" y="110" width="46" height="5" rx="2.5"/>
+                <rect class="ill-accent" x="290" y="232" width="22" height="52" rx="2"/>
+                <rect class="ill-accent" x="322" y="212" width="22" height="72" rx="2"/>
+                <rect class="ill-accent" x="354" y="220" width="22" height="64" rx="2"/>
+                <rect class="ill-accent" x="386" y="190" width="22" height="94" rx="2"/>
+                <rect class="ill-btn" x="418" y="170" width="22" height="114" rx="2"/>
+                <path class="ill-link" d="M456 260c22-6 36-40 58-46s30-34 46-44"/>
+              </g>
+              <circle class="ill-pulse" cx="122" cy="108" r="4.5"/>
+              <circle class="ill-pulse" cx="134" cy="228" r="4.5"/>
+              <circle class="ill-pulse" cx="630" cy="112" r="4.5"/>
+              <circle class="ill-pulse" cx="622" cy="230" r="4.5"/>
+              <circle class="ill-node" cx="56" cy="96" r="30"/>
+              <g class="ill-icon"><rect x="41" y="83" width="30" height="26" rx="2"/><path d="M41 92h30M41 101h30M51 83v26M61 83v26"/></g>
+              <circle class="ill-node" cx="56" cy="250" r="30"/>
+              <g class="ill-icon"><rect x="40" y="239" width="32" height="23" rx="2"/><path d="M41 241l15 11 15-11"/></g>
+              <circle class="ill-node" cx="704" cy="96" r="30"/>
+              <g class="ill-icon"><rect x="689" y="84" width="30" height="27" rx="2"/><path d="M689 92h30M697 80v7M711 80v7M696 99h3M703 99h3M710 99h3M696 105h3M703 105h3"/></g>
+              <circle class="ill-node" cx="704" cy="250" r="30"/>
+              <g class="ill-icon"><path d="M692 234h18l8 8v24h-26z"/><path d="M710 234v8h8M697 248h10M697 254h16M697 260h12"/></g>
+            </svg>
+          </figure>
+        </li>
+      </ol>
+
+      <div class="extras">
+        <article class="extra on-band reveal" id="consultation">
+          <p class="eyebrow">Start here</p>
+          <h3>Free consultation and tech check-up</h3>
+          <ul class="prices" role="list" aria-label="Price"><li>Free</li></ul>
+          <p>An honest look at your website and the tools you use. I'll tell you what's worth fixing. If you don't need anything, I'll tell you that too.</p>
+          <a class="btn" href="#contact">Get a free consultation</a>
+        </article>
+        <article class="extra on-band reveal" id="support">
+          <p class="eyebrow">Keep it running</p>
+          <h3>Website care plan</h3>
+          <ul class="prices" role="list" aria-label="Price"><li>From $50 a month</li></ul>
+          <p>Your site stays updated, watched, and current, so you don't have to think about it.</p>
+          <ul class="ticks">
+            <li>Updates</li>
+            <li>Monitoring</li>
+            <li>Small changes</li>
           </ul>
-        </div>
-
-        <div class="offer">
-          <span class="onum">B</span>
-          <span class="tag">Scoped · Milestone-based</span>
-          <h3>Automation &amp; AI Agent Build</h3>
-          <p>Once the assessment defines the work, this builds and deploys it. AI agents, workflow automation, custom software, integrations, and the web development to finish the result professionally. Payment is milestone-based, so cost tracks with progress, not promises.</p>
-          <ul>
-            <li>AI agents and workflow automation</li>
-            <li>Custom software and integrations</li>
-            <li>Web development and front-end polish</li>
-          </ul>
-        </div>
-
-        <div class="offer">
-          <span class="onum">C</span>
-          <span class="tag">Retainer / hourly</span>
-          <span class="price">$70/hr · Retainer scoped to your needs</span>
-          <h3>Embedded Development &amp; Ongoing Support</h3>
-          <p>Ongoing development without the commitment of a full-time hire. I embed into your team, ship features front to back, maintain and extend what was already built, and give practical guidance on where AI actually fits in your product.</p>
-          <ul>
-            <li>Feature development, front to back</li>
-            <li>Ongoing maintenance and enhancement</li>
-            <li>Practical AI guidance</li>
-          </ul>
-        </div>
-
+        </article>
       </div>
+    </div>
+  </section>
+
+  <!-- FREE WEBSITE CHECK (stage 4: PageSpeed results, gauges, and the 3D laptop screen) -->
+  <section class="check sec" id="check" aria-labelledby="check-title">
+    <div class="wrap check-grid">
+      <div class="check-copy reveal">
+        <p class="eyebrow">Free website check</p>
+        <h2 id="check-title">How does your website do on a phone?</h2>
+        <p>Type in your web address. I'll run Google's free PageSpeed test and explain what it finds in plain English. It usually takes under a minute.</p>
+        <form class="check-form" id="checkForm">
+          <label class="label" for="checkUrl">Your website address</label>
+          <div class="check-row">
+            <input class="input" id="checkUrl" name="url" type="text" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" placeholder="yourbusiness.com" aria-describedby="checkHint" required />
+            <button class="btn" type="submit" disabled>Check my site</button>
+          </div>
+          <p class="hint" id="checkHint">I don't store your address or results. The test runs on Google's PageSpeed service.</p>
+        </form>
+        <p class="stage-note">[STAGE 4] The checker gets wired up in stage 4.</p>
+      </div>
+      <figure class="check-visual reveal" aria-hidden="true">
+        <svg class="ill" viewBox="0 0 600 380" focusable="false">
+          <use href="#ill-laptop"/>
+          <defs><clipPath id="clip-check"><rect x="102" y="34" width="396" height="270" rx="4"/></clipPath></defs>
+          <g clip-path="url(#clip-check)">
+            <rect class="ill-bar" x="102" y="34" width="396" height="270"/>
+            <rect class="ill-screen" x="122" y="54" width="356" height="230" rx="4"/>
+            <rect class="ill-muted" x="142" y="74" width="120" height="10" rx="3"/>
+            <rect class="ill-muted" x="142" y="94" width="316" height="70" rx="3"/>
+            <rect class="ill-muted" x="142" y="176" width="96" height="88" rx="3"/>
+            <rect class="ill-muted" x="252" y="176" width="96" height="88" rx="3"/>
+            <rect class="ill-muted" x="362" y="176" width="96" height="88" rx="3"/>
+            <text class="ill-label" x="300" y="134" text-anchor="middle">YOUR SITE HERE</text>
+          </g>
+        </svg>
+      </figure>
     </div>
   </section>
 
   <!-- WORK -->
-  <section class="sec" id="work">
+  <section class="work sec" id="work" aria-labelledby="work-title">
     <div class="wrap">
       <div class="sec-head reveal">
-        <h2>Founding clients.</h2>
-        <span class="num">/ 02 · Selected work</span>
+        <p class="eyebrow">Work</p>
+        <h2 id="work-title">Recent work.</h2>
+        <p class="sec-lede">Some sites I built from scratch. Some I upgraded or fixed. Each one says exactly what I did.</p>
       </div>
-      <div class="work-grid reveal">
 
-        <div class="work-card">
-          <div class="work-thumb"><span class="glyph">minicine?</span></div>
-          <div class="work-body">
-            <span class="work-status">● Founding client · Now building</span>
-            <h3>minicine?</h3>
-            <p>A Shreveport microcinema that grew into a community stage for local musicians and artists. Run from the heart of founder David Nelson, minicine? never had a rigid schedule, just an open door. The site honors that same spirit.</p>
-            <div class="work-meta">
-              <span class="chip">Web design</span>
-              <span class="chip">Front-end</span>
+      <ul class="work-grid reveal" role="list">
+        <li>
+          <article class="work-card">
+            <div class="work-thumb">
+              <!-- @picture src="work/analemma/live-desktop" widths="480,800,1280" sizes="(min-width: 961px) 360px, (min-width: 641px) 50vw, 100vw" alt="" width="1440" height="900" -->
             </div>
-            <!-- After launch: add live link and outcome -->
-          </div>
-        </div>
-
-        <div class="work-card">
-          <div class="work-thumb"><span class="glyph">ABZ</span></div>
-          <div class="work-body">
-            <span class="work-status">● Founding client · Now building</span>
-            <h3>ABZ Health &amp; Recovery</h3>
-            <p>ABZ Health and Recovery believes every path to sobriety is personal. The site reflects their approach: compassionate, direct, and built to make it as easy as possible for someone to take that first step and ask for help.</p>
-            <div class="work-meta">
-              <span class="chip">Web design</span>
-              <span class="chip">Accessibility</span>
+            <div class="work-body">
+              <h3><a href="/work/analemma/">Analemma</a></h3>
+              <p class="work-role">Design, build, and ongoing maintenance</p>
+              <p>A collection of experimental photographic work by Elizabeth House Evans, gathered from pieces she shared with friends over the years. I designed and built the site, and I keep it secure and up to date.</p>
+              <div class="work-links">
+                <a class="text-link" href="https://analemma.us/" rel="noopener">Visit analemma.us</a>
+              </div>
             </div>
-            <!-- After launch: add live link and outcome -->
-          </div>
-        </div>
+          </article>
+        </li>
 
-        <div class="work-card">
-          <div class="work-thumb"><span class="glyph">ST</span></div>
-          <div class="work-body">
-            <span class="work-status">● Founding client · Now building</span>
-            <h3>SimplyThrive Medical</h3>
-            <p>A weight loss and hormone therapy clinic in Shreveport that runs on relationships, not protocol. Providers call and check in on their patients. The site is built to earn that same trust from the first visit.</p>
-            <div class="work-meta">
-              <span class="chip">Web design</span>
-              <span class="chip">Healthcare</span>
+        <li>
+          <article class="work-card">
+            <div class="work-thumb">
+              <!-- @picture src="work/minicine/live-desktop" widths="480,800,1280" sizes="(min-width: 961px) 360px, (min-width: 641px) 50vw, 100vw" alt="" width="1100" height="688" -->
             </div>
-          </div>
-        </div>
-
-        <div class="work-card">
-          <div class="work-thumb"><span class="glyph">Analemma</span></div>
-          <div class="work-body">
-            <span class="work-status">● Founding client · Live</span>
-            <h3>Analemma</h3>
-            <p>A memorial photography archive built for David Nelson to carry forward the work of Elizabeth House Evans. The galleries move through her range, from portraits and pinhole to cyanotype and mixed media, so the site reads less like a portfolio and more like a place to sit with her eye for the world.</p>
-            <div class="work-meta">
-              <span class="chip">Web design</span>
-              <span class="chip">Photography archive</span>
+            <div class="work-body">
+              <h3><a href="/work/minicine/">minicine?</a></h3>
+              <p class="work-role">Framework upgrades, security, and new features</p>
+              <p>A Shreveport microcinema and community stage. I didn't design this site. I upgraded it from Drupal 8 to Drupal 11, checked all 543 pages, switched over with no downtime, and rebuilt the site search.</p>
+              <div class="work-links">
+                <a class="text-link" href="https://www.minicine.org" rel="noopener">Visit minicine.org</a>
+              </div>
             </div>
-            <a class="work-link" href="https://analemma.us/" target="_blank" rel="noopener">Visit site →</a>
-          </div>
-        </div>
+          </article>
+        </li>
 
-      </div>
+        <li>
+          <article class="work-card">
+            <div class="work-thumb">
+              <!-- @picture src="work/werla/live-desktop" widths="480,800,1280" sizes="(min-width: 961px) 360px, (min-width: 641px) 50vw, 100vw" alt="" width="1440" height="900" -->
+            </div>
+            <div class="work-body">
+              <h3><a href="/work/werla/">WERLA</a></h3>
+              <p class="work-role">Volunteer work, improvements to an existing site</p>
+              <p>Wildlife Education and Rehabilitation of Louisiana. I didn't build this site. I kept their layout and made it work better, starting with site email that had never been sending.</p>
+              <div class="work-links">
+                <a class="text-link" href="https://werla.net/" rel="noopener">Visit werla.net</a>
+              </div>
+            </div>
+          </article>
+        </li>
+
+        <!-- CARD TEMPLATE: copy this <li>, then make a case study page by copying work/werla/.
+             Screenshots: add the site to scripts/capture-screenshots.mjs and run `npm run screenshots`.
+        <li>
+          <article class="work-card">
+            <div class="work-thumb">
+              @picture src="work/SLUG/live-desktop" widths="480,800,1280" sizes="(min-width: 961px) 360px, (min-width: 641px) 50vw, 100vw" alt="" width="1440" height="900"
+            </div>
+            <div class="work-body">
+              <h3><a href="/work/SLUG/">PROJECT NAME</a></h3>
+              <p class="work-role">HONEST ROLE LABEL</p>
+              <p>One or two sentences: what the business is, and exactly what you did.</p>
+              <div class="work-links">
+                <a class="text-link" href="https://EXAMPLE.COM/" rel="noopener">Visit example.com</a>
+              </div>
+            </div>
+          </article>
+        </li>
+        -->
+      </ul>
     </div>
   </section>
 
   <!-- ABOUT -->
-  <section class="sec" id="about">
-    <div class="wrap">
-      <div class="sec-head reveal" style="margin-bottom:38px">
-        <p class="eyebrow">Background</p>
-        <span class="num" style="color:#8d8473">/ 03 · About</span>
+  <section class="about dark sec" id="about" aria-labelledby="about-title">
+    <div class="wrap about-grid">
+      <div class="about-bio reveal">
+        <p class="eyebrow">About</p>
+        <h2 id="about-title">Hi, I'm Ethan Manco.</h2>
+        <p>I'm a software developer based in Shreveport-Bossier. Manco Labs is just me, so the person you talk to is the person doing the work.</p>
+        <p>Before this, I led a product modernization at <strong>Cervey</strong>. I set the design and technical standards, planned the move to a new framework, and wrote everything down so the team could run it without me. At <strong>Emergent Enforcement Solutions</strong>, I built a CJIS-compliant web app from the servers to the screens.</p>
+        <p>I'll explain things in plain English, give you a straight answer about what's worth paying for, and document what I build so you're never locked in.</p>
+        <p class="eyebrow about-stack-label">Tools I work with</p>
+        <ul class="about-stack" role="list">
+          <li class="chip">JavaScript / TypeScript</li>
+          <li class="chip">React</li>
+          <li class="chip">HTML / CSS</li>
+          <li class="chip">Design systems</li>
+          <li class="chip">Python / Django</li>
+          <li class="chip">PostgreSQL</li>
+          <li class="chip">AWS</li>
+          <li class="chip">REST APIs</li>
+          <li class="chip">API integration</li>
+          <li class="chip">Workflow automation</li>
+          <li class="chip">AI agents</li>
+        </ul>
       </div>
-      <div class="about-grid reveal">
-        <div class="about-bio">
-          <h2>The experience to advise. The depth to build it.</h2>
-          <p>Most consultants hand off a slide deck and leave. Most developers build without questioning whether it's the right approach. I've worked both sides, at real depth. At <strong>Cervey</strong>, I assessed the full product suite, set the design and technical standards, planned the migration, and then led the implementation, documenting everything so the team could own it.</p>
-          <p>Before that, at <strong>Emergent Enforcement Solutions</strong>, I built a CJIS-compliant full-stack application end to end: real backend, cloud, and integration work, not just interfaces. That combination is what I bring to Manco Labs: the judgment to tell you honestly what your business needs, and the ability to actually deliver it.</p>
-          <div class="about-stack">
-            <span class="chip">JavaScript / TypeScript</span>
-            <span class="chip">React</span>
-            <span class="chip">HTML / CSS</span>
-            <span class="chip">Design systems</span>
-            <span class="chip">Python / Django</span>
-            <span class="chip">PostgreSQL</span>
-            <span class="chip">AWS</span>
-            <span class="chip">REST APIs</span>
-          </div>
-        </div>
+      <div class="about-side reveal">
+        <figure class="about-photo">
+          <!-- [PLACEHOLDER] Photo of Ethan. Replace this figure's contents with an <img> (alt="Ethan Manco"). -->
+          <figcaption>[PLACEHOLDER] Photo of Ethan</figcaption>
+        </figure>
         <div class="timeline">
           <div class="tl-item">
-            <div class="tl-role">Cervey</div>
-            <div class="tl-meta">Front-end / Product · Most recent</div>
-            <p>Led modernization of the product suite and established platform-wide design standards. Evaluated and planned framework migration, implemented a unified, brand-aligned design system, produced thorough documentation, and contributed to AI-integration roadmapping.</p>
+            <h3 class="tl-role">Cervey</h3>
+            <p class="tl-meta">Front-end / Product · Most recent</p>
+            <p>Led modernization of the product suite and set platform-wide design standards. Evaluated and planned the framework migration, built a unified design system, wrote thorough documentation, and helped plan where AI fit into the product.</p>
           </div>
           <div class="tl-item">
-            <div class="tl-role">Emergent Enforcement Solutions, Senior Software Developer</div>
-            <div class="tl-meta">Mansfield, LA · 01/2023 – 08/2023</div>
-            <p>Built a full-stack application for processing police lidar-gun video so CJIS-compliant workers could adjudicate violations. Engineered FTP servers to relay video to cloud storage, parsed manufacturer DLLs, integrated a DMV license-plate query API with regex auto-fill, and built the adjudicator interface. Django, PostgreSQL, and AWS, working alongside a junior developer.</p>
+            <h3 class="tl-role">Emergent Enforcement Solutions</h3>
+            <p class="tl-meta">Senior Software Developer · Mansfield, LA · 01/2023 to 08/2023</p>
+            <p>Built a full-stack app for processing police lidar-gun video so CJIS-compliant workers could review violations. Set up FTP servers to relay video to cloud storage, parsed manufacturer DLLs, connected a DMV license-plate lookup, and built the review screens. Django, PostgreSQL, and AWS, working alongside a junior developer.</p>
           </div>
         </div>
       </div>
@@ -216,128 +417,73 @@
   </section>
 
   <!-- CONTACT -->
-  <section class="sec" id="contact">
-    <div class="wrap">
-      <div class="contact-grid reveal">
-        <div class="contact-side">
-          <p class="eyebrow">Get in touch</p>
-          <h2 style="margin-top:18px">Wondering where technology can help? <em>Let's find out.</em></h2>
-          <p>Tell me a little about your business and what you're trying to solve. I read every message and reply personally.</p>
-          <div class="contact-direct">
-            <a href="mailto:hello@mancolabs.dev"><span class="lbl">Email</span> hello@mancolabs.dev</a>
-            <a href="tel:3186424582"><span class="lbl">Phone</span> (318) 642-4582</a>
-            <a href="https://calendar.app.google/dEzn8KtDqeCAZYYE8" target="_blank" rel="noopener"><span class="lbl">Or</span> Book a 30-min intro call →</a>
-            <a href="https://github.com/MancoLabs/mancolabs-site" target="_blank" rel="noopener"><span class="lbl">Code</span> GitHub →</a>
+  <section class="contact sec" id="contact" aria-labelledby="contact-title">
+    <div class="wrap contact-grid">
+      <div class="contact-side reveal">
+        <p class="eyebrow">Free consultation</p>
+        <h2 id="contact-title">Tell me what's not working. <em>Let's sort it out.</em></h2>
+        <p>Send a few lines about your business and what you need. I read every message and reply personally.</p>
+        <ul class="contact-direct" role="list">
+          <li><a href="mailto:hello@mancolabs.dev"><span class="lbl">Email</span> hello@mancolabs.dev</a></li>
+          <li><a href="tel:+13186424582"><span class="lbl">Phone</span> (318) 642-4582</a></li>
+          <li><a href="https://calendar.app.google/dEzn8KtDqeCAZYYE8" rel="noopener"><span class="lbl">Or</span> Book a 30-min intro call</a></li>
+        </ul>
+      </div>
+
+      <form id="contactForm" class="reveal" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="068306a2-55e7-4c19-ac86-ede0b6ce2396" />
+        <input type="hidden" name="subject" value="Contact Form - Manco Labs" />
+        <div class="row2">
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" autocomplete="name" required />
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required />
           </div>
         </div>
-
-        <form id="contactForm" action="https://api.web3forms.com/submit" method="POST">
-          <input type="hidden" name="access_key" value="068306a2-55e7-4c19-ac86-ede0b6ce2396" />
-          <input type="hidden" name="subject" value="Contact Form - Manco Labs" />
-          <div class="row2">
-            <div class="field">
-              <label for="name">Name</label>
-              <input id="name" name="name" type="text" required />
-            </div>
-            <div class="field">
-              <label for="email">Email</label>
-              <input id="email" name="email" type="email" required />
-            </div>
-          </div>
-          <div class="row2">
-            <div class="field">
-              <label for="company">Company</label>
-              <input id="company" name="company" type="text" />
-            </div>
-            <div class="field">
-              <label for="service">What fits best?</label>
-              <select id="service" name="service">
-                <option>Operations &amp; AI Assessment</option>
-                <option>Automation or AI Agent Build</option>
-                <option>Embedded development or support</option>
-                <option>Not sure yet</option>
-              </select>
-            </div>
+        <div class="row2">
+          <div class="field">
+            <label for="company">Business name <span class="optional">(optional)</span></label>
+            <input id="company" name="company" type="text" autocomplete="organization" />
           </div>
           <div class="field">
-            <label for="budget">Rough budget (optional)</label>
-            <select id="budget" name="budget">
-              <option>Prefer not to say</option>
-              <option>Under $2k</option>
-              <option>$2k – $5k</option>
-              <option>$5k – $15k</option>
-              <option>$15k+</option>
+            <label for="service">What fits best?</label>
+            <select id="service" name="service">
+              <option>Fix something</option>
+              <option>Build a website</option>
+              <option>Build a custom tool</option>
+              <option>Automate a task</option>
+              <option>Ongoing support</option>
+              <option selected>Not sure yet</option>
             </select>
           </div>
-          <div class="field">
-            <label for="message">Project details</label>
-            <textarea id="message" name="message" required></textarea>
-          </div>
-          <button class="btn" type="submit" style="justify-self:start">Send message</button>
-          <p id="formMsg" role="status" aria-live="polite"></p>
-          <p class="form-note">Prefer email? Reach me directly at hello@mancolabs.dev.</p>
-        </form>
-      </div>
+        </div>
+        <div class="field">
+          <label for="budget">Rough budget <span class="optional">(optional)</span></label>
+          <select id="budget" name="budget">
+            <option>Not sure yet</option>
+            <option>Under $250</option>
+            <option>$250 to $500</option>
+            <option>$500 to $1,000</option>
+            <option>$1,000 to $2,500</option>
+            <option>$2,500+</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="message">What do you need help with?</label>
+          <textarea id="message" name="message" required></textarea>
+        </div>
+        <button class="btn" type="submit" style="justify-self:start">Send message</button>
+        <p id="formMsg" role="status" aria-live="polite"></p>
+        <p class="form-note">Prefer email? Reach me directly at hello@mancolabs.dev.</p>
+      </form>
     </div>
   </section>
 
 </main>
 
-<footer>
-  <div class="wrap foot">
-    <a href="#top" class="brand"><svg viewBox="287 41 106 109" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M 308,112 C 320,121 358,104 373,112 L 386,138 Q 389,145 377,145 L 303,145 Q 291,145 295,138 Z" fill="#7AAD80" opacity="0.4"/>
-    <path d="M 323,45 L 323,80 L 295,138 Q 291,145 303,145 L 377,145 Q 389,145 386,138 L 357,80 L 357,45" stroke="#7AAD80" stroke-width="8" stroke-linejoin="round"/>
-  </svg>Manco Labs</a>
-    <span class="copy">Manco Labs LLC · © 2026 · Built front to back.</span>
-  </div>
-</footer>
-
-<script>
-  // Mobile menu
-  const toggle = document.getElementById("menuToggle");
-  const links = document.getElementById("navlinks");
-  toggle.addEventListener("click", () => links.classList.toggle("open"));
-  links.querySelectorAll("a").forEach(a => a.addEventListener("click", () => links.classList.remove("open")));
-
-  // Nav border on scroll
-  const header = document.getElementById("header");
-  const onScroll = () => header.classList.toggle("scrolled", window.scrollY > 12);
-  onScroll();
-  window.addEventListener("scroll", onScroll, { passive: true });
-
-  // Reveal on scroll
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-    });
-  }, { threshold: 0.12 });
-  document.querySelectorAll(".reveal").forEach(el => io.observe(el));
-
-  // Contact form
-  const form = document.getElementById("contactForm");
-  const msg = document.getElementById("formMsg");
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    msg.className = ""; msg.textContent = "Sending…";
-    try {
-      const res = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(Object.fromEntries(new FormData(form))),
-      });
-      const out = await res.json();
-      if (out.success) {
-        msg.className = "ok"; msg.textContent = "✓ Thanks, I'll be in touch shortly.";
-        form.reset();
-      } else {
-        msg.className = "err"; msg.textContent = "Something went wrong. Email hello@mancolabs.dev instead.";
-      }
-    } catch {
-      msg.className = "err"; msg.textContent = "Network error. Email hello@mancolabs.dev instead.";
-    }
-  });
-</script>
-
+<!-- @include footer.html -->
 </body>
 </html>

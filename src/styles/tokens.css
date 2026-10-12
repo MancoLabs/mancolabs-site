@@ -1,0 +1,114 @@
+/* ── PALETTE ─────────────────────────────────
+   The brand colors. Unchanged from the original site.
+   Everything else (CSS, SVG, 3D) reads from these. */
+:root {
+  --paper:       #F3F5F2;
+  --paper-2:     #D0E4CC;
+  --paper-3:     #B8D4B5;
+  --ink:         #1A2420;
+  --ink-soft:    #5E8A68;
+  --ink-faint:   #8AAF90;
+  --accent:      #7AAD80;
+  --accent-deep: #4A7550;
+  --line:        rgba(26, 36, 32, 0.1);
+  --line-strong: rgba(26, 36, 32, 0.18);
+  --radius: 4px;
+  --maxw: 1140px;
+  --sans: "Inter", "Inter Fallback", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "DM Sans", "DM Sans Fallback", system-ui, sans-serif;
+}
+
+/* ── ROLES ───────────────────────────────────
+   Which palette color does which job. Every text pairing passes WCAG AA:
+   on --paper: ink 14.5, accent-deep 4.85, ink-soft 3.61 (large text only)
+   on --paper-2: ink 11.9
+   on --ink: paper 14.5, paper-3 10.0, accent 6.2, ink-faint 6.5
+   --text-display is for large text only (24px+, or 19px+ bold). */
+:root {
+  --bg: var(--paper);
+  --surface: var(--paper);
+  --band: var(--paper-2);
+  --text: var(--ink);
+  --text-2: var(--accent-deep);
+  --text-display: var(--ink-soft);
+  --accent-text: var(--accent-deep);
+  --text-2-on-band: var(--ink);
+  --text-display-on-band: var(--accent-deep);
+  --border: var(--line-strong);
+  --hairline: var(--line);
+  --field-border: var(--ink-soft);
+  --focus: var(--accent-deep);
+  --deco: var(--accent);
+  --btn-bg: var(--ink);
+  --btn-text: var(--paper);
+  --btn-hover: var(--accent-deep);
+  --btn-hover-text: var(--paper);
+  --header-bg: rgba(243, 245, 242, 0.9);
+  --shadow: rgba(26, 36, 32, 0.08);
+  --ill-frame: var(--ink);
+  --ill-base: color-mix(in srgb, var(--ink) 82%, var(--paper));
+  color-scheme: light;
+}
+
+/* Dark roles. Used by .dark sections, and site-wide when the OS is in dark mode.
+   Surfaces are mixed from palette colors, the same way --line is. */
+.dark {
+  --bg: var(--ink);
+  --surface: color-mix(in srgb, var(--ink) 90%, var(--paper));
+  --band: color-mix(in srgb, var(--ink) 84%, var(--accent-deep));
+  --text: var(--paper);
+  --text-2: var(--paper-3);
+  --text-display: var(--accent);
+  --accent-text: var(--accent);
+  --text-2-on-band: var(--paper-3);
+  --text-display-on-band: var(--accent);
+  --border: rgba(243, 245, 242, 0.22);
+  --hairline: rgba(243, 245, 242, 0.12);
+  --field-border: var(--ink-faint);
+  --focus: var(--accent);
+  --deco: var(--accent);
+  --btn-bg: var(--paper);
+  --btn-text: var(--ink);
+  --btn-hover: var(--accent);
+  --btn-hover-text: var(--ink);
+  --header-bg: rgba(26, 36, 32, 0.88);
+  --shadow: rgba(0, 0, 0, 0.32);
+  --ill-frame: color-mix(in srgb, var(--ink) 72%, var(--paper));
+  --ill-base: color-mix(in srgb, var(--ink) 60%, var(--paper));
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: var(--ink);
+    --surface: color-mix(in srgb, var(--ink) 90%, var(--paper));
+    --band: color-mix(in srgb, var(--ink) 84%, var(--accent-deep));
+    --text: var(--paper);
+    --text-2: var(--paper-3);
+    --text-display: var(--accent);
+    --accent-text: var(--accent);
+    --text-2-on-band: var(--paper-3);
+    --text-display-on-band: var(--accent);
+    --border: rgba(243, 245, 242, 0.22);
+    --hairline: rgba(243, 245, 242, 0.12);
+    --field-border: var(--ink-faint);
+    --focus: var(--accent);
+    --deco: var(--accent);
+    --btn-bg: var(--paper);
+    --btn-text: var(--ink);
+    --btn-hover: var(--accent);
+    --btn-hover-text: var(--ink);
+    --header-bg: rgba(26, 36, 32, 0.88);
+    --shadow: rgba(0, 0, 0, 0.32);
+    --ill-frame: color-mix(in srgb, var(--ink) 72%, var(--paper));
+    --ill-base: color-mix(in srgb, var(--ink) 60%, var(--paper));
+    color-scheme: dark;
+  }
+}
+
+/* Tinted band: re-point secondary text so it stays readable on --band. */
+.on-band {
+  --text-2: var(--text-2-on-band);
+  --text-display: var(--text-display-on-band);
+  --accent-text: var(--text-2-on-band);
+}
