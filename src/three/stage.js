@@ -76,9 +76,12 @@ export class Stage {
       // only appear later (the laptop, the services effects), so nothing has to
       // compile in the middle of a scroll.
       const restore = this.scene3.showAllForCompile?.();
-      await renderer.compileAsync(this.scene, this.camera);
-      restore?.();
       for (const t of this.scene3.textures?.() || []) renderer.initTexture?.(t);
+      await renderer.compileAsync(this.scene, this.camera);
+      // Then draw everything once while the canvas is still invisible: some GPU
+      // drivers only finish setting up a shader the first time it draws.
+      renderer.render(this.scene, this.camera);
+      restore?.();
 
       this.frames = 0;
       this.sync();

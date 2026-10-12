@@ -358,6 +358,8 @@ export class HeroScene {
     drawIcons(this.iconCanvas.getContext('2d'), P);
     for (const t of [this.atlas, this.screenTex, this.gridTex, this.iconTex]) t.needsUpdate = true;
     this.check.shown = -2; // redraw the check screen in the new colors
+    // Draw it now too: WebGPU can't upload a canvas that has never been drawn on.
+    if (!this.check.film) this.drawCheckScreen(0);
     const u = this.u;
     u.bg.value.set(P.bg);
     u.back.value.set(P.paper3);
@@ -639,10 +641,15 @@ export class HeroScene {
     const parts = [this.papers, this.laptop, this.pieceMesh, this.auto];
     const before = parts.map((o) => o.visible);
     const bodyY = this.body.scale.y;
+    // Three.js skips anything outside the camera when compiling, and the laptop
+    // starts below the fold, so switch culling off until this is restored.
+    const culled = [];
+    this.root.traverse((o) => { if (o.frustumCulled) { culled.push(o); o.frustumCulled = false; } });
     parts.forEach((o) => { o.visible = true; });
     this.body.scale.y = 1;
     return () => {
       parts.forEach((o, i) => { o.visible = before[i]; });
+      culled.forEach((o) => { o.frustumCulled = true; });
       this.body.scale.y = bodyY;
     };
   }
