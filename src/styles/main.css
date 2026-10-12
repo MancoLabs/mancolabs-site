@@ -260,6 +260,14 @@ main, .site-footer { position: relative; z-index: 1; }
   .hero-cta { margin-top: 26px; }
 }
 
+/* Phones (boot.js prepareFlow): the canvas scrolls with the page. It sits in a
+   sticky holder over the services rows, or in the website check box, behind
+   the text. JavaScript sets the holder's offsets and the canvas's box. */
+.flow-run { display: flow-root; }
+.flow-pin { position: sticky; height: 0; z-index: -1; pointer-events: none; }
+.stage-canvas.flow { position: absolute; inset: auto; width: auto; height: auto; z-index: -1; }
+.flow-3d .check-visual { position: relative; }
+
 /* Social share image capture (?og), used by scripts/render-posters.mjs. */
 .og-mode .skip, .og-mode .site-header, .og-mode .site-footer,
 .og-mode main > :not(.hero), .og-mode .hero .lead, .og-mode .hero-cta, .og-mode .hero-stage { display: none !important; }

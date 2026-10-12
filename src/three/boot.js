@@ -9,6 +9,8 @@ const POSTER = params.has('poster') || params.has('og');
 // Phones and tablets: timed animations instead of scroll-scrubbing, which
 // stutters with touch momentum scrolling.
 const TOUCH = matchMedia('(pointer: coarse)').matches;
+// Phones: the canvas scrolls with the page instead of being redrawn to follow it.
+const FLOW = TOUCH && matchMedia('(max-width: 699px)').matches;
 
 let teardown = null;
 let host = null;
@@ -71,9 +73,10 @@ async function launch({ scene, prepare }) {
 
   canvas.className = 'stage-canvas';
   canvas.setAttribute('aria-hidden', 'true');
-  document.body.prepend(canvas);
+  if (hooks.mount) hooks.mount(canvas);
+  else document.body.prepend(canvas);
   const dpr = Math.min(window.devicePixelRatio || 1, POSTER ? 3 : ctx.coarse ? 1.5 : 2);
-  ctx.size = () => ({ width: canvas.clientWidth, height: canvas.clientHeight });
+  ctx.size = hooks.size || (() => ({ width: canvas.clientWidth, height: canvas.clientHeight }));
   ctx.forceWebGL = forceWebGL;
 
   const startTimer = setTimeout(() => off('the renderer took too long to start'), 15000);
@@ -108,6 +111,7 @@ async function launch({ scene, prepare }) {
     dpr,
     palette: readPalette(),
     layout: hooks.layout(),
+    flow: hooks.flow?.() || null,
     forceWebGL,
     poster: POSTER,
   };
@@ -139,6 +143,7 @@ function wireCommon(ctx, hooks) {
   const ro = new ResizeObserver(() => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
+      if (hooks.relayout) return hooks.relayout();
       host?.send({ type: 'resize', ...ctx.size() });
       host?.send({ type: 'layout', layout: hooks.layout() });
     }, 150);
@@ -191,6 +196,7 @@ function startHero() {
       const viewport = stableViewport();
       ctx.cleanups.push(viewport.dispose);
       const bandEl = heroEl.querySelector('.hero-band');
+      if (FLOW) return prepareFlow(ctx, { gsap, ScrollTrigger, viewport, bandEl, anchorEl });
 
       const measure = () => {
         const sy = window.scrollY;
@@ -434,6 +440,290 @@ function startHero() {
       };
     },
   });
+}
+
+// ── Phones: the canvas scrolls with the page ──
+// A phone scrolls the page on its own thread, so 3D that is redrawn to follow
+// the scroll always lands a frame late and jitters against the page. Here
+// nothing in the 3D follows the scroll. One canvas covers the hero band down to
+// the laptop box and lives in a position: sticky holder, so the browser itself
+// carries it up and holds it over the services rows. Past the rows it moves into
+// the website check box while both are off screen. Inside it, only timed
+// animations run: the assembly, the services effects, the scanning light.
+const PIN_Y = 84;
+const M_TOP = 48, M_BOTTOM = 64, M_CHECK = 48; // room around the boxes for papers and icons
+
+function prepareFlow(ctx, { gsap, ScrollTrigger, viewport, bandEl, anchorEl }) {
+  const storyEl = document.querySelector('[data-anchor="story"]');
+  const checkEl = document.querySelector('[data-anchor="check"]');
+  const headEl = storyEl?.closest('section')?.querySelector('.sec-head');
+  const firstVisual = storyEl?.querySelector('.stage-visual');
+  if (!bandEl || !storyEl || !checkEl || !headEl || !firstVisual) {
+    ctx.off('unexpected page layout');
+    return null;
+  }
+
+  // The sticky holder sits at the top of a wrapper around the services heading
+  // and rows, so it lets go where the rows end. It takes no room in the layout:
+  // the holder is zero height, and a spacer (cancelled by a negative margin)
+  // stretches the wrapper so the laptop's bottom, not the holder's, meets the end.
+  const run = document.createElement('div');
+  run.className = 'flow-run';
+  headEl.before(run);
+  run.append(headEl, storyEl);
+  const pin = document.createElement('div');
+  pin.className = 'flow-pin';
+  pin.setAttribute('aria-hidden', 'true');
+  const spacer = document.createElement('div');
+  spacer.setAttribute('aria-hidden', 'true');
+  run.prepend(pin);
+  run.append(spacer);
+  root.classList.add('flow-3d');
+  ctx.cleanups.push(() => {
+    root.classList.remove('flow-3d');
+    run.before(headEl, storyEl);
+    run.remove();
+  });
+
+  // Geometry, in page pixels, measured once and again only when the layout changes.
+  // Each canvas is a window onto a virtual screen (vw x vh), with off0/off1 giving
+  // where the window sits on it (see Stage.applyFlow).
+  let G = null;
+  const measure = () => {
+    const sy = window.scrollY;
+    const doc = (el) => { const r = el.getBoundingClientRect(); return { x: r.left, y: r.top + sy, w: r.width, h: r.height }; };
+    const vw = document.documentElement.clientWidth;
+    const vh = viewport.get();
+    const A = doc(anchorEl), B = doc(bandEl), R = doc(run), list = doc(storyEl), C = doc(checkEl);
+    const D = R.y - A.y; // the holder sits D below the laptop box
+    const top = B.y - M_TOP; // page y of the run canvas's top edge
+    G = {
+      vw, vh, D,
+      extra: Math.max(0, D - A.h),
+      run: {
+        left: -R.x, top: top - R.y, width: vw, height: A.y + A.h + M_BOTTOM - top,
+        laptop: { x: A.x, y: A.y - top, w: A.w, h: A.h },
+        band: { x: B.x, y: B.y - top, w: B.w, h: B.h },
+        off0: top, // the page at the top, as the band always looked
+        off1: PIN_Y - (A.y - top), // the laptop pinned PIN_Y from the top
+      },
+      check: {
+        left: -C.x, top: -M_CHECK, width: vw, height: C.h + 2 * M_CHECK,
+        laptop: { x: C.x, y: M_CHECK, w: C.w, h: C.h },
+        off0: (vh - C.h) / 2 - M_CHECK, off1: (vh - C.h) / 2 - M_CHECK,
+      },
+      // Switch canvases halfway between the end of the rows and the check box.
+      gapMid: (list.y + list.h + M_BOTTOM + C.y - M_CHECK) / 2,
+    };
+    pin.style.top = `${PIN_Y + D}px`;
+    spacer.style.height = `${G.extra}px`;
+    run.style.marginBottom = `${-G.extra}px`;
+  };
+  measure();
+
+  let canvas = null;
+  let mode = window.scrollY + G.vh / 2 > G.gapMid ? 'check' : 'run';
+  const intro = { p: 0 };
+  let introTween = null;
+  const place = (m) => {
+    mode = m;
+    const g = G[m];
+    const parent = m === 'run' ? pin : checkEl;
+    if (canvas.parentNode !== parent) parent.append(canvas);
+    Object.assign(canvas.style, { left: `${g.left}px`, top: `${g.top}px`, width: `${g.width}px`, height: `${g.height}px` });
+    if (m === 'run') {
+      introTween?.kill();
+      introTween = null;
+      intro.p = 0;
+    }
+  };
+  const flowConfig = () => {
+    const g = G[mode];
+    return { vw: G.vw, vh: G.vh, width: g.width, height: g.height, off0: g.off0, off1: g.off1 };
+  };
+  const sceneLayout = () => ({ hero: G.run.band, keepOut: G.run.band, band: G.run.band, assembly: G.run.laptop });
+
+  // Assembly: timed. The papers leave the band once it has scrolled out of view
+  // and fly back when it returns. Poster captures stay at the start.
+  const proxy = { assemble: 0 };
+  if (!POSTER) {
+    let tween = null;
+    const playTo = (to) => {
+      tween?.kill();
+      tween = gsap.to(proxy, { assemble: to, duration: 1.35 * Math.abs(to - proxy.assemble), ease: 'none' });
+    };
+    const st = ScrollTrigger.create({ trigger: bandEl, start: 'bottom top', onEnter: () => playTo(1), onLeaveBack: () => playTo(0) });
+    if (st.progress > 0 || window.scrollY > st.start) proxy.assemble = 1;
+    ctx.cleanups.push(() => { st.kill(); tween?.kill(); });
+  }
+
+  // Services: each stage plays through on its own once its row reaches the
+  // reading area under the laptop, and rewinds if you scroll back above it.
+  const rows = [...storyEl.querySelectorAll('.stage')];
+  const fadeEls = [...headEl.children, ...storyEl.querySelectorAll('.stage-copy > :not(ul), .stage-copy li')];
+  const story = { enter: 0, fix: 0, build: 0, auto: 0, exit: 0 };
+  let fading = false;
+  const resetFade = () => {
+    if (!fading) return;
+    fading = false;
+    fadeEls.forEach((el) => { el.style.opacity = ''; });
+  };
+  ctx.cleanups.push(resetFade);
+  let lastFrame = performance.now();
+
+  const frameState = () => {
+    const now = performance.now();
+    const dt = Math.min(0.1, (now - lastFrame) / 1000);
+    lastFrame = now;
+    const vh = viewport.get();
+    const want = window.scrollY + vh / 2 > G.gapMid ? 'check' : 'run';
+    if (want !== mode) {
+      place(want);
+      host?.send({ type: 'flow', flow: flowConfig() });
+    }
+    const list = storyEl.getBoundingClientRect();
+    const vH = firstVisual.getBoundingClientRect().height;
+    story.enter = clamp01((vh - list.top) / Math.max(1, vh - PIN_Y));
+    const focus = PIN_Y + vH + (vh - PIN_Y - vH) * 0.45;
+    rows.forEach((row, i) => {
+      const key = ['fix', 'build', 'auto'][i];
+      if (!key) return;
+      const target = row.getBoundingClientRect().top < focus ? 1 : 0;
+      const step = dt / 1.3;
+      story[key] = target > story[key] ? Math.min(1, story[key] + step) : Math.max(0, story[key] - step);
+    });
+    story.exit = mode === 'check' ? 1 : 0;
+
+    // Text fades as it slides under the pinned laptop.
+    let faded = false;
+    if (mode === 'run') {
+      const laptopTop = pin.getBoundingClientRect().top - G.D;
+      if (laptopTop <= PIN_Y + 0.5) {
+        const line = laptopTop + G.run.laptop.h - 12;
+        fadeEls.forEach((el) => {
+          const f = clamp01((el.getBoundingClientRect().top - line) / 56);
+          el.style.opacity = f < 1 ? f.toFixed(3) : '';
+        });
+        fading = faded = true;
+      }
+    }
+    if (!faded) resetFade();
+
+    // Website check: the laptop opens once its box is in view.
+    if (mode === 'check' && !POSTER && intro.p === 0 && !introTween) {
+      const r = checkEl.getBoundingClientRect();
+      if (r.top < vh * 0.8 && r.bottom > vh * 0.2) {
+        introTween = gsap.to(intro, { p: 1, duration: 0.9, ease: 'power2.out' });
+      }
+    }
+    const assemble = mode === 'run' ? proxy.assemble : 0.78 + 0.22 * intro.p;
+    return { scrollY: 0, assemble, laptop: G[mode].laptop, story: { ...story } };
+  };
+
+  const mq = matchMedia('(max-width: 699px)');
+  const onMq = () => { if (!mq.matches) ctx.off('the page switched to the wide layout'); };
+  mq.addEventListener('change', onMq);
+  ctx.cleanups.push(() => { mq.removeEventListener('change', onMq); introTween?.kill(); });
+
+  let aboutCanvas = null;
+  return {
+    layout: sceneLayout,
+    mount: (c) => {
+      canvas = c;
+      canvas.classList.add('flow');
+      place(mode);
+    },
+    size: () => ({ width: G[mode].width, height: G[mode].height }),
+    flow: flowConfig,
+    relayout: () => {
+      measure();
+      place(mode);
+      host?.send({ type: 'flow', flow: flowConfig() });
+      host?.send({ type: 'layout', layout: sceneLayout() });
+    },
+    started: () => {
+      host.send({ type: 'frame', state: frameState() });
+      const onCheck = (e) => forwardCheck(e.detail);
+      addEventListener('check:state', onCheck);
+      ctx.cleanups.push(() => removeEventListener('check:state', onCheck));
+      if (window.__checkState) forwardCheck(window.__checkState);
+    },
+    onMessage: (msg) => {
+      if (msg.type === 'about-ready') aboutCanvas?.classList.add('is-on');
+      if (msg.type === 'about-error') aboutCanvas?.remove();
+    },
+    wire: () => {
+      let active = true;
+      let last = '';
+      const aboutEl = document.querySelector('.about');
+      // The state is worked out every frame (the mode switch and the timed stages
+      // depend on it) but only sent while the canvas is near the screen.
+      const tick = () => {
+        if (!host) return;
+        const state = frameState();
+        if (!active) return;
+        const key = JSON.stringify(state);
+        if (key !== last) {
+          last = key;
+          host.send({ type: 'frame', state });
+        }
+      };
+      gsap.ticker.add(tick);
+      ctx.cleanups.push(() => gsap.ticker.remove(tick));
+
+      // Render only while the canvas is near the screen and the tab is visible.
+      let near = true;
+      let aboutNear = false;
+      let aboutOn = false;
+      const sync = () => {
+        const on = near && !document.hidden;
+        if (on !== active) {
+          active = on;
+          if (on) {
+            last = '';
+            tick();
+          }
+          host?.send({ type: 'active', value: on });
+        }
+        const a = aboutNear && !document.hidden;
+        if (a !== aboutOn && aboutCanvas) {
+          aboutOn = a;
+          host?.send({ type: 'about-active', value: a });
+        }
+      };
+      const io = new IntersectionObserver((entries) => {
+        near = entries.at(-1).isIntersecting;
+        sync();
+      }, { rootMargin: '25% 0px' });
+      io.observe(canvas);
+      const aboutIo = new IntersectionObserver((entries) => {
+        aboutNear = entries.at(-1).isIntersecting;
+        sync();
+      });
+      document.addEventListener('visibilitychange', sync);
+      ctx.cleanups.push(() => { io.disconnect(); aboutIo.disconnect(); document.removeEventListener('visibilitychange', sync); });
+
+      // About: its own small canvas inside the section, as on desktop.
+      if (aboutEl) {
+        aboutCanvas = document.createElement('canvas');
+        aboutCanvas.className = 'about-canvas';
+        aboutCanvas.setAttribute('aria-hidden', 'true');
+        aboutEl.prepend(aboutCanvas);
+        const aSize = () => ({ width: Math.max(1, Math.round(aboutEl.clientWidth)), height: Math.max(1, Math.round(aboutEl.clientHeight)) });
+        if (host.mode === 'worker' && 'transferControlToOffscreen' in aboutCanvas) {
+          const offscreen = aboutCanvas.transferControlToOffscreen();
+          host.send({ type: 'about-init', canvas: offscreen, ...aSize() }, [offscreen]);
+        } else {
+          host.send({ type: 'about-init', canvas: aboutCanvas, ...aSize() });
+        }
+        const aro = new ResizeObserver(() => host?.send({ type: 'about-resize', ...aSize() }));
+        aro.observe(aboutEl);
+        aboutIo.observe(aboutEl);
+        const c = aboutCanvas;
+        ctx.cleanups.push(() => { aro.disconnect(); c.remove(); });
+      }
+    },
+  };
 }
 
 // ── 404 page ──────────────────────────────────

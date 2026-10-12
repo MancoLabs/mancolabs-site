@@ -32,6 +32,7 @@ export class Stage {
     switch (msg.type) {
       case 'init': return this.init(msg);
       case 'resize': return this.resize(msg);
+      case 'flow': return this.applyFlow(msg.flow);
       case 'layout': this.scene3?.setLayout(msg.layout); return;
       case 'frame': Object.assign(this.state, msg.state); return;
       case 'pointer': this.scene3?.setPointer(msg.x, msg.y, msg.t, msg.down); return;
@@ -47,7 +48,7 @@ export class Stage {
     }
   }
 
-  async init({ canvas, width, height, dpr, palette, layout, forceWebGL, poster, scene = 'hero' }) {
+  async init({ canvas, width, height, dpr, palette, layout, forceWebGL, poster, scene = 'hero', flow = null }) {
     try {
       this.poster = poster;
       this.dpr = dpr;
@@ -64,13 +65,15 @@ export class Stage {
       this.camera = new PerspectiveCamera(FOV, width / height, 0.1, 60);
       this.camera.position.set(0, 0, CAM_Z);
       this.view = { width, height, camZ: CAM_Z, ppu: 0 };
+      this.size = { width, height };
       this.updateView(width, height);
+      if (flow) this.applyFlow(flow);
 
       this.scene = new Scene();
       this.scene3 = new SCENES[scene]({ palette, mobile: width < 700 });
       this.scene3.setLayout(layout);
       this.scene.add(this.scene3.root);
-      this.scene3.update(0, 0, this.state, this.view);
+      this.scene3.update(0, 0, this.sceneState(), this.view);
 
       // Compile every shader and upload every texture now, including parts that
       // only appear later (the laptop, the services effects), so nothing has to
@@ -103,6 +106,34 @@ export class Stage {
     }
   }
 
+  // Phones ("flow" mode): the canvas scrolls with the page, so it is a fixed
+  // window onto a virtual screen (vw x vh). off is where the canvas sits on that
+  // screen; it moves from off0 (the hero band's view) to off1 (the pinned
+  // laptop's view) as the papers fly, so each looks the way it did before.
+  applyFlow(flow) {
+    if (!this.renderer) return;
+    this.flow = flow;
+    this.flowOff = null;
+    this.renderer.setSize(flow.width, flow.height, false);
+    this.size = { width: flow.width, height: flow.height };
+    this.updateView(flow.vw, flow.vh);
+  }
+
+  // What the scene sees each frame. Outside flow mode, exactly the page state.
+  sceneState() {
+    const f = this.flow;
+    if (!f) return this.state;
+    const t = Math.min(1, Math.max(0, (this.state.assemble || 0) / 0.85));
+    const off = f.off0 + (f.off1 - f.off0) * (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+    if (off !== this.flowOff) {
+      this.flowOff = off;
+      this.camera.setViewOffset(f.vw, f.vh, 0, off, f.width, f.height);
+    }
+    const L = this.state.laptop;
+    // Canvas pixels to virtual-screen pixels: shift by off (the scene treats it like scroll).
+    return { ...this.state, scrollY: -off, laptop: L && { ...L, y: L.y + off } };
+  }
+
   updateView(width, height) {
     this.view.width = width;
     this.view.height = height;
@@ -114,6 +145,7 @@ export class Stage {
   resize({ width, height }) {
     if (!this.renderer) return;
     this.renderer.setSize(width, height, false);
+    this.size = { width, height };
     this.updateView(width, height);
   }
 
@@ -131,7 +163,7 @@ export class Stage {
       this.renderer.setAnimationLoop((now) => this.frame(now));
     } else {
       // One last frame with the latest scroll position, then stop.
-      this.scene3.update(this.time, 0, this.state, this.view);
+      this.scene3.update(this.time, 0, this.sceneState(), this.view);
       this.renderer.render(this.scene, this.camera);
       this.renderer.setAnimationLoop(null);
       this.post({ type: 'loop', running: false });
@@ -144,7 +176,7 @@ export class Stage {
     this.last = now;
     if (!this.poster) this.time += dt;
     if (this.mainActive || !this.ready) {
-      this.scene3.update(this.time, this.poster ? 0 : dt, this.state, this.view);
+      this.scene3.update(this.time, this.poster ? 0 : dt, this.sceneState(), this.view);
       this.renderer.render(this.scene, this.camera);
     }
     if (this.aboutActive) this.about?.render(this.time, dt);
@@ -184,7 +216,7 @@ export class Stage {
     if (avg > 1 / 42 && this.dpr > 1) {
       this.dpr = Math.max(1, this.dpr - 0.25);
       this.renderer.setPixelRatio(this.dpr);
-      this.renderer.setSize(this.view.width, this.view.height, false);
+      this.renderer.setSize(this.size.width, this.size.height, false);
     } else if (fps < 30) {
       if (++w.strikes >= 2) this.post({ type: 'slow', fps: Math.round(fps) });
     } else {

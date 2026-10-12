@@ -177,18 +177,31 @@ Layout is identical in every state. The laptop is always fitted inside a page bo
 
 ### The laptop's path
 
-`frameState()` in `boot.js` works out, every frame, which box the laptop should fill and how far each stage has progressed. The page marks three boxes:
+On desktop and tablets, `frameState()` in `boot.js` works out, every frame, which box the laptop should fill and how far each stage has progressed. Phones work differently (see "Phones: the canvas scrolls with the page" below). The page marks three boxes:
 
-1. **`[data-anchor="assembly"]`:** where the papers assemble into the laptop. On desktop, progress is scrubbed to scroll with GSAP ScrollTrigger. On touch devices it plays on its own over about 1.3 seconds once the laptop box is about a third into view, and plays in reverse if you scroll back above that point. Scroll-scrubbing stutters with touch momentum scrolling. The Fix, Build, and Automate effects work the same way on touch devices: each plays through when its row reaches the reading area.
+1. **`[data-anchor="assembly"]`:** where the papers assemble into the laptop. On desktop, progress is scrubbed to scroll with GSAP ScrollTrigger. On touch devices it plays on its own over about 1.3 seconds and plays in reverse if you scroll back. Tablets start it once the laptop box is about a third into view; phones start it once the paper band has scrolled out of view. Scroll-scrubbing stutters with touch momentum scrolling. The Fix, Build, and Automate effects work the same way on touch devices: each plays through when its row reaches the reading area.
 2. **`[data-anchor="story"]`:** the Fix / Build / Automate rows.
    - **Desktop:** the laptop is held in the middle of the right-hand column while the rows scroll past.
-   - **Phones:** it stays at the top of the screen, and the text fades as it slides up underneath, so the two never overlap.
+   - **Phones:** it stays at the top of the screen (held by `position: sticky`), and the text fades as it slides up underneath, so the two never overlap.
    - **Effects:** the screen glitches and repairs (Fix), interface pieces fly in and snap into place (Build), and four tool icons link up into a network with data pulses along the links (Automate).
-3. **`[data-anchor="check"]`:** the website check. The screen shows the visitor's site.
+3. **`[data-anchor="check"]`:** the website check. The screen shows the visitor's site. On phones the laptop opens when its box comes into view.
 
 **Between the boxes:**
 - **Desktop:** the laptop glides, and it shrinks while passing behind the two service cards.
 - **Phones:** it moves only while both ends are off screen.
+
+### Phones: the canvas scrolls with the page
+
+A phone scrolls the page on its own thread, separately from JavaScript. Anything the 3D moves to follow the scroll is drawn a frame or more late, so it lags and jitters against the page. So on phones (touch screen and narrower than 700px), nothing in the 3D follows the scroll position. `prepareFlow()` in `boot.js` sets this up:
+
+- **One canvas inside the page, not fixed to the screen.** It covers the hero's paper band down to the laptop box, so the papers really fly from the band into the laptop, all inside one canvas.
+- **A sticky holder.** The canvas sits in `.flow-pin`, a zero-height `position: sticky` box at the top of a wrapper (`.flow-run`) around the services heading and rows. The browser carries it up with the page, holds the laptop 84px from the top while the rows scroll underneath, and lets go where the rows end. The wrapper and holder are added by JavaScript and take no room, so the layout is identical with or without them.
+- **The website check.** Halfway between the end of the rows and the check box, while both are off screen, the canvas moves into `[data-anchor="check"]`.
+- **Only timed animations inside:** the assembly, the services effects, the scanning light, and the laptop opening at the check.
+- **The camera.** Each canvas is a fixed window onto a virtual screen (`Stage.applyFlow`). As the papers fly, the window slides from the band's view to the pinned laptop's view, so each looks the way it did on the old full-screen canvas. That is also why the existing band posters still line up.
+- **Rotation.** If the page switches to the wide layout (for example, turning the phone sideways), the 3D gives way to the drawings for the rest of the visit.
+
+Tablets and desktop keep the full-screen canvas.
 
 ### When the poster stays
 
@@ -203,7 +216,7 @@ Layout is identical in every state. The laptop is always fitted inside a page bo
 
 ### While it runs
 
-- **Pausing:** rendering stops when the hero and the assembly are off screen, or when the tab is hidden.
+- **Pausing:** rendering stops when the hero and the assembly are off screen (on phones, when the canvas is), or when the tab is hidden.
 - **Resolution:** pixel ratio is capped at 2 (1.5 on touch devices). It drops in 0.25 steps if frames run long.
 - **Draw calls:** all papers are a single instanced mesh. Their flutter and shading run in TSL shaders, and their positions are computed in the worker.
 - **Colors:** every color comes from the CSS variables, read at runtime by `src/three/palette.js`. The paper artwork and the laptop screen are drawn from those colors (`textures.js`), so there are no image downloads. Switching the device to dark mode repaints the scene.
@@ -345,7 +358,7 @@ git push origin main          # Cloudflare builds and deploys
 These need real hardware; WebKit on Windows isn't Safari.
 - [ ] **Fonts:** headings are bold. The Windows WebKit test build couldn't use variable-font weights.
 - [ ] **3D:** the papers drift in their band under the headline. The developer view (seven logo taps) shows `WebGL 2` and `worker`, frame times (p95 should stay under about 20 ms), and few or no frames over 33 ms.
-- [ ] **Scrolling:** the assembly into the laptop is smooth. In the services section, the laptop stays at the top, the text fades beneath it, and nothing overlaps.
+- [ ] **Scrolling:** flick up and down from the hero to the website check. The papers and laptop move exactly with the page, with no lag or wobble. In the services section, the laptop stays at the top, the text fades beneath it, and nothing overlaps.
 - [ ] **Website check:** a check runs, and "Want these fixed?" fills in the contact form.
 - [ ] **Transitions:** tapping a work card grows it into the case study (Safari 18.2 and newer).
 - [ ] **Dark mode:** switch the phone to dark mode and reload.
