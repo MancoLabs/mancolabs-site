@@ -153,6 +153,120 @@ export function drawPaperAtlas(ctx, P) {
 export const SCREEN_W = 1024;
 export const SCREEN_H = 640;
 
+// Pieces of the website that snap into place during "Build". Rects in screen
+// texture pixels; they match the layout drawn by drawScreen().
+export const BUILD_PIECES = [
+  [34, 34, 600, 48],    // nav bar
+  [64, 118, 300, 72],   // headline
+  [64, 194, 260, 98],   // copy and button
+  [388, 112, 216, 180], // image
+  [64, 318, 172, 236],  // card 1
+  [246, 318, 172, 236], // card 2
+  [428, 318, 172, 236], // card 3
+  [660, 34, 330, 572],  // dashboard panel
+];
+
+// The empty canvas the Build stage starts from: paper with a dot grid.
+export function drawGrid(ctx, P) {
+  ctx.fillStyle = P.paper;
+  ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+  ctx.fillStyle = P.paper3;
+  for (let y = 16; y < SCREEN_H; y += 24) for (let x = 16; x < SCREEN_W; x += 24) ctx.fillRect(x, y, 3, 3);
+  ctx.strokeStyle = P.paper3;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([10, 8]);
+  for (const [x, y, w, h] of BUILD_PIECES) {
+    rr(ctx, x + 2, y + 2, w - 4, h - 4, 8);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+}
+
+// Four tool icons for "Automate": spreadsheet, email, calendar, invoice.
+export const ICON_CELL = 256;
+export function drawIcons(ctx, P) {
+  const C = ICON_CELL;
+  ctx.clearRect(0, 0, C * 4, C);
+  for (let i = 0; i < 4; i++) {
+    const x = i * C;
+    ctx.fillStyle = P.paper;
+    rr(ctx, x + 12, 12, C - 24, C - 24, 44);
+    ctx.fill();
+    ctx.strokeStyle = P.accentDeep;
+    ctx.lineWidth = 10;
+    rr(ctx, x + 17, 17, C - 34, C - 34, 40);
+    ctx.stroke();
+    ctx.strokeStyle = P.ink;
+    ctx.lineWidth = 9;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    const cx = x + C / 2, cy = C / 2;
+    ctx.beginPath();
+    if (i === 0) {
+      rr(ctx, cx - 56, cy - 48, 112, 96, 8);
+      ctx.moveTo(cx - 56, cy - 16); ctx.lineTo(cx + 56, cy - 16);
+      ctx.moveTo(cx - 56, cy + 16); ctx.lineTo(cx + 56, cy + 16);
+      ctx.moveTo(cx - 18, cy - 48); ctx.lineTo(cx - 18, cy + 48);
+      ctx.moveTo(cx + 18, cy - 48); ctx.lineTo(cx + 18, cy + 48);
+    } else if (i === 1) {
+      rr(ctx, cx - 60, cy - 42, 120, 84, 8);
+      ctx.moveTo(cx - 56, cy - 36); ctx.lineTo(cx, cy + 6); ctx.lineTo(cx + 56, cy - 36);
+    } else if (i === 2) {
+      rr(ctx, cx - 56, cy - 44, 112, 100, 8);
+      ctx.moveTo(cx - 56, cy - 14); ctx.lineTo(cx + 56, cy - 14);
+      ctx.moveTo(cx - 28, cy - 62); ctx.lineTo(cx - 28, cy - 34);
+      ctx.moveTo(cx + 28, cy - 62); ctx.lineTo(cx + 28, cy - 34);
+    } else {
+      ctx.moveTo(cx - 44, cy - 62); ctx.lineTo(cx + 20, cy - 62); ctx.lineTo(cx + 46, cy - 36);
+      ctx.lineTo(cx + 46, cy + 62); ctx.lineTo(cx - 44, cy + 62); ctx.closePath();
+      ctx.moveTo(cx - 22, cy - 16); ctx.lineTo(cx + 24, cy - 16);
+      ctx.moveTo(cx - 22, cy + 10); ctx.lineTo(cx + 24, cy + 10);
+      ctx.moveTo(cx - 22, cy + 36); ctx.lineTo(cx + 6, cy + 36);
+    }
+    ctx.stroke();
+    if (i === 2) {
+      ctx.fillStyle = P.accentDeep;
+      ctx.fillRect(cx - 34, cy + 6, 18, 18);
+      ctx.fillRect(cx - 9, cy + 6, 18, 18);
+      ctx.fillStyle = P.paper3;
+      ctx.fillRect(cx + 16, cy + 6, 18, 18);
+    }
+  }
+  ctx.lineCap = 'butt';
+}
+
+// The laptop screen during the Free Website Check: a phone-sized preview of the
+// visitor's site (or a placeholder while the check runs).
+export function drawCheck(ctx, P, { host = '', image = null, label = 'YOUR SITE HERE' } = {}) {
+  const W = SCREEN_W, H = SCREEN_H;
+  ctx.fillStyle = P.paper2;
+  ctx.fillRect(0, 0, W, H);
+  const ph = H - 56, pw = Math.round(ph * 0.5), px = (W - pw) / 2, py = 28;
+  ctx.fillStyle = P.ink;
+  rr(ctx, px - 10, py - 10, pw + 20, ph + 20, 34);
+  ctx.fill();
+  ctx.save();
+  rr(ctx, px, py, pw, ph, 24);
+  ctx.clip();
+  ctx.fillStyle = P.paper;
+  ctx.fillRect(px, py, pw, ph);
+  if (image) {
+    const scale = pw / image.width;
+    ctx.drawImage(image, px, py, pw, image.height * scale);
+  } else {
+    bar(ctx, P.paper3, px + 22, py + 26, pw - 44, 26);
+    ctx.fillStyle = P.paper3;
+    rr(ctx, px + 22, py + 76, pw - 44, 150, 10);
+    ctx.fill();
+    for (let i = 0; i < 6; i++) bar(ctx, P.paper3, px + 22, py + 252 + i * 26, pw - 44 - (i % 3) * 40, 12);
+    ctx.fillStyle = P.accentDeep;
+    ctx.font = '600 15px Inter, "DM Sans", system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(host || label, px + pw / 2, py + 160, pw - 40);
+  }
+  ctx.restore();
+}
+
 // A tidy website with a small dashboard beside it: the "after" picture.
 export function drawScreen(ctx, P) {
   const W = SCREEN_W, H = SCREEN_H;

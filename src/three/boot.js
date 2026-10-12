@@ -58,6 +58,77 @@ export async function startStage() {
     return { hero: box(heroEl), keepOut: { x: k.x, y: k.y, w: k.r - k.x, h: k.b - k.y }, assembly: box(anchorEl) };
   };
 
+  // The laptop's path: assembly box, then held beside (desktop) or above (phone)
+  // the services rows, then the website check box.
+  const storyEl = document.querySelector('[data-anchor="story"]');
+  const checkEl = document.querySelector('[data-anchor="check"]');
+  const rows = storyEl ? [...storyEl.querySelectorAll('.stage')] : [];
+  const firstVisual = storyEl?.querySelector('.stage-visual');
+  const fadeEls = storyEl
+    ? [...storyEl.closest('section').querySelectorAll('.sec-head > *'), ...storyEl.querySelectorAll('.stage-copy > :not(ul), .stage-copy li')]
+    : [];
+  const desktopMQ = matchMedia('(min-width: 961px)');
+  const story = { enter: 0, fix: 0, build: 0, auto: 0, exit: 0 };
+  let fading = false;
+  let lastFrame = performance.now();
+  const resetFade = () => {
+    if (!fading) return;
+    fading = false;
+    fadeEls.forEach((el) => { el.style.opacity = ''; });
+  };
+  cleanups.push(resetFade);
+
+  const frameState = () => {
+    const now = performance.now();
+    const k = 1 - Math.exp(-Math.min(0.1, (now - lastFrame) / 1000) * 10);
+    lastFrame = now;
+    const vh = innerHeight;
+    const box = (el) => { const r = el.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; };
+    const A = box(anchorEl);
+    let laptop = { ...A, s: 1 };
+    let fade = null;
+    if (storyEl && firstVisual && checkEl) {
+      const desktop = desktopMQ.matches;
+      const list = storyEl.getBoundingClientRect();
+      const V = box(firstVisual);
+      const C = box(checkEl);
+      const pinY = desktop ? (vh - V.h) / 2 + 36 : 84;
+      const S = { x: V.x, y: Math.min(Math.max(list.top, pinY), list.bottom - V.h), w: V.w, h: V.h };
+      story.enter = clamp01((vh - list.top) / Math.max(1, vh - pinY));
+      const past = pinY + V.h - list.bottom;
+      const span = C.y + C.h / 2 - vh / 2 - (list.bottom - pinY - V.h);
+      story.exit = span > 0 ? clamp01(past / span) : past > 0 ? 1 : 0;
+      const focus = desktop ? vh * 0.5 : pinY + V.h + (vh - pinY - V.h) * 0.45;
+      rows.forEach((row, i) => {
+        const r = row.getBoundingClientRect();
+        const key = ['fix', 'build', 'auto'][i];
+        if (key) story[key] += (clamp01((focus - r.top) / r.height) - story[key]) * k;
+      });
+      if (desktop) {
+        // Glide between boxes in the right-hand column; shrink while passing behind the cards.
+        if (story.exit > 0) laptop = { ...lerpBox(S, C, ease(story.exit)), s: 1 - 0.92 * Math.sin(Math.PI * story.exit) };
+        else if (story.enter > 0) laptop = { ...lerpBox(A, S, ease(story.enter)), s: 1 };
+      } else {
+        // Phones: ride up with the assembly box, stay at the top while the text
+        // scrolls underneath (and fades), leave with the end of the rows, and
+        // reappear at the check while both are off screen. It never crosses text.
+        const P = { x: V.x, y: Math.min(pinY, list.bottom - V.h), w: V.w, h: V.h };
+        if (P.y + P.h < 0 && story.exit > 0) laptop = { ...C, s: 1 };
+        else if (A.y > pinY) laptop = { ...A, s: 1 };
+        else {
+          laptop = { ...P, s: 1 };
+          const line = P.y + P.h - 12;
+          fade = fadeEls.map((el) => clamp01((el.getBoundingClientRect().top - line) / 56));
+        }
+      }
+    }
+    if (fade) {
+      fading = true;
+      fadeEls.forEach((el, i) => { el.style.opacity = fade[i] < 1 ? fade[i].toFixed(3) : ''; });
+    } else resetFade();
+    return { scrollY: window.scrollY, assemble: proxy.assemble, laptop, story: { ...story } };
+  };
+
   // Scroll-scrubbed assembly progress.
   // Poster and share-image captures stay frozen at the very start.
   const { gsap } = gsapMods;
@@ -111,6 +182,10 @@ export async function startStage() {
     poster: POSTER,
   };
 
+  const onCheck = (e) => forwardCheck(e.detail);
+  addEventListener('check:state', onCheck);
+  cleanups.push(() => removeEventListener('check:state', onCheck));
+
   const useWorker = !params.has('mainthread') && typeof Worker !== 'undefined' && 'transferControlToOffscreen' in canvas;
   try {
     if (useWorker) {
@@ -126,7 +201,8 @@ export async function startStage() {
       host = { send: (m) => stage.handle(m), stop() {}, mode: 'main thread' };
       host.send({ ...init, canvas });
     }
-    host.send({ type: 'frame', state: { scrollY: window.scrollY, assemble: proxy.assemble } });
+    host.send({ type: 'frame', state: frameState() });
+    if (window.__checkState) forwardCheck(window.__checkState);
   } catch (err) {
     return off(String(err?.message || err));
   }
@@ -134,14 +210,15 @@ export async function startStage() {
   function wire() {
     let active = true;
     let pending = null;
-    let last = { y: -1, a: -1 };
+    let last = '';
 
     const tick = () => {
       if (!active || !host) return;
-      const y = window.scrollY;
-      if (y !== last.y || proxy.assemble !== last.a) {
-        last = { y, a: proxy.assemble };
-        host.send({ type: 'frame', state: { scrollY: y, assemble: proxy.assemble } });
+      const state = frameState();
+      const key = JSON.stringify(state);
+      if (key !== last) {
+        last = key;
+        host.send({ type: 'frame', state });
       }
       if (pending) {
         host.send({ type: 'pointer', ...pending });
@@ -151,7 +228,7 @@ export async function startStage() {
     gsap.ticker.add(tick);
     cleanups.push(() => gsap.ticker.remove(tick));
 
-    // Only render while the hero or the assembly is near the screen and the tab is visible.
+    // Only render while a 3D part of the page is near the screen and the tab is visible.
     const near = new Set();
     const sync = () => {
       const on = near.size > 0 && !document.hidden;
@@ -166,6 +243,8 @@ export async function startStage() {
     }, { rootMargin: '25% 0px' });
     io.observe(heroEl);
     io.observe(statementEl);
+    if (storyEl) io.observe(storyEl);
+    if (checkEl) io.observe(checkEl);
     document.addEventListener('visibilitychange', sync);
     cleanups.push(() => { io.disconnect(); document.removeEventListener('visibilitychange', sync); });
 
@@ -178,7 +257,8 @@ export async function startStage() {
     }
 
     const tiltBtn = heroEl.querySelector('.tilt-toggle');
-    if (tiltBtn && coarse && 'DeviceOrientationEvent' in window) {
+    // Motion sensors only work on HTTPS (or localhost), so don't offer tilt elsewhere.
+    if (tiltBtn && coarse && window.isSecureContext && 'DeviceOrientationEvent' in window) {
       let tilting = false;
       const onTilt = (e) => {
         if (e.gamma == null) return;
@@ -237,6 +317,27 @@ export async function startStage() {
     cleanups.push(() => scheme.removeEventListener('change', repaint));
   }
 }
+
+// The website check's progress, shown on the laptop screen. Screenshots go to
+// the renderer as bitmaps (transferred, not copied, when it runs in a worker).
+async function forwardCheck(d) {
+  const msg = { type: 'check', state: d.state, host: d.host || '', frames: [], final: null };
+  if (d.state === 'result') {
+    const bitmap = async (src) => createImageBitmap(await (await fetch(src)).blob());
+    try {
+      msg.frames = await Promise.all((d.frames || []).map(bitmap));
+      msg.final = d.screenshot ? await bitmap(d.screenshot) : null;
+    } catch {
+      msg.frames = [];
+      msg.final = null;
+    }
+  }
+  host?.send(msg, [...msg.frames, ...(msg.final ? [msg.final] : [])]);
+}
+
+const clamp01 = (x) => Math.min(1, Math.max(0, x));
+const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+const lerpBox = (a, b, t) => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, w: a.w + (b.w - a.w) * t, h: a.h + (b.h - a.h) * t });
 
 async function loadGsap() {
   const [{ gsap }, { ScrollTrigger }] = await Promise.all([import('gsap'), import('gsap/ScrollTrigger')]);

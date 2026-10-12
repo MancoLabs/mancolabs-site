@@ -5,7 +5,27 @@ root.dataset.ready = '';
 initHeader();
 initReveal();
 initContactForm();
+initCheckLoader();
 initStage();
+
+// The website check's code loads once the page is idle, or right away if
+// someone submits before then.
+function initCheckLoader() {
+  const section = document.getElementById('check');
+  if (!section) return;
+  const form = section.querySelector('#checkForm');
+  let loading = null;
+  const load = () => (loading ||= import('./check/check.js').then((m) => m.initCheck(section)));
+  form.addEventListener('submit', (e) => {
+    if (section.dataset.checkReady) return;
+    e.preventDefault();
+    load().then(() => form.requestSubmit());
+  });
+  const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 300));
+  const go = () => idle(load, { timeout: 3000 });
+  if (document.readyState === 'complete') go();
+  else addEventListener('load', go, { once: true });
+}
 
 // The 3D layer loads only after the page has finished loading and the browser
 // is idle, and only if the inline head check marked this device as capable.

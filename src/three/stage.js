@@ -25,6 +25,7 @@ export class Stage {
       case 'frame': Object.assign(this.state, msg.state); return;
       case 'pointer': this.hero?.setPointer(msg.x, msg.y, msg.t, msg.tilt); return;
       case 'palette': this.hero?.setPalette(msg.palette); return;
+      case 'check': this.hero?.setCheck(msg); return;
       case 'active': return this.setActive(msg.value);
       case 'stats': this.wantStats = msg.value; return;
       case 'dispose': return this.dispose();
