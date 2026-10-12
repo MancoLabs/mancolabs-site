@@ -19,6 +19,19 @@
         ('deviceMemory' in n && (n.deviceMemory < 4 || n.hardwareConcurrency < 4));
       d.setAttribute('data-3d', forced || !skip ? 'pending' : 'off');
       if (/[?&]og\b/.test(q)) d.classList.add('og-mode');
+      // Firefox for Android: its toolbar can resize viewport units while it slides,
+      // which moved the page. Hold them at the height on load (see main.css), and
+      // only take a new one when the width changes (the phone turned).
+      if (/Android/.test(n.userAgent) && /Firefox\//.test(n.userAgent)) {
+        d.classList.add('ff-android');
+        var fw = innerWidth;
+        d.style.setProperty('--fx-vh', innerHeight + 'px');
+        addEventListener('resize', function () {
+          if (innerWidth === fw) return;
+          fw = innerWidth;
+          d.style.setProperty('--fx-vh', innerHeight + 'px');
+        });
+      }
     })(document.documentElement, location.search, navigator);
   </script>
   <link rel="stylesheet" href="/src/styles/main.css" />

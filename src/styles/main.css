@@ -268,6 +268,17 @@ main, .site-footer { position: relative; z-index: 1; }
 .stage-canvas.flow { position: absolute; inset: auto; width: auto; height: auto; z-index: -1; }
 .flow-3d .check-visual { position: relative; }
 
+/* Firefox for Android only (.ff-android and --fx-vh are set in head.html): its
+   toolbar sliding in and out can change svh, which resized the paper band and
+   moved everything below it. Use the height measured on load instead, and turn
+   off scroll anchoring so the browser never shifts the page to compensate. */
+.ff-android, .ff-android body { overflow-anchor: none; }
+.ff-android .hero { min-height: min(860px, calc(var(--fx-vh, 100svh) - 72px)); }
+.ff-android .lost { min-height: calc(var(--fx-vh, 100svh) - 72px - 130px); }
+@media (max-width: 699px) {
+  .ff-android .hero-band { height: clamp(104px, calc(var(--fx-vh, 100svh) * 0.16), 150px); }
+}
+
 /* Social share image capture (?og), used by scripts/render-posters.mjs. */
 .og-mode .skip, .og-mode .site-header, .og-mode .site-footer,
 .og-mode main > :not(.hero), .og-mode .hero .lead, .og-mode .hero-cta, .og-mode .hero-stage { display: none !important; }
