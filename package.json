@@ -10,7 +10,8 @@
     "build": "node scripts/check-copy.mjs && vite build",
     "preview": "vite preview",
     "check:copy": "node scripts/check-copy.mjs",
-    "screenshots": "node scripts/capture-screenshots.mjs"
+    "screenshots": "node scripts/capture-screenshots.mjs",
+    "posters": "node scripts/render-posters.mjs"
   },
   "devDependencies": {
     "@fontsource-variable/inter": "^5.3.0",
@@ -18,7 +19,12 @@
     "fontkit": "^2.0.4",
     "lighthouse": "^13.5.0",
     "playwright-core": "^1.64.0",
+    "puppeteer-core": "^25.13.0",
     "sharp": "^0.35.5",
     "vite": "^8.3.4"
+  },
+  "dependencies": {
+    "gsap": "^3.15.0",
+    "three": "^0.186.1"
   }
 }

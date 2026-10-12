@@ -218,8 +218,68 @@ p { text-wrap: pretty; }
 .hero .lead { font-size: clamp(1.05rem, 2vw, 1.25rem); color: var(--text-2); max-width: 54ch; margin-top: 24px; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
 
+/* ── 3D LAYER ────────────────────────────────
+   data-3d on <html>: "pending" (trying), "live" (rendering), "off" (poster).
+   Layout is identical in every state; only visibility changes. */
+main, .site-footer { position: relative; z-index: 1; }
+
+.stage-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+[data-3d="live"] .stage-canvas { opacity: 1; }
+
+.hero-poster, .hero-poster img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero-poster img { object-fit: cover; object-position: center top; }
+.hero-poster { transition: opacity 0.7s ease; }
+[data-3d="live"] .hero-poster { opacity: 0; }
+
+.assembly-anchor .ill { transition: opacity 0.7s ease; }
+[data-3d="live"] .assembly-anchor .ill { opacity: 0; }
+
+.tilt-toggle {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2;
+  min-height: 44px;
+  padding: 0.6em 1em;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--header-bg);
+  border: 1.5px solid var(--field-border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.tilt-toggle[aria-pressed="true"] { background: var(--btn-bg); color: var(--btn-text); border-color: var(--btn-bg); }
+
+/* Social share image capture (?og), used by scripts/render-posters.mjs. */
+.og-mode .skip, .og-mode .site-header, .og-mode .site-footer,
+.og-mode main > :not(.hero), .og-mode .hero .lead, .og-mode .hero-cta, .og-mode .hero-stage { display: none !important; }
+.og-mode .hero { height: 630px; min-height: 0; padding: 0; }
+.og-mode .hero-inner { padding-inline: 72px; }
+.og-mode .hero h1 { font-size: 66px; max-width: 13ch; }
+.og-mode .og-brand { display: flex !important; width: fit-content; align-items: center; gap: 12px; font-size: 30px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 30px; }
+.og-mode .rise { animation: none; }
+
 /* ── STATEMENT (scroll-assembly beat) ────── */
 .statement { padding-block: clamp(56px, 9vw, 112px); border-top: 1px solid var(--hairline); }
+.statement-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(28px, 5vw, 72px);
+  align-items: center;
+}
+.assembly-anchor { margin: 0; aspect-ratio: 5 / 4; display: grid; place-items: center; }
 .statement p {
   font-size: clamp(1.5rem, 3.4vw, 2.5rem);
   font-weight: 500;
@@ -504,8 +564,8 @@ p { text-wrap: pretty; }
 
 /* ── RESPONSIVE ──────────────────────────── */
 @media (max-width: 960px) {
-  .stage, .check-grid { grid-template-columns: 1fr; }
-  .stage-visual, .check-visual { max-width: 560px; }
+  .stage, .check-grid, .statement-grid { grid-template-columns: 1fr; }
+  .stage-visual, .check-visual, .assembly-anchor { max-width: 560px; }
   .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 

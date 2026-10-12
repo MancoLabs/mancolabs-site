@@ -10,7 +10,11 @@
   <meta property="og:title" content="Manco Labs | Local tech help for Shreveport-Bossier businesses" />
   <meta property="og:description" content="I fix, build, and automate the software your business runs on. Free consultation." />
   <meta property="og:url" content="https://mancolabs.dev/" />
-  <!-- [PLACEHOLDER] og:image and twitter:image: rendered from the hero scene in stage 3. -->
+  <meta property="og:image" content="https://mancolabs.dev/og.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Manco Labs: I fix, build, and automate the software your business runs on." />
+  <meta name="twitter:image" content="https://mancolabs.dev/og.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
   <script type="application/ld+json">
   {
@@ -39,9 +43,12 @@
 <main id="main">
 
   <!-- HERO -->
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="hero-stage" aria-hidden="true"><!-- Stage 3: hero poster + 3D canvas mount here. --></div>
+  <section class="hero" data-stage="hero" aria-labelledby="hero-title">
+    <div class="hero-stage" aria-hidden="true">
+      <!-- @include hero-poster.html -->
+    </div>
     <div class="wrap hero-inner">
+      <p class="og-brand" hidden><svg viewBox="287 41 106 109" width="34" height="34" fill="none" aria-hidden="true" focusable="false"><path d="M 308,112 C 320,121 358,104 373,112 L 386,138 Q 389,145 377,145 L 303,145 Q 291,145 295,138 Z" class="mark-fill"/><path d="M 323,45 L 323,80 L 295,138 Q 291,145 303,145 L 377,145 Q 389,145 386,138 L 357,80 L 357,45" class="mark-stroke" stroke-width="8" stroke-linejoin="round"/></svg>Manco Labs</p>
       <p class="eyebrow rise" style="--i:0">Local software help for Shreveport-Bossier businesses</p>
       <h1 id="hero-title" class="rise" style="--i:1">I fix, build, and automate the software your business <em>runs on.</em></h1>
       <p class="lead rise" style="--i:2">Websites, email, spreadsheets, online booking, and whatever else is slowing you down. I'm local, my prices are fair, and I'll give you an honest answer, even if that answer is that you don't need me.</p>
@@ -50,12 +57,62 @@
         <a class="btn ghost" href="tel:+13186424582">Call (318) 642-4582</a>
       </div>
     </div>
+    <button class="tilt-toggle" type="button" aria-pressed="false" hidden>Tilt to play</button>
   </section>
 
-  <!-- STATEMENT (stage 3: the papers assemble into a laptop behind this) -->
+  <!-- STATEMENT: in 3D the papers fly together into a laptop in the .assembly-anchor box. -->
   <div class="statement">
-    <div class="wrap">
-      <p class="reveal">A lot of small businesses run on paper, sticky notes, and a spreadsheet only one person knows how to use. <strong>I help turn that into something the whole team can use.</strong></p>
+    <div class="wrap statement-grid">
+      <p class="statement-text reveal">A lot of small businesses run on paper, sticky notes, and a spreadsheet only one person knows how to use. <strong>I help turn that into something the whole team can use.</strong></p>
+      <figure class="assembly-anchor" data-anchor="assembly" aria-hidden="true">
+        <svg class="ill" viewBox="0 0 600 380" focusable="false">
+          <use href="#ill-laptop"/>
+          <defs><clipPath id="clip-assembly"><rect x="102" y="34" width="396" height="270" rx="4"/></clipPath></defs>
+          <g clip-path="url(#clip-assembly)">
+            <rect class="ill-bar" x="102" y="34" width="396" height="270"/>
+            <rect class="ill-screen" x="112" y="44" width="232" height="250" rx="5"/>
+            <circle class="ill-accent" cx="124" cy="54" r="3.5"/>
+            <rect class="ill-ink" x="131" y="51" width="28" height="5" rx="2.5"/>
+            <rect class="ill-muted" x="112" y="62" width="232" height="1.5"/>
+            <rect class="ill-ink" x="124" y="74" width="112" height="9" rx="3"/>
+            <rect class="ill-ink" x="124" y="87" width="82" height="9" rx="3"/>
+            <rect class="ill-muted" x="124" y="104" width="96" height="4" rx="2"/>
+            <rect class="ill-muted" x="124" y="111" width="84" height="4" rx="2"/>
+            <rect class="ill-btn" x="124" y="122" width="46" height="13" rx="2"/>
+            <rect class="ill-muted" x="258" y="72" width="76" height="64" rx="3"/>
+            <rect class="ill-card" x="122" y="150" width="64" height="132" rx="3"/>
+            <rect class="ill-card" x="196" y="150" width="64" height="132" rx="3"/>
+            <rect class="ill-card" x="270" y="150" width="64" height="132" rx="3"/>
+            <rect class="ill-muted" x="128" y="156" width="52" height="38" rx="2"/>
+            <rect class="ill-muted" x="202" y="156" width="52" height="38" rx="2"/>
+            <rect class="ill-muted" x="276" y="156" width="52" height="38" rx="2"/>
+            <rect class="ill-ink" x="128" y="202" width="40" height="4" rx="2"/>
+            <rect class="ill-ink" x="202" y="202" width="40" height="4" rx="2"/>
+            <rect class="ill-ink" x="276" y="202" width="40" height="4" rx="2"/>
+            <rect class="ill-screen" x="352" y="44" width="136" height="250" rx="5"/>
+            <rect class="ill-ink" x="362" y="54" width="48" height="5" rx="2.5"/>
+            <rect class="ill-card" x="362" y="66" width="54" height="34" rx="3"/>
+            <rect class="ill-card" x="424" y="66" width="54" height="34" rx="3"/>
+            <rect class="ill-ink" x="368" y="74" width="24" height="7" rx="2"/>
+            <rect class="ill-ink" x="430" y="74" width="24" height="7" rx="2"/>
+            <rect class="ill-accent" x="364" y="172" width="12" height="28" rx="2"/>
+            <rect class="ill-accent" x="382" y="156" width="12" height="44" rx="2"/>
+            <rect class="ill-accent" x="400" y="163" width="12" height="37" rx="2"/>
+            <rect class="ill-accent" x="418" y="140" width="12" height="60" rx="2"/>
+            <rect class="ill-accent" x="436" y="149" width="12" height="51" rx="2"/>
+            <rect class="ill-btn" x="454" y="130" width="12" height="70" rx="2"/>
+            <rect class="ill-muted" x="362" y="203" width="116" height="1.5"/>
+            <circle class="ill-btn" cx="366" cy="216" r="3"/>
+            <circle class="ill-btn" cx="366" cy="234" r="3"/>
+            <circle class="ill-btn" cx="366" cy="252" r="3"/>
+            <circle class="ill-muted" cx="366" cy="270" r="3"/>
+            <rect class="ill-ink" x="374" y="214" width="50" height="4" rx="2" opacity="0.7"/>
+            <rect class="ill-ink" x="374" y="232" width="62" height="4" rx="2" opacity="0.7"/>
+            <rect class="ill-ink" x="374" y="250" width="44" height="4" rx="2" opacity="0.7"/>
+            <rect class="ill-ink" x="374" y="268" width="56" height="4" rx="2" opacity="0.7"/>
+          </g>
+        </svg>
+      </figure>
     </div>
   </div>
 
@@ -325,7 +382,7 @@
             <div class="work-body">
               <h3><a href="/work/minicine/">minicine?</a></h3>
               <p class="work-role">Framework upgrades, security, and new features</p>
-              <p>A Shreveport microcinema and community stage. I didn't design this site. I upgraded it from Drupal 8 to Drupal 11, checked all 543 pages, switched over with no downtime, and rebuilt the site search.</p>
+              <p>A Shreveport microcinema and community stage, founded by David Nelson. I didn't design this site. I upgraded it from Drupal 8 to Drupal 11, checked all 543 pages, switched over with no downtime, and rebuilt the site search.</p>
               <div class="work-links">
                 <a class="text-link" href="https://www.minicine.org" rel="noopener">Visit minicine.org</a>
               </div>

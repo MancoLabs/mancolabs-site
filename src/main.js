@@ -5,6 +5,25 @@ root.dataset.ready = '';
 initHeader();
 initReveal();
 initContactForm();
+initStage();
+
+// The 3D layer loads only after the page has finished loading and the browser
+// is idle, and only if the inline head check marked this device as capable.
+function initStage() {
+  if (root.getAttribute('data-3d') !== 'pending' || !document.querySelector('[data-stage]')) return;
+  const start = () =>
+    import('./three/boot.js')
+      .then((m) => m.startStage())
+      .catch((err) => {
+        console.info('[3d] Showing the poster instead:', err);
+        root.setAttribute('data-3d', 'off');
+      });
+  if (/[?&](poster|og)\b/.test(location.search)) return start();
+  const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 200));
+  const go = () => idle(start, { timeout: 2000 });
+  if (document.readyState === 'complete') go();
+  else addEventListener('load', go, { once: true });
+}
 
 function initHeader() {
   const header = document.querySelector('.site-header');

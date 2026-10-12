@@ -7,10 +7,19 @@
   <link rel="preload" href="/fonts/inter-latin-wght.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/dm-sans-latin-500.woff2" as="font" type="font/woff2" crossorigin />
   <script>
-    (function (d) {
+    (function (d, q, n) {
       d.className = d.className.replace('no-js', 'js reveal-armed');
       setTimeout(function () { if (!('ready' in d.dataset)) d.classList.remove('reveal-armed'); }, 3000);
-    })(document.documentElement);
+      // 3D: "pending" means try it once the page is idle; "off" means keep the poster.
+      var c = n.connection || {};
+      var forced = /[?&](poster|og|3d=on|3d=force-webgl)\b/.test(q);
+      var skip = /[?&]3d=off\b/.test(q) ||
+        matchMedia('(prefers-reduced-motion: reduce)').matches ||
+        c.saveData || /2g/.test(c.effectiveType || '') ||
+        ('deviceMemory' in n && (n.deviceMemory < 4 || n.hardwareConcurrency < 4));
+      d.setAttribute('data-3d', forced || !skip ? 'pending' : 'off');
+      if (/[?&]og\b/.test(q)) d.classList.add('og-mode');
+    })(document.documentElement, location.search, navigator);
   </script>
   <link rel="stylesheet" href="/src/styles/main.css" />
   <script type="module" src="/src/main.js"></script>
