@@ -76,6 +76,16 @@ In `index.html`, inside `<section id="work">`. There's a commented-out card temp
 
 `npm run screenshots` opens each live site in Chrome at desktop (1440 wide; minicine uses 1100 because its layout is fixed-width) and phone (390 wide) sizes, then writes AVIF and WebP files to `src/assets/work/<slug>/`. Run `npm run screenshots -- werla` to redo just one.
 
+### About photo
+
+`src/assets/about/ethan-{300,480}.{avif,webp}` is a 4:5 head-and-shoulders crop of the original, which lives in `source-images/` (gitignored, so the uncropped photo is never committed or published). The crop ends where the backpack straps start. To redo it:
+
+```bash
+node -e "const s=require('sharp');s('source-images/ethan.jpg').extract({left:313,top:262,width:493,height:616}).toBuffer().then(b=>Promise.all([300,480].flatMap(w=>[s(b).resize({width:w}).avif({quality:60}).toFile('src/assets/about/ethan-'+w+'.avif'),s(b).resize({width:w}).webp({quality:80}).toFile('src/assets/about/ethan-'+w+'.webp')])))"
+```
+
+### WERLA
+
 WERLA has no before/after slider. Every Wayback Machine capture of werla.net from before July 2026 is missing the old site's navigation and layout stylesheets, so none of them shows what the site really looked like.
 
 ### Copy rules
@@ -138,7 +148,6 @@ Cloudflare Pages auto-deploys on every push to `main`. **Before the redesign is 
 
 | What | Where | Notes |
 |---|---|---|
-| [PLACEHOLDER] Photo of Ethan | `index.html`, About section (`.about-photo`) | Replace the figure's contents with an `<img alt="Ethan Manco">`. Portrait, about 4:5. |
 | [PLACEHOLDER] Social share image | `index.html` `<head>` (og:image, twitter:image) | Rendered from the hero scene in stage 3. |
 | [STAGE 4] Website check note | `index.html`, `#check` | Temporary. Removed when the checker is wired up. |
 
