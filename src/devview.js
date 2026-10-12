@@ -62,6 +62,15 @@ function open() {
     dl.append(el('dt', '', label), dd);
     rows[key] = dd;
   }
+  // Which browser check in the head script matched (Firefox on phones gets the
+  // drawings), and the raw user agent it was checked against.
+  const match = document.documentElement.dataset.uaMatch || 'none';
+  dl.append(
+    el('dt', '', 'Browser match'),
+    el('dd', '', match === 'none' ? 'none' : `${match} (drawings)`),
+    el('dt', 'dev-wide', 'User agent'),
+    el('dd', 'dev-wide', navigator.userAgent),
+  );
   panel.append(title, dl, closeBtn);
 
   const live = el('p', 'sr-only');

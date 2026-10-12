@@ -11,9 +11,10 @@ const POSTER = params.has('poster') || params.has('og');
 const TOUCH = matchMedia('(pointer: coarse)').matches;
 // Phones: the canvas scrolls with the page instead of being redrawn to follow it.
 const FLOW = TOUCH && matchMedia('(max-width: 699px)').matches;
-// Firefox for Android (set by the head script): its toolbar can change the
-// viewport height mid-scroll, so height-only changes are ignored there.
-const FF_ANDROID = root.classList.contains('ff-android');
+// Firefox on phones (set by the head script): its toolbar changes the viewport
+// height mid-scroll, so height-only changes are ignored there. It normally gets
+// the drawings; this matters only when the 3D is forced with ?3d=on.
+const FF_MOBILE = root.classList.contains('ff-mobile');
 
 let teardown = null;
 let host = null;
@@ -179,7 +180,7 @@ function stableViewport() {
   let vh = probe.offsetHeight || innerHeight;
   let w = innerWidth;
   const ro = new ResizeObserver(() => {
-    if (FF_ANDROID && innerWidth === w) return; // the toolbar moved, not the phone
+    if (FF_MOBILE && innerWidth === w) return; // the toolbar moved, not the phone
     w = innerWidth;
     vh = probe.offsetHeight || innerHeight;
   });
@@ -644,9 +645,9 @@ function prepareFlow(ctx, { gsap, ScrollTrigger, viewport, bandEl, anchorEl }) {
     size: () => ({ width: G[mode].width, height: G[mode].height }),
     flow: flowConfig,
     relayout: () => {
-      const before = FF_ANDROID && JSON.stringify(G);
+      const before = FF_MOBILE && JSON.stringify(G);
       measure();
-      // Firefox for Android: nothing really moved, so don't resize (and blank) the canvas.
+      // Firefox on phones: nothing really moved, so don't resize (and blank) the canvas.
       if (before && before === JSON.stringify(G)) return;
       place(mode);
       host?.send({ type: 'flow', flow: flowConfig() });

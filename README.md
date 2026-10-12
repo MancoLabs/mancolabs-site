@@ -208,7 +208,7 @@ Tablets and desktop keep the full-screen canvas.
 | Condition | Decided |
 |---|---|
 | `prefers-reduced-motion: reduce` | before first paint |
-| Firefox for Android (it blanks and redraws the canvas whenever its toolbar slides) | before first paint |
+| Firefox on phones, iOS and Android (its toolbar resizes the page as it slides, which blanked and redrew the canvas) | before first paint |
 | Data Saver on, or a 2G connection | before first paint |
 | Under 4 GB memory or under 4 CPU cores (Chromium only; Safari doesn't report these) | before first paint |
 | No WebGPU and no hardware WebGL 2, or a software renderer (SwiftShader, llvmpipe) | after load |
@@ -224,7 +224,7 @@ Tablets and desktop keep the full-screen canvas.
 - **Pointer:** a mouse or trackpad gently pushes nearby papers aside, and they drift back.
 - **Phones:** 24 smaller papers live in their own band under the headline (`.hero-band`), fully on screen on load and never under the header or behind text. Desktop keeps 96 papers framing the text.
 - **Address bar:** the phone address bar sliding in and out never re-measures anything. ScrollTrigger runs with `ignoreMobileResize`, and the 3D code uses a stable 100svh height.
-- **Firefox for Android:** its toolbar can move `svh` while it slides, which resized the paper band and moved the page. There (only), the head script records the height on load as `--fx-vh` and adds `.ff-android`. The hero and band use that height instead of `svh`, scroll anchoring is off, and height-only resizes are ignored by the 3D code. A new height is taken only when the width changes (the phone turned). Firefox for Android also always gets the drawings instead of the 3D: it blanked and redrew the canvas every time the toolbar slid.
+- **Firefox on phones (iOS and Android):** its toolbar resizes the page while it slides (on an iPhone, the page height jumps between about 670 and 798px), which moved the page and blanked and redrew the 3D. The head script spots it from the user agent (`FxiOS` on iOS, `Android` with `Firefox/` on Android), records the height on load as `--fx-vh`, adds `.ff-mobile`, and always shows the drawings instead of the 3D. The hero and band use `--fx-vh` instead of `svh`, so the text stays still, and scroll anchoring is off. A new height is taken only when the width changes (the phone turned). With "Request desktop site" on, Firefox sends a desktop user agent and is treated like any desktop browser.
 
 ### Files
 
@@ -268,7 +268,7 @@ Run `npm run posters` after you change the hero text, the hero layout, the color
 | Magnetic buttons | `src/anim/motion.js` | Any element with `data-magnetic` leans toward the mouse. Mouse and trackpad only. |
 | Scroll progress | `.scroll-progress` in `partials/header.html` | A 2px bar under the header. Driven by CSS scroll timelines where supported, and by a tiny scroll listener elsewhere (Firefox). |
 | About background | `src/three/about-backdrop.js` | Slow noise in the palette's dark greens with a soft glow near the cursor. It has its own canvas inside the section, rendered by the same worker. It's capped so the section's smallest text keeps at least 4.5:1 contrast. |
-| Developer view | `src/devview.js` | Open it with the Konami code (up, up, down, down, left, right, left, right, B, A) or seven quick taps on the header logo on the home page. On the home page the logo scrolls to the top instead of reloading. It shows a 12-column grid (4 on phones), labeled component outlines, and live stats: page FPS, the renderer actually in use and its thread, whether the 3D loop is running or paused, 3D FPS, 3D frame time (95th percentile and worst), frames over 33 ms, draw calls, pixel ratio, LCP, and CLS. Escape or Close closes it. It loads only when triggered. |
+| Developer view | `src/devview.js` | Open it with the Konami code (up, up, down, down, left, right, left, right, B, A) or seven quick taps on the header logo on the home page. On the home page the logo scrolls to the top instead of reloading. It shows a 12-column grid (4 on phones), labeled component outlines, and live stats: page FPS, the renderer actually in use and its thread, whether the 3D loop is running or paused, 3D FPS, 3D frame time (95th percentile and worst), frames over 33 ms, draw calls, pixel ratio, LCP, CLS, which browser check matched (Firefox on phones gets the drawings), and the raw user agent. Escape or Close closes it. It loads only when triggered. |
 | 404 | `404.html`, `src/three/lost-scene.js` | One lost invoice floats over the page. Push it with the mouse, or tap near it on a phone, and it bounces off the screen edges. In poster mode it's a drawing. |
 
 `src/anim/motion.js` loads after the page is idle, and never with reduced motion.
@@ -363,7 +363,7 @@ These need real hardware; WebKit on Windows isn't Safari.
 - [ ] **Scrolling:** flick up and down from the hero to the website check. The papers and laptop move exactly with the page, with no lag or wobble. In the services section, the laptop stays at the top, the text fades beneath it, and nothing overlaps.
 - [ ] **Website check:** a check runs, and "Want these fixed?" fills in the contact form.
 - [ ] **Transitions:** tapping a work card grows it into the case study (Safari 18.2 and newer).
-- [ ] **Firefox for Android:** the drawings show instead of the 3D. Scroll down from the very top and back up: the address bar slides away and back without the page jumping or anything flashing.
+- [ ] **Firefox (iPhone and Android):** the drawings show instead of the 3D, and the developer view shows "Browser match: Firefox for iOS (drawings)" (or Android). Scroll down from the very top and back up: the toolbar slides away and back without the page jumping or anything flashing.
 - [ ] **Dark mode:** switch the phone to dark mode and reload.
 - [ ] **Reduce Motion:** turn on Reduce Motion (iPhone: Settings > Accessibility > Motion). You should get the poster only and no heading animations.
 - [ ] **Low Power Mode:** iPhones cap animation at 30 fps, so the site may switch to the poster. That's intended; it saves battery.

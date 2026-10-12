@@ -12,21 +12,24 @@
       setTimeout(function () { if (!('ready' in d.dataset)) d.classList.remove('reveal-armed'); }, 3000);
       // 3D: "pending" means try it once the page is idle; "off" means keep the poster.
       var c = n.connection || {};
-      // Firefox for Android blanks and redraws the 3D every time its toolbar
-      // slides, so it always gets the drawings.
-      var ffAndroid = /Android/.test(n.userAgent) && /Firefox\//.test(n.userAgent);
+      // Firefox on phones resizes the page while its toolbar slides, which blanked
+      // and redrew the 3D, so it always gets the drawings. Firefox for iOS says
+      // "FxiOS" (it runs on WebKit); Firefox for Android says "Android ... Firefox/".
+      var ua = n.userAgent;
+      var ffMobile = /FxiOS\//.test(ua) ? 'Firefox for iOS' : /Android/.test(ua) && /Firefox\//.test(ua) ? 'Firefox for Android' : '';
+      d.setAttribute('data-ua-match', ffMobile || 'none');
       var forced = /[?&](poster|og|3d=on|3d=force-webgl)\b/.test(q);
-      var skip = /[?&]3d=off\b/.test(q) || ffAndroid ||
+      var skip = /[?&]3d=off\b/.test(q) || !!ffMobile ||
         matchMedia('(prefers-reduced-motion: reduce)').matches ||
         c.saveData || /2g/.test(c.effectiveType || '') ||
         ('deviceMemory' in n && (n.deviceMemory < 4 || n.hardwareConcurrency < 4));
       d.setAttribute('data-3d', forced || !skip ? 'pending' : 'off');
       if (/[?&]og\b/.test(q)) d.classList.add('og-mode');
-      // Firefox for Android: its toolbar can resize viewport units while it slides,
-      // which moved the page. Hold them at the height on load (see main.css), and
-      // only take a new one when the width changes (the phone turned).
-      if (ffAndroid) {
-        d.classList.add('ff-android');
+      // Firefox on phones: its toolbar changes the viewport height while it slides,
+      // which moved the page. Hold the height from load (see main.css), and only
+      // take a new one when the width changes (the phone turned).
+      if (ffMobile) {
+        d.classList.add('ff-mobile');
         var fw = innerWidth;
         d.style.setProperty('--fx-vh', innerHeight + 'px');
         addEventListener('resize', function () {
