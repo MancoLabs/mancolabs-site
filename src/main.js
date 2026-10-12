@@ -7,6 +7,56 @@ initReveal();
 initContactForm();
 initCheckLoader();
 initStage();
+initWork();
+initScrollProgress();
+initKonami();
+afterIdle(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  import('./anim/motion.js').then((m) => m.initMotion());
+});
+
+function afterIdle(fn) {
+  const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 300));
+  const go = () => idle(fn, { timeout: 3000 });
+  if (document.readyState === 'complete') go();
+  else addEventListener('load', go, { once: true });
+}
+
+function initWork() {
+  const cards = document.querySelectorAll('.work-card');
+  if (cards.length) import('./work/tilt.js').then((m) => m.initTilt(cards));
+  if (document.querySelector('[data-before-after]')) import('./work/before-after.js').then((m) => m.initBeforeAfter());
+}
+
+// A slim bar under the header. Browsers with CSS scroll timelines drive it in
+// CSS (see main.css); others get this small scroll listener.
+function initScrollProgress() {
+  const bar = document.querySelector('.scroll-progress');
+  if (!bar || CSS.supports('animation-timeline: scroll()')) return;
+  let frame = 0;
+  const update = () => {
+    frame = 0;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.setProperty('--p', max > 0 ? (scrollY / max).toFixed(4) : '0');
+  };
+  addEventListener('scroll', () => { if (!frame) frame = requestAnimationFrame(update); }, { passive: true });
+  update();
+}
+
+// Up, up, down, down, left, right, left, right, B, A: toggles the developer view.
+function initKonami() {
+  const code = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
+  let at = 0;
+  addEventListener('keydown', (e) => {
+    if (e.target.closest?.('input, textarea, select, [contenteditable]')) return;
+    const key = e.key.toLowerCase();
+    at = key === code[at] ? at + 1 : key === code[0] ? 1 : 0;
+    if (at === code.length) {
+      at = 0;
+      import('./devview.js').then((m) => m.toggleDevView());
+    }
+  });
+}
 
 // The website check's code loads once the page is idle, or right away if
 // someone submits before then.

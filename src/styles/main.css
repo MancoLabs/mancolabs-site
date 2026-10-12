@@ -527,12 +527,36 @@ main, .site-footer { position: relative; z-index: 1; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
-  transition: transform 0.25s, box-shadow 0.25s;
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.25s;
 }
 .work-card:hover { box-shadow: 8px 12px 0 var(--shadow); }
 @media (prefers-reduced-motion: no-preference) {
   .work-card:hover { transform: translateY(-4px); }
+  /* Pointer tilt (src/work/tilt.js) and a soft highlight that follows it. */
+  .work-card.is-tilting {
+    transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-4px);
+    transition: transform 0.1s linear, box-shadow 0.25s;
+  }
+  .work-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), color-mix(in srgb, var(--paper) 32%, transparent), transparent 55%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .work-card.is-tilting::before { opacity: 1; }
 }
+
+/* Card to case study: the screenshot and title grow into the next page.
+   Chrome, Edge, and Safari 18.2+; other browsers just load the page. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+::view-transition-group(*) { animation-duration: 0.45s; animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1); }
+.site-header { view-transition-name: site-header; }
 .work-thumb { aspect-ratio: 16 / 10; background: var(--ink); border-bottom: 1px solid var(--border); overflow: hidden; }
 .work-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
 .work-body { flex: 1; display: grid; align-content: start; gap: 10px; padding: 22px 24px 24px; }
@@ -548,8 +572,80 @@ main, .site-footer { position: relative; z-index: 1; }
   .work-card h3 a:focus-visible { outline: none; }
 }
 
+/* ── BEFORE / AFTER (src/work/before-after.js) ── */
+.ba { margin: 0; }
+.ba-frame { --pos: 50%; position: relative; overflow: hidden; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.ba-frame img { display: block; width: 100%; height: auto; }
+.ba-before-wrap { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+.ba-before-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.ba-handle { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 3px; margin-left: -1.5px; background: var(--paper); box-shadow: 0 0 0 1px var(--ink); pointer-events: none; }
+.ba-handle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-radius: 50%;
+  background: var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M16 13l-6 7 6 7M24 13l6 7-6 7' fill='none' stroke='%231A2420' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% no-repeat;
+  box-shadow: 0 0 0 1px var(--ink), 0 4px 12px var(--shadow);
+}
+.ba-range { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; touch-action: pan-y; }
+.ba-frame:has(.ba-range:focus-visible) .ba-handle::after { outline: 3px solid var(--focus); outline-offset: 3px; }
+.ba figcaption { display: flex; justify-content: space-between; margin-top: 10px; font-family: var(--mono); font-size: 0.82rem; color: var(--text-2); }
+
+/* ── SCROLL PROGRESS ─────────────────────── */
+.scroll-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--accent-text);
+  transform-origin: 0 50%;
+  transform: scaleX(var(--p, 0));
+  pointer-events: none;
+}
+@supports (animation-timeline: scroll()) {
+  .scroll-progress { animation: scroll-progress linear both; animation-timeline: scroll(root block); }
+  @keyframes scroll-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+}
+
+/* ── DEVELOPER VIEW (Konami code) ─────────── */
+.dev-grid { position: fixed; inset: 0; z-index: 90; pointer-events: none; }
+.dev-grid-cols { height: 100%; display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; }
+.dev-grid-cols span { background: color-mix(in srgb, var(--accent) 14%, transparent); border-inline: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); }
+.dev-boxes { position: absolute; top: 0; left: 0; width: 100%; z-index: 91; pointer-events: none; }
+.dev-box { position: absolute; outline: 1px dashed var(--accent-deep); outline-offset: -1px; }
+.dev-box span { position: absolute; top: 0; left: 0; padding: 1px 5px; font: 500 10px/1.4 var(--mono); color: var(--paper); background: var(--accent-deep); white-space: nowrap; }
+.dev-panel {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 92;
+  min-width: 230px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--paper);
+  background: color-mix(in srgb, var(--ink) 94%, transparent);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+.dev-title { font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.dev-panel dl { display: grid; grid-template-columns: auto auto; gap: 3px 16px; }
+.dev-panel dt { color: var(--paper-3); }
+.dev-panel dd { text-align: right; font-variant-numeric: tabular-nums; }
+.dev-close { margin-top: 10px; min-height: 32px; padding: 4px 10px; font: inherit; color: var(--ink); background: var(--paper); border: none; border-radius: 4px; cursor: pointer; }
+.dev-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 /* ── ABOUT ───────────────────────────────── */
-.about { background: var(--bg); color: var(--text); }
+.about { position: relative; isolation: isolate; background: var(--bg); color: var(--text); }
+/* Shader background (src/three/about-backdrop.js). The section's own dark
+   background shows until the first frame is drawn. */
+.about-canvas { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; opacity: 0; transition: opacity 0.8s ease; pointer-events: none; }
+.about-canvas.is-on { opacity: 1; }
 .about-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: clamp(40px, 6vw, 80px); align-items: start; }
 .about h2 { font-size: clamp(2rem, 4vw, 2.9rem); margin-top: 16px; }
 .about-bio p:not(.eyebrow) { color: var(--text-2); font-size: 1.08rem; margin-top: 18px; max-width: 54ch; }
@@ -655,6 +751,14 @@ main, .site-footer { position: relative; z-index: 1; }
 
 /* ── 404 ─────────────────────────────────── */
 .lost { min-height: calc(100svh - 72px - 130px); display: grid; align-items: center; padding-block: 64px; }
+.lost-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(28px, 5vw, 72px); align-items: center; }
+.lost-anchor { margin: 0; aspect-ratio: 1; max-width: 360px; justify-self: center; display: grid; place-items: center; }
+.lost-anchor .ill { width: 70%; transition: opacity 0.7s ease; }
+[data-3d="live"] .lost-anchor .ill { opacity: 0; }
+@media (max-width: 760px) {
+  .lost-grid { grid-template-columns: 1fr; }
+  .lost-anchor { max-width: 220px; }
+}
 .lost h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); max-width: 16ch; margin-top: 16px; }
 .lost p:not(.eyebrow) { color: var(--text-2); margin-top: 18px; max-width: 46ch; font-size: 1.08rem; }
 .lost .btn { margin-top: 30px; }

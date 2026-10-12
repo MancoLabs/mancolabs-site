@@ -3,16 +3,21 @@
 // only talks through handle(message) and post(message).
 import { WebGPURenderer, PerspectiveCamera, Scene } from 'three/webgpu';
 import { HeroScene } from './hero-scene.js';
+import { LostScene } from './lost-scene.js';
+import { AboutBackdrop } from './about-backdrop.js';
 
 const CAM_Z = 12;
 const FOV = 30;
+const SCENES = { hero: HeroScene, lost: LostScene };
 
 export class Stage {
   constructor(post) {
     this.post = post;
     this.state = { scrollY: 0, assemble: 0 };
     this.time = 0;
-    this.active = true;
+    this.mainActive = true;
+    this.aboutActive = false;
+    this.running = false;
     this.ready = false;
     this.watch = { acc: 0, n: 0, strikes: 0 };
   }
@@ -21,21 +26,27 @@ export class Stage {
     switch (msg.type) {
       case 'init': return this.init(msg);
       case 'resize': return this.resize(msg);
-      case 'layout': if (this.hero) this.hero.setLayout(msg.layout); return;
+      case 'layout': this.scene3?.setLayout(msg.layout); return;
       case 'frame': Object.assign(this.state, msg.state); return;
-      case 'pointer': this.hero?.setPointer(msg.x, msg.y, msg.t, msg.tilt); return;
-      case 'palette': this.hero?.setPalette(msg.palette); return;
-      case 'check': this.hero?.setCheck(msg); return;
-      case 'active': return this.setActive(msg.value);
+      case 'pointer': this.scene3?.setPointer(msg.x, msg.y, msg.t, msg.tilt, msg.down); return;
+      case 'palette': this.scene3?.setPalette(msg.palette); this.about?.setPalette(msg.palette); return;
+      case 'check': this.scene3?.setCheck?.(msg); return;
+      case 'active': this.mainActive = msg.value; return this.sync();
+      case 'about-init': return this.initAbout(msg);
+      case 'about-resize': this.about?.resize(msg.width, msg.height); return;
+      case 'about-pointer': this.about?.setPointer(msg.x, msg.y, msg.width, msg.height); return;
+      case 'about-active': this.aboutActive = msg.value; return this.sync();
       case 'stats': this.wantStats = msg.value; return;
       case 'dispose': return this.dispose();
     }
   }
 
-  async init({ canvas, width, height, dpr, palette, layout, forceWebGL, poster }) {
+  async init({ canvas, width, height, dpr, palette, layout, forceWebGL, poster, scene = 'hero' }) {
     try {
       this.poster = poster;
       this.dpr = dpr;
+      this.forceWebGL = forceWebGL;
+      this.palette = palette;
       const renderer = new WebGPURenderer({ canvas, alpha: true, antialias: dpr < 1.75, forceWebGL });
       renderer.setClearColor(0x000000, 0);
       renderer.setPixelRatio(dpr);
@@ -50,17 +61,29 @@ export class Stage {
       this.updateView(width, height);
 
       this.scene = new Scene();
-      this.hero = new HeroScene({ palette, mobile: width < 700 });
-      this.hero.setLayout(layout);
-      this.scene.add(this.hero.root);
-      this.hero.update(0, 0, this.state, this.view);
+      this.scene3 = new SCENES[scene]({ palette, mobile: width < 700 });
+      this.scene3.setLayout(layout);
+      this.scene.add(this.scene3.root);
+      this.scene3.update(0, 0, this.state, this.view);
       await renderer.compileAsync(this.scene, this.camera);
 
       this.frames = 0;
-      this.last = performance.now();
-      renderer.setAnimationLoop((now) => this.frame(now));
+      this.sync();
     } catch (err) {
       this.post({ type: 'error', message: String(err?.message || err) });
+    }
+  }
+
+  async initAbout({ canvas, width, height }) {
+    try {
+      const about = new AboutBackdrop();
+      await about.init({ canvas, width, height, palette: this.palette, forceWebGL: this.forceWebGL });
+      this.about = about;
+      about.render(this.time, 0);
+      this.post({ type: 'about-ready' });
+      this.sync();
+    } catch (err) {
+      this.post({ type: 'about-error', message: String(err?.message || err) });
     }
   }
 
@@ -78,12 +101,33 @@ export class Stage {
     this.updateView(width, height);
   }
 
+  // Run the loop only while something visible needs drawing.
+  sync() {
+    if (!this.renderer) return;
+    const want = this.mainActive || (this.aboutActive && !!this.about);
+    if (want === this.running) return;
+    this.running = want;
+    if (want) {
+      this.last = performance.now();
+      this.watch = { acc: 0, n: 0, strikes: 0 };
+      this.renderer.setAnimationLoop((now) => this.frame(now));
+    } else {
+      // One last frame with the latest scroll position, then stop.
+      this.scene3.update(this.time, 0, this.state, this.view);
+      this.renderer.render(this.scene, this.camera);
+      this.renderer.setAnimationLoop(null);
+    }
+  }
+
   frame(now) {
     const dt = Math.min(0.05, (now - this.last) / 1000);
     this.last = now;
     if (!this.poster) this.time += dt;
-    this.hero.update(this.time, this.poster ? 0 : dt, this.state, this.view);
-    this.renderer.render(this.scene, this.camera);
+    if (this.mainActive || !this.ready) {
+      this.scene3.update(this.time, this.poster ? 0 : dt, this.state, this.view);
+      this.renderer.render(this.scene, this.camera);
+    }
+    if (this.aboutActive) this.about?.render(this.time, dt);
     this.frames++;
     if (!this.ready && this.frames >= 3) {
       this.ready = true;
@@ -116,23 +160,10 @@ export class Stage {
     w.n = 0;
   }
 
-  setActive(on) {
-    if (!this.renderer || on === this.active) return;
-    this.active = on;
-    if (on) {
-      this.last = performance.now();
-      this.watch = { acc: 0, n: 0, strikes: 0 };
-      this.renderer.setAnimationLoop((now) => this.frame(now));
-    } else {
-      this.hero.update(this.time, 0, this.state, this.view);
-      this.renderer.render(this.scene, this.camera);
-      this.renderer.setAnimationLoop(null);
-    }
-  }
-
   dispose() {
     this.renderer?.setAnimationLoop(null);
-    this.hero?.dispose();
+    this.scene3?.dispose();
+    this.about?.dispose();
     this.renderer?.dispose();
     this.renderer = null;
     this.post({ type: 'disposed' });

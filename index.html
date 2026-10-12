@@ -53,8 +53,8 @@
       <h1 id="hero-title" class="rise" style="--i:1">I fix, build, and automate the software your business <em>runs on.</em></h1>
       <p class="lead rise" style="--i:2">Websites, email, spreadsheets, online booking, and whatever else is slowing you down. I'm local, my prices are fair, and I'll give you an honest answer, even if that answer is that you don't need me.</p>
       <div class="hero-cta rise" style="--i:3">
-        <a class="btn" href="#contact">Get a free consultation</a>
-        <a class="btn ghost" href="tel:+13186424582">Call (318) 642-4582</a>
+        <a class="btn" href="#contact" data-magnetic>Get a free consultation</a>
+        <a class="btn ghost" href="tel:+13186424582" data-magnetic>Call (318) 642-4582</a>
       </div>
     </div>
     <button class="tilt-toggle" type="button" aria-pressed="false" hidden>Tilt to play</button>
@@ -295,7 +295,7 @@
           <h3>Free consultation and tech check-up</h3>
           <ul class="prices" role="list" aria-label="Price"><li>Free</li></ul>
           <p>An honest look at your website and the tools you use. I'll tell you what's worth fixing. If you don't need anything, I'll tell you that too.</p>
-          <a class="btn" href="#contact">Get a free consultation</a>
+          <a class="btn" href="#contact" data-magnetic>Get a free consultation</a>
         </article>
         <article class="extra on-band reveal" id="support">
           <p class="eyebrow">Keep it running</p>
@@ -324,7 +324,7 @@
           <label class="label" for="checkUrl">Your website address</label>
           <div class="check-row">
             <input class="input" id="checkUrl" name="url" type="text" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" placeholder="yourbusiness.com" aria-describedby="checkError checkHint" required />
-            <button class="btn" type="submit">Check my site</button>
+            <button class="btn" type="submit" data-magnetic>Check my site</button>
           </div>
           <p class="field-error" id="checkError" role="alert" hidden></p>
           <p class="hint" id="checkHint">I don't store your address or results. The test runs on Google's PageSpeed service.</p>
@@ -368,11 +368,11 @@
       <ul class="work-grid reveal" role="list">
         <li>
           <article class="work-card">
-            <div class="work-thumb">
+            <div class="work-thumb" style="view-transition-name: shot-analemma">
               <!-- @picture src="work/analemma/live-desktop" widths="480,800,1280" sizes="(min-width: 961px) 360px, (min-width: 641px) 50vw, 100vw" alt="" width="1440" height="900" -->
             </div>
             <div class="work-body">
-              <h3><a href="/work/analemma/">Analemma</a></h3>
+              <h3 style="view-transition-name: title-analemma"><a href="/work/analemma/">Analemma</a></h3>
               <p class="work-role">Design, build, and ongoing maintenance</p>
               <p>A collection of experimental photographic work by Elizabeth House Evans, gathered from pieces she shared with friends over the years. I designed and built the site, and I keep it secure and up to date.</p>
               <div class="work-links">
@@ -384,11 +384,11 @@
 
         <li>
           <article class="work-card">
-            <div class="work-thumb">
+            <div class="work-thumb" style="view-transition-name: shot-minicine">
               <!-- @picture src="work/minicine/live-desktop" widths="480,800,1280" sizes="(min-width: 961px) 360px, (min-width: 641px) 50vw, 100vw" alt="" width="1100" height="688" -->
             </div>
             <div class="work-body">
-              <h3><a href="/work/minicine/">minicine?</a></h3>
+              <h3 style="view-transition-name: title-minicine"><a href="/work/minicine/">minicine?</a></h3>
               <p class="work-role">Framework upgrades, security, and new features</p>
               <p>A Shreveport microcinema and community stage, founded by David Nelson. I didn't design this site. I upgraded it from Drupal 8 to Drupal 11, checked all 543 pages, switched over with no downtime, and rebuilt the site search.</p>
               <div class="work-links">
@@ -400,13 +400,13 @@
 
         <li>
           <article class="work-card">
-            <div class="work-thumb">
+            <div class="work-thumb" style="view-transition-name: shot-werla">
               <!-- @picture src="work/werla/live-desktop" widths="480,800,1280" sizes="(min-width: 961px) 360px, (min-width: 641px) 50vw, 100vw" alt="" width="1440" height="900" -->
             </div>
             <div class="work-body">
-              <h3><a href="/work/werla/">WERLA</a></h3>
+              <h3 style="view-transition-name: title-werla"><a href="/work/werla/">WERLA</a></h3>
               <p class="work-role">Volunteer work, improvements to an existing site</p>
-              <p>Wildlife Education and Rehabilitation of Louisiana. I didn't build this site. I kept their layout and made it work better: fixed their site email, which had never been sending, cleaned up what was slowing it down, and made every page work on phones.</p>
+              <p>Wildlife Education and Rehabilitation of Louisiana. I didn't build this site. I kept their layout and made it work better: fixed their site email, which had never been sending, cut image sizes by 86 to 93 percent, and made every page work on phones.</p>
               <div class="work-links">
                 <a class="text-link" href="https://werla.net/" rel="noopener">Visit werla.net</a>
               </div>
@@ -425,6 +425,16 @@
               <h3><a href="/work/SLUG/">PROJECT NAME</a></h3>
               <p class="work-role">HONEST ROLE LABEL</p>
               <p>One or two sentences: what the business is, and exactly what you did.</p>
+              BEFORE/AFTER (optional, for a case study page, once you have real "before" screenshots):
+              <figure class="ba" data-before-after>
+                <div class="ba-frame">
+                  <img src="/src/assets/work/SLUG/live-desktop-1280.webp" alt="After: DESCRIBE THE NEW VERSION" width="1440" height="900" loading="lazy">
+                  <div class="ba-before-wrap"><img src="/src/assets/work/SLUG/before-desktop-1280.webp" alt="Before: DESCRIBE THE OLD VERSION" width="1440" height="900" loading="lazy"></div>
+                  <span class="ba-handle" aria-hidden="true"></span>
+                  <input class="ba-range" type="range" min="0" max="100" value="50" aria-label="Before and after comparison. Slide right to see more of the old version.">
+                </div>
+                <figcaption><span>Before</span><span>After</span></figcaption>
+              </figure>
               <div class="work-links">
                 <a class="text-link" href="https://EXAMPLE.COM/" rel="noopener">Visit example.com</a>
               </div>
@@ -539,7 +549,7 @@
           <label for="message">What do you need help with?</label>
           <textarea id="message" name="message" required></textarea>
         </div>
-        <button class="btn" type="submit" style="justify-self:start">Send message</button>
+        <button class="btn" type="submit" style="justify-self:start" data-magnetic>Send message</button>
         <p id="formMsg" role="status" aria-live="polite"></p>
         <p class="form-note">Prefer email? Reach me directly at hello@mancolabs.dev.</p>
       </form>
