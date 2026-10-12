@@ -10,6 +10,7 @@ initStage();
 initWork();
 initScrollProgress();
 initKonami();
+initLogoTaps();
 afterIdle(() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   import('./anim/motion.js').then((m) => m.initMotion());
@@ -41,6 +42,28 @@ function initScrollProgress() {
   };
   addEventListener('scroll', () => { if (!frame) frame = requestAnimationFrame(update); }, { passive: true });
   update();
+}
+
+// On the home page the header logo scrolls to the top instead of reloading.
+// Seven quick taps open the developer view (the Konami code needs a keyboard).
+function initLogoTaps() {
+  const logo = document.querySelector('.site-header .brand');
+  if (!logo) return;
+  let taps = 0;
+  let last = 0;
+  logo.addEventListener('click', (e) => {
+    if (location.pathname !== '/' && location.pathname !== '/index.html') return;
+    e.preventDefault();
+    history.replaceState(null, '', '/');
+    scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    const now = performance.now();
+    taps = now - last < 800 ? taps + 1 : 1;
+    last = now;
+    if (taps === 7) {
+      taps = 0;
+      import('./devview.js').then((m) => m.toggleDevView());
+    }
+  });
 }
 
 // Up, up, down, down, left, right, left, right, B, A: toggles the developer view.

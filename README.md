@@ -2,7 +2,36 @@
 
 The website for **Manco Labs LLC**: affordable, practical software help for local businesses in Shreveport-Bossier. Plain HTML and CSS, built with Vite. A 3D layer (three.js) is added on top as progressive enhancement, and the site works fully without it.
 
-> **Status:** redesign in progress on the `redesign` branch. Stages 1 to 5 are done. Stage 6 (the final performance and accessibility pass) is next.
+> **Status:** the redesign is complete on the `redesign` branch and ready to launch. See the launch checklist under "Deploying".
+
+## Results
+
+These are Lighthouse 13.5 results on the production build (`npm run build && npm run preview`), measured on October 11, 2026. Mobile runs simulate a mid-range phone on slow 4G. The home page was measured with the 3D running (a real GPU) and again with the GPU disabled, which is the poster path.
+
+| Page | Mobile perf | Desktop perf | Accessibility | Best practices | SEO | Mobile LCP | TBT | CLS |
+|---|---|---|---|---|---|---|---|---|
+| Home, 3D (median of 3) | 99 | 100 | 100 | 100 | 100 | 1.95 s | 0 ms | 0 |
+| Home, poster path | 100 | 100 | 100 | 100 | 100 | 1.66 s | 0 ms | 0 |
+| Case studies (each) | 99 | 100 | 100 | 100 | 100 | 2.0 s | 0 ms | 0 |
+| 404 | 100 | 100 | 100 | 100 | 63* | 1.66 s | 0 ms | 0 |
+
+\* The 404 is `noindex` on purpose, so search engines don't list "not found" pages. Lighthouse counts that against SEO.
+
+**Why mobile performance is 99, not 100:** the hero keeps animating after it fades in, so Speed Index never sees a "finished" page (2.4 s with 3D, 1.2 s without). That's the cost of a live hero.
+
+**Also checked:**
+- **axe-core (WCAG 2.0/2.1 A and AA):** zero violations on every page, in light and dark mode, at desktop and phone sizes.
+- **Keyboard:** a full walk through the home page found 33 stops in a logical order. Each has a visible focus ring and scrolls fully into view.
+- **Reflow:** no sideways scrolling at 320px wide or at 200% zoom.
+- **Headings:** one h1 per page and no skipped levels.
+- **Browsers:** Chrome, Firefox, and WebKit run every page with no console errors. Real Safari and iPhone checks are in the launch checklist.
+
+**Tried and rejected:** inlining the CSS into each page. It made first paint slower (1.2 s to 1.4 s on simulated slow 4G), because the bigger HTML cost more than the separate request saved.
+
+**Compressed sizes (brotli):**
+- **First paint on a phone:** HTML 8 KB, CSS 7 KB, JS 2 KB, fonts 61 KB, poster 10 to 24 KB.
+- **After idle, capable devices only:** the 3D renderer is about 204 KB, and GSAP is 39 KB.
+- **Website check:** 8 KB.
 
 ---
 
@@ -221,7 +250,7 @@ Run `npm run posters` after you change the hero text, the hero layout, the color
 | Magnetic buttons | `src/anim/motion.js` | Any element with `data-magnetic` leans toward the mouse. Mouse and trackpad only. |
 | Scroll progress | `.scroll-progress` in `partials/header.html` | A 2px bar under the header. Driven by CSS scroll timelines where supported, and by a tiny scroll listener elsewhere (Firefox). |
 | About background | `src/three/about-backdrop.js` | Slow noise in the palette's dark greens with a soft glow near the cursor. It has its own canvas inside the section, rendered by the same worker. It's capped so the section's smallest text keeps at least 4.5:1 contrast. |
-| Developer view | `src/devview.js` | Konami code (up, up, down, down, left, right, left, right, B, A): 12-column grid, labeled component outlines, and live stats (page FPS, renderer and thread, 3D FPS, draw calls, pixel ratio, LCP, CLS). Escape closes it. Loads only when triggered. |
+| Developer view | `src/devview.js` | Open it with the Konami code (up, up, down, down, left, right, left, right, B, A) or seven quick taps on the header logo on the home page. On the home page the logo scrolls to the top instead of reloading. It shows a 12-column grid (4 on phones), labeled component outlines, and live stats: page FPS, renderer and thread, 3D FPS, draw calls, pixel ratio, LCP, and CLS. Escape or Close closes it. It loads only when triggered. |
 | 404 | `404.html`, `src/three/lost-scene.js` | One lost invoice floats over the page. Push it with the mouse, or tap near it on a phone, and it bounces off the screen edges. In poster mode it's a drawing. |
 
 `src/anim/motion.js` loads after the page is idle, and never with reduced motion.
@@ -250,14 +279,77 @@ Vite bakes this key into the public JavaScript, so anyone can read it. The websi
 
 ## Deploying
 
-Cloudflare Pages auto-deploys on every push to `main`. **Before the redesign is merged**, change the Pages build settings:
+Cloudflare Pages auto-deploys on every push to `main`. The site now has a build step, so Pages has to build it.
+
+### Launch checklist
+
+**1. Cloudflare Pages build settings.** In the Cloudflare dashboard, go to **Workers & Pages > your project > Settings > Build > Build configuration > Edit**:
 
 | Setting | Value |
 |---|---|
+| Framework preset | `None` (or `Vite`, which fills in the same two values) |
 | Build command | `npm run build` |
 | Build output directory | `dist` |
-| Environment variable `NODE_VERSION` | `22` (or newer) |
-| Environment variable `VITE_PSI_API_KEY` | your key |
+| Root directory | leave empty |
+
+Under **Settings > Build**, make sure **Build system version** is the latest (v3).
+
+**2. Environment variables.** Go to **Settings > Variables and Secrets** and add these for **Production**, and for **Preview** too if you use branch previews:
+
+| Name | Value | Type |
+|---|---|---|
+| `VITE_PSI_API_KEY` | your PageSpeed key | Text. It ends up in the public JavaScript anyway; the key's website restrictions are what protect it. |
+| `NODE_VERSION` | `22` | Text. Vite 8 needs Node 22.12 or newer. |
+
+**3. Google Cloud key restrictions.** Under **APIs & Services > Credentials > your key > Website restrictions**, make sure these are listed:
+- `https://mancolabs.dev/*`
+- `https://www.mancolabs.dev/*` (if the www address is used)
+- `https://*.YOUR-PROJECT.pages.dev/*`, if you want the check to work on preview deployments
+
+You can remove `http://192.168.1.92:4173/*` once you're done testing on your phone. Keep the `localhost` entries if you'll keep developing locally.
+
+**4. Optional but recommended: test a preview first.** Push the `redesign` branch on its own (`git push origin redesign`). Pages builds a preview at `https://redesign.YOUR-PROJECT.pages.dev` without touching the live site. Anyone with that link can see it, but nothing links to it.
+
+**5. Merge and push.** `main` has one commit the redesign branch doesn't: the September Analemma wording fix. Both changed `index.html`, so the merge stops on that one file. Keep the redesign's version, which already reads correctly:
+
+```bash
+git checkout main
+git pull
+git merge redesign            # stops with a conflict in index.html
+git checkout --theirs index.html
+git add index.html
+git commit                    # accept the default merge message
+git push origin main          # Cloudflare builds and deploys
+```
+
+**6. After it deploys:**
+- [ ] **Build:** the Pages deployment log shows `Copy check passed` and a successful `vite build`.
+- [ ] **Home page:** https://mancolabs.dev loads, and the papers fade in on a desktop with a GPU. To see the renderer and thread, use the Konami code, or tap the logo seven times on a phone.
+- [ ] **Website check:** one real check works. That confirms the key and its restrictions.
+- [ ] **404:** a made-up address, like `/does-not-exist`, shows the paper 404. `curl -I` shows status `404`.
+- [ ] **Email signature image:** https://mancolabs.dev/logo.png still loads.
+- [ ] **SEO files:** https://mancolabs.dev/robots.txt and `/sitemap.xml` load.
+- [ ] **Caching:** `curl -I` on any `/assets/...` file shows `Cache-Control: public, max-age=31536000, immutable`.
+- [ ] **Link previews:** refresh them with LinkedIn Post Inspector or the Facebook Sharing Debugger, so they pick up `og.jpg`.
+- [ ] **Search Console:** submit `https://mancolabs.dev/sitemap.xml` in Google Search Console.
+- [ ] **PageSpeed:** run PageSpeed Insights on the live site, mobile and desktop. Its lab machines may not have a real GPU, in which case it measures the poster version (correctly).
+- [ ] **Real devices:** go through the checks below on your iPhone and an Android phone. Tilt to play only works over HTTPS, so production is the first place you can try it.
+
+**If something's wrong:** in Cloudflare, go to **Deployments**, pick the previous deployment, and choose **Rollback to this deployment**. It's instant.
+
+### Real-device checks (Safari, iPhone, Android)
+
+These need real hardware; WebKit on Windows isn't Safari.
+- [ ] **Fonts:** headings are bold. The Windows WebKit test build couldn't use variable-font weights.
+- [ ] **3D:** the papers drift. The developer view (seven logo taps) shows the renderer (WebGPU on recent Safari, otherwise WebGL 2) and `worker` as the thread.
+- [ ] **Scrolling:** the assembly into the laptop is smooth. In the services section, the laptop stays at the top, the text fades beneath it, and nothing overlaps.
+- [ ] **Website check:** a check runs, and "Want these fixed?" fills in the contact form.
+- [ ] **Tilt:** the "Tilt to play" button asks for motion permission and then moves the papers (iPhone, HTTPS only).
+- [ ] **Transitions:** tapping a work card grows it into the case study (Safari 18.2 and newer).
+- [ ] **Dark mode:** switch the phone to dark mode and reload.
+- [ ] **Reduce Motion:** turn on Reduce Motion (iPhone: Settings > Accessibility > Motion). You should get the poster only and no heading animations.
+- [ ] **Low Power Mode:** iPhones cap animation at 30 fps, so the site may switch to the poster. That's intended; it saves battery.
+- [ ] **VoiceOver:** quick pass. Headings appear in the rotor, form fields read their labels, and website check results are announced.
 
 ## Free Website Check
 

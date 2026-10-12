@@ -4,7 +4,7 @@
 /* ── RESET & BASE ────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-padding-top: 88px; -webkit-text-size-adjust: 100%; }
+html { scroll-padding-block: 88px 32px; -webkit-text-size-adjust: 100%; }
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
 }
@@ -639,6 +639,11 @@ main, .site-footer { position: relative; z-index: 1; }
 .dev-panel dd { text-align: right; font-variant-numeric: tabular-nums; }
 .dev-close { margin-top: 10px; min-height: 32px; padding: 4px 10px; font: inherit; color: var(--ink); background: var(--paper); border: none; border-radius: 4px; cursor: pointer; }
 .dev-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 640px) {
+  .dev-grid-cols { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .dev-grid-cols span:nth-child(n + 5) { display: none; }
+  .dev-close { min-height: 44px; padding-inline: 16px; }
+}
 
 /* ── ABOUT ───────────────────────────────── */
 .about { position: relative; isolation: isolate; background: var(--bg); color: var(--text); }
