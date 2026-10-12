@@ -679,6 +679,8 @@ main, .site-footer { position: relative; z-index: 1; }
 .about h2 { font-size: clamp(2rem, 4vw, 2.9rem); margin-top: 16px; }
 .about-bio p:not(.eyebrow) { color: var(--text-2); font-size: 1.08rem; margin-top: 18px; max-width: 54ch; }
 .about-bio strong { color: var(--text); font-weight: 600; }
+.about-links a { color: var(--text); text-underline-offset: 3px; }
+.about-links a:hover { text-decoration-thickness: 2px; }
 .about-stack-label { margin-top: 34px; }
 .about-stack { list-style: none; margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
 
