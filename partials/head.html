@@ -12,8 +12,11 @@
       setTimeout(function () { if (!('ready' in d.dataset)) d.classList.remove('reveal-armed'); }, 3000);
       // 3D: "pending" means try it once the page is idle; "off" means keep the poster.
       var c = n.connection || {};
+      // Firefox for Android blanks and redraws the 3D every time its toolbar
+      // slides, so it always gets the drawings.
+      var ffAndroid = /Android/.test(n.userAgent) && /Firefox\//.test(n.userAgent);
       var forced = /[?&](poster|og|3d=on|3d=force-webgl)\b/.test(q);
-      var skip = /[?&]3d=off\b/.test(q) ||
+      var skip = /[?&]3d=off\b/.test(q) || ffAndroid ||
         matchMedia('(prefers-reduced-motion: reduce)').matches ||
         c.saveData || /2g/.test(c.effectiveType || '') ||
         ('deviceMemory' in n && (n.deviceMemory < 4 || n.hardwareConcurrency < 4));
@@ -22,7 +25,7 @@
       // Firefox for Android: its toolbar can resize viewport units while it slides,
       // which moved the page. Hold them at the height on load (see main.css), and
       // only take a new one when the width changes (the phone turned).
-      if (/Android/.test(n.userAgent) && /Firefox\//.test(n.userAgent)) {
+      if (ffAndroid) {
         d.classList.add('ff-android');
         var fw = innerWidth;
         d.style.setProperty('--fx-vh', innerHeight + 'px');

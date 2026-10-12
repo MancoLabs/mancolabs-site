@@ -208,6 +208,7 @@ Tablets and desktop keep the full-screen canvas.
 | Condition | Decided |
 |---|---|
 | `prefers-reduced-motion: reduce` | before first paint |
+| Firefox for Android (it blanks and redraws the canvas whenever its toolbar slides) | before first paint |
 | Data Saver on, or a 2G connection | before first paint |
 | Under 4 GB memory or under 4 CPU cores (Chromium only; Safari doesn't report these) | before first paint |
 | No WebGPU and no hardware WebGL 2, or a software renderer (SwiftShader, llvmpipe) | after load |
@@ -223,7 +224,7 @@ Tablets and desktop keep the full-screen canvas.
 - **Pointer:** a mouse or trackpad gently pushes nearby papers aside, and they drift back.
 - **Phones:** 24 smaller papers live in their own band under the headline (`.hero-band`), fully on screen on load and never under the header or behind text. Desktop keeps 96 papers framing the text.
 - **Address bar:** the phone address bar sliding in and out never re-measures anything. ScrollTrigger runs with `ignoreMobileResize`, and the 3D code uses a stable 100svh height.
-- **Firefox for Android:** its toolbar can move `svh` while it slides, which resized the paper band and moved the page. There (only), the head script records the height on load as `--fx-vh` and adds `.ff-android`. The hero and band use that height instead of `svh`, scroll anchoring is off, and height-only resizes are ignored by the 3D code. A new height is taken only when the width changes (the phone turned).
+- **Firefox for Android:** its toolbar can move `svh` while it slides, which resized the paper band and moved the page. There (only), the head script records the height on load as `--fx-vh` and adds `.ff-android`. The hero and band use that height instead of `svh`, scroll anchoring is off, and height-only resizes are ignored by the 3D code. A new height is taken only when the width changes (the phone turned). Firefox for Android also always gets the drawings instead of the 3D: it blanked and redrew the canvas every time the toolbar slid.
 
 ### Files
 
@@ -362,7 +363,7 @@ These need real hardware; WebKit on Windows isn't Safari.
 - [ ] **Scrolling:** flick up and down from the hero to the website check. The papers and laptop move exactly with the page, with no lag or wobble. In the services section, the laptop stays at the top, the text fades beneath it, and nothing overlaps.
 - [ ] **Website check:** a check runs, and "Want these fixed?" fills in the contact form.
 - [ ] **Transitions:** tapping a work card grows it into the case study (Safari 18.2 and newer).
-- [ ] **Firefox for Android:** scroll down from the very top and back up. The address bar slides away and back without the page jumping.
+- [ ] **Firefox for Android:** the drawings show instead of the 3D. Scroll down from the very top and back up: the address bar slides away and back without the page jumping or anything flashing.
 - [ ] **Dark mode:** switch the phone to dark mode and reload.
 - [ ] **Reduce Motion:** turn on Reduce Motion (iPhone: Settings > Accessibility > Motion). You should get the poster only and no heading animations.
 - [ ] **Low Power Mode:** iPhones cap animation at 30 fps, so the site may switch to the poster. That's intended; it saves battery.
