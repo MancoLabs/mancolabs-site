@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <!-- @include head.html -->
+  <title>Free tools | Manco Labs</title>
+  <meta name="description" content="Free tools for small businesses: check your website's speed and accessibility, see whether your email is set up to stay out of spam, and find out what manual paperwork costs you each year." />
+  <link rel="canonical" href="https://mancolabs.dev/tools/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Manco Labs" />
+  <meta property="og:title" content="Free tools | Manco Labs" />
+  <meta property="og:description" content="Check your website, your email setup, and what manual paperwork costs you. Free, no sign-up." />
+  <meta property="og:url" content="https://mancolabs.dev/tools/" />
+  <meta property="og:image" content="https://mancolabs.dev/og.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Manco Labs: I fix, build, and automate the software your business runs on." />
+  <meta name="twitter:image" content="https://mancolabs.dev/og.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+</head>
+
+<body>
+<!-- @include laptop-sprite.html -->
+<!-- @include header.html -->
+
+<main id="main">
+  <section class="cs-hero tools-hero" aria-labelledby="tools-title">
+    <div class="wrap">
+      <p class="eyebrow">Free tools</p>
+      <h1 id="tools-title">Free tools for your business</h1>
+      <p class="cs-summary">Three quick checks for local businesses. No sign-up, and I don't keep anything you type in.</p>
+      <ul class="tool-jump" role="list">
+        <li><a href="#check">Website and accessibility check</a></li>
+        <li><a href="#email-check">Email health check</a></li>
+        <li><a href="#cost">Paperwork cost calculator</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- WEBSITE CHECK: the same check as the home page, without the 3D laptop. -->
+  <section class="check sec" id="check" aria-labelledby="check-title">
+    <!-- @include check-tool.html -->
+  </section>
+
+  <!-- EMAIL HEALTH CHECK (src/tools/email-check.js) -->
+  <section class="tool sec" id="email-check" aria-labelledby="email-title" data-tool="email">
+    <div class="wrap tool-grid">
+      <div class="tool-copy">
+        <p class="eyebrow">Email health check</p>
+        <h2 id="email-title">Is your email set up to stay out of spam?</h2>
+        <p>Type in your domain. I'll look up its public email settings and explain what they mean. It only takes a few seconds.</p>
+        <form class="check-form" id="emailForm" novalidate>
+          <label class="label" for="emailDomain">Your email domain</label>
+          <div class="check-row">
+            <input class="input" id="emailDomain" name="domain" type="text" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" placeholder="yourbusiness.com" aria-describedby="emailError emailHint" required />
+            <button class="btn" type="submit">Check my email</button>
+          </div>
+          <p class="field-error" id="emailError" role="alert" hidden></p>
+          <p class="hint" id="emailHint">You can also paste an email address. The lookup uses Cloudflare's public DNS service. Nothing is stored, and no email is sent.</p>
+        </form>
+        <noscript><p class="hint">This check needs JavaScript turned on.</p></noscript>
+        <p class="sr-only" role="status" aria-live="polite"></p>
+        <section class="tool-results check-results" aria-labelledby="mailResultsTitle" hidden></section>
+      </div>
+      <div class="tool-side">
+        <h3>What it looks at</h3>
+        <dl class="tool-facts">
+          <dt>Email provider</dt>
+          <dd>Which company handles your email, from your mail server settings.</dd>
+          <dt>Sender list (SPF)</dt>
+          <dd>Which services are allowed to send email as your business.</dd>
+          <dt>Digital signature (DKIM)</dt>
+          <dd>A signature on each message that proves it really came from you.</dd>
+          <dt>Spoofing protection (DMARC)</dt>
+          <dd>What inboxes should do with fake email that uses your name.</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAPERWORK COST CALCULATOR (src/tools/cost.js). The numbers below match the starting values. -->
+  <section class="tool sec" id="cost" aria-labelledby="cost-title" data-tool="cost">
+    <div class="wrap tool-grid">
+      <div class="tool-copy">
+        <p class="eyebrow">Paperwork cost calculator</p>
+        <h2 id="cost-title">What does manual paperwork cost you?</h2>
+        <p>Filling out forms, typing the same thing into two places, and billing by hand all add up. Put in your own numbers to see the yearly cost.</p>
+        <form class="cost-form" id="costForm" novalidate>
+          <div class="field">
+            <label for="costHours">Hours a week each person spends on paperwork, double entry, or billing</label>
+            <input id="costHours" name="hours" type="number" inputmode="decimal" min="0" max="80" step="0.5" value="5" />
+          </div>
+          <div class="field">
+            <label for="costPeople">People who do this work</label>
+            <input id="costPeople" name="people" type="number" inputmode="numeric" min="1" max="500" step="1" value="2" />
+          </div>
+          <div class="field">
+            <label for="costRate">Hourly cost per person, in dollars</label>
+            <input id="costRate" name="rate" type="number" inputmode="decimal" min="1" max="500" step="1" value="25" aria-describedby="costRateHint" />
+            <p class="hint" id="costRateHint">Include taxes and benefits if you know them.</p>
+          </div>
+        </form>
+        <noscript><p class="hint">The total updates as you type when JavaScript is on. These are the results for the starting numbers.</p></noscript>
+      </div>
+      <div class="cost-panel">
+        <div class="cost-result on-band" aria-live="polite" aria-atomic="true">
+          <p class="cost-label">Yearly cost</p>
+          <p class="cost-total">$12,500 a year</p>
+          <p class="cost-detail">That's 500 hours a year of manual work across 2 people, based on 50 working weeks.</p>
+          <p class="cost-automate">If software took over even half of this work, you'd get back about $6,250 and 250 hours a year.</p>
+        </div>
+        <a class="btn cost-cta" href="/#contact">Want to see what could be automated? Free consultation.</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- @include footer.html -->
+</body>
+</html>

@@ -361,6 +361,96 @@ export function topIssues(lh, limit = 3) {
   return out;
 }
 
+// ── Accessibility report ─────────────────────
+// Every failing automated accessibility check from the same PageSpeed result,
+// in plain English and grouped by issue (checks that read the same are one
+// issue). These extra entries only cover checks that rarely make the top three,
+// so they're kept apart and never change topIssues().
+const ARIA_WRONG = { family: 'aria', title: () => 'Some screen reader code is set up wrong', body: 'Code meant to help screen readers has errors, which can make parts of the page confusing or unusable.' };
+const ARIA_NAMELESS = { family: 'aria-names', title: () => 'Some interactive parts have no readable name', body: "Screen reader users hear what kind of control it is, but not what it's for." };
+const TABLES = { family: 'tables', title: () => 'Tables are hard to follow with a screen reader', body: "Headers and cells aren't connected, so screen reader users can't tell which column or row a value belongs to." };
+const MORE_A11Y = {
+  'accesskeys': { family: 'keyboard', title: () => 'Keyboard shortcuts clash', body: 'Some shortcut keys are used twice, so pressing them may do the wrong thing.' },
+  'aria-allowed-role': ARIA_WRONG,
+  'aria-conditional-attr': ARIA_WRONG,
+  'aria-deprecated-role': ARIA_WRONG,
+  'aria-prohibited-attr': ARIA_WRONG,
+  'aria-text': ARIA_WRONG,
+  'aria-command-name': ARIA_NAMELESS,
+  'aria-dialog-name': ARIA_NAMELESS,
+  'aria-meter-name': ARIA_NAMELESS,
+  'aria-progressbar-name': ARIA_NAMELESS,
+  'aria-tooltip-name': ARIA_NAMELESS,
+  'aria-treeitem-name': ARIA_NAMELESS,
+  'input-button-name': { family: 'names', title: () => 'Some buttons have no readable name', body: "Screen reader users can't tell what these buttons do." },
+  'aria-input-field-name': { family: 'forms', title: () => 'Form fields are missing labels', body: "People using screen readers can't tell what to type into some fields, which can cost you inquiries." },
+  'aria-toggle-field-name': { family: 'forms', title: () => 'Some switches and checkboxes are missing labels', body: "Screen reader users can't tell what they turn on or off." },
+  'form-field-multiple-labels': { family: 'forms', title: () => 'Some form fields have more than one label', body: 'Screen readers may read the wrong label, or only one of them.' },
+  'aria-hidden-body': { family: 'hidden-page', title: () => 'The whole page is hidden from screen readers', body: 'A setting on the page tells screen readers to skip everything, so blind visitors get nothing.' },
+  'skip-link': { family: 'keyboard', title: () => "The skip link doesn't work", body: "Keyboard users press it to jump past the menu, but it doesn't go anywhere." },
+  'definition-list': { family: 'structure', title: () => 'Lists are coded incorrectly', body: 'Screen readers may not announce lists properly.' },
+  'dlitem': { family: 'structure', title: () => 'Lists are coded incorrectly', body: 'Screen readers may not announce lists properly.' },
+  'empty-heading': { family: 'headings', title: () => 'Some headings are empty', body: 'Screen reader users jumping between headings land on blank ones.' },
+  'html-xml-lang-mismatch': { family: 'lang', title: () => "The page's language setting is wrong", body: 'Screen readers may read it with the wrong pronunciation.' },
+  'valid-lang': { family: 'lang', title: () => 'Some text is marked with the wrong language', body: 'Screen readers may read those parts with the wrong pronunciation.' },
+  'identical-links-same-purpose': { family: 'links', title: () => 'Links with the same words go to different places', body: 'Visitors expect links that read the same to lead to the same page.' },
+  'image-redundant-alt': { family: 'alt-repeat', title: () => 'Some image descriptions repeat nearby text', body: 'Screen reader users hear the same words twice.' },
+  'object-alt': { family: 'alt', title: () => 'Embedded items are missing descriptions', body: "Screen readers can't say what these embedded items are." },
+  'landmark-one-main': { family: 'landmarks', title: () => "The page's main area isn't marked", body: 'Screen reader users use it to jump straight to the content.' },
+  'meta-refresh': { family: 'refresh', title: () => 'The page reloads or moves on by itself', body: 'Pages that change on a timer can interrupt people who read or type slowly.' },
+  'table-duplicate-name': TABLES,
+  'table-fake-caption': TABLES,
+  'td-has-header': TABLES,
+  'td-headers-attr': TABLES,
+  'th-has-data-cells': TABLES,
+};
+
+// A short, readable example of where a problem is ("Book now", not markup).
+const TAGS = /^(a|abbr|article|aside|b|body|button|div|em|footer|form|h[1-6]|header|html|i|iframe|img|input|label|li|main|nav|ol|p|section|select|span|strong|svg|table|td|th|textarea|ul|video)$/i;
+const exampleOf = (item) => {
+  const label = String(item?.node?.nodeLabel || '').replace(/\s+/g, ' ').trim();
+  // Skip markup and CSS selectors ("td > img", "a#home"): they mean nothing to an owner.
+  if (label.length < 2 || TAGS.test(label) || /^[<{]/.test(label) || /s>s/.test(label) || /^[a-z][w-]*([#.][w-]+)+$/i.test(label)) return null;
+  return label.length > 42 ? `${label.slice(0, 40).trim()}…` : label;
+};
+
+// Checks about the page as a whole, where "found in 1 place" would be odd.
+const WHOLE_PAGE = new Set(['html-has-lang', 'html-lang-valid', 'html-xml-lang-mismatch', 'document-title', 'meta-viewport', 'meta-refresh', 'bypass', 'landmark-one-main', 'aria-hidden-body', 'skip-link']);
+
+export function a11yReport(lh) {
+  const cat = lh.categories?.accessibility;
+  if (!cat) return null;
+  let passed = 0;
+  let total = 0;
+  const groups = new Map();
+  for (const ref of cat.auditRefs) {
+    const a = lh.audits[ref.id];
+    if (!a || a.scoreDisplayMode !== 'binary' || a.score == null) continue;
+    total++;
+    if (a.score >= 1) {
+      passed++;
+      continue;
+    }
+    const entry = ENTRIES[ref.id] || MORE_A11Y[ref.id];
+    const title = entry ? text(entry.title, a) : stripMarkdown(a.title);
+    const items = a.details?.items || [];
+    const g = groups.get(title) || { title, body: entry ? text(entry.body, a) : 'Google flagged this as something worth fixing.', count: 0, examples: [], weight: 0, page: false };
+    g.weight += ref.weight || 0;
+    if (items.length && !WHOLE_PAGE.has(ref.id)) g.count += items.length;
+    else g.page = true;
+    for (const item of items) {
+      const ex = exampleOf(item);
+      if (ex && g.examples.length < 2 && !g.examples.includes(ex)) g.examples.push(ex);
+    }
+    groups.set(title, g);
+  }
+  return {
+    passed,
+    total,
+    groups: [...groups.values()].sort((x, y) => y.weight - x.weight || y.count - x.count),
+  };
+}
+
 export function band(score) {
   if (score >= 90) return { key: 'good', label: 'Good' };
   if (score >= 50) return { key: 'okay', label: 'Needs work' };

@@ -1,6 +1,7 @@
 // The Free Website Check: form, progress, results, and the laptop screen.
 import { normalizeUrl, runCheck, CheckError } from './psi.js';
 import { band } from './issues.js';
+import { sendToContact, fillContact } from '../contact-handoff.js';
 
 const MESSAGES = {
   empty: 'Type in your website address, like yourbusiness.com.',
@@ -31,6 +32,7 @@ const CACHE_MS = 30 * 60 * 1000;
 // optional polish rather than problems to fix.
 const isStrong = (scores) => CATS.every(([key]) => scores[key] >= 90);
 const SELF_URL = 'https://mancolabs.dev/';
+const A11Y_NOTE = 'Automated tests like this catch only some accessibility problems. A full review also includes testing by hand, such as using the site with only a keyboard and with a screen reader.';
 const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function h(tag, attrs = {}, ...children) {
@@ -247,6 +249,8 @@ export function initCheck(section) {
     const cta = h('a', { class: 'btn', href: '#contact', text: issues.length && !strong ? 'Want these fixed? Free consultation.' : 'Want a second opinion? Free consultation.' });
     cta.addEventListener('click', (e) => {
       e.preventDefault();
+      // No contact form on this page (the /tools/ page): carry the summary to the home page's.
+      if (!document.getElementById('contactForm')) return sendToContact(contactSummary(host, result));
       prefillContact(host, result);
       document.getElementById('contact')?.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth' });
       history.replaceState(null, '', '#contact');
@@ -260,28 +264,48 @@ export function initCheck(section) {
       h('h4', { text: strong ? 'Minor suggestions' : 'Top things to fix' }),
       ...intro,
       list,
+      a11yDetails(result.accessibility),
       cta,
     );
   }
 
-  function prefillContact(host, { scores, issues }) {
-    const message = document.getElementById('message');
-    const service = document.getElementById('service');
-    if (!message) return;
+  // Every failing automated accessibility check, grouped by issue. Collapsed by default.
+  function a11yDetails(report) {
+    if (!report) return null; // a result cached before this section existed
+    const { groups, passed, total } = report;
+    const n = groups.length;
+    const where = (g) => {
+      if (g.page && !g.count) return 'This affects the whole page.';
+      const places = `Found in ${g.count} ${g.count === 1 ? 'place' : 'places'}`;
+      return g.examples.length ? `${places}, for example ${g.examples.map((x) => `"${x}"`).join(' and ')}.` : `${places}.`;
+    };
+    return h(
+      'details',
+      { class: 'a11y' },
+      h('summary', { text: n ? `Accessibility details: ${n} ${n === 1 ? 'issue' : 'issues'} found` : 'Accessibility details: no problems found' }),
+      h('p', { class: 'a11y-intro', text: `Google's automated test passed ${passed} of ${total} accessibility checks.` }),
+      n
+        ? h('ol', { class: 'issues a11y-list' }, ...groups.map((g) => h('li', {}, h('strong', { text: g.title }), h('p', { text: g.body }), h('p', { class: 'a11y-where', text: where(g) }))))
+        : h('p', { class: 'issues-none', text: "It didn't find any accessibility problems." }),
+      h('p', { class: 'a11y-note', text: A11Y_NOTE }),
+    );
+  }
+
+  function contactSummary(host, { scores, issues }) {
     const strong = isStrong(scores);
-    const text = [
+    const message = [
       `I ran the free website check on ${host}.`,
       `Performance ${scores.performance}, Accessibility ${scores.accessibility}, Best practices ${scores.bestPractices}, SEO ${scores.seo}.`,
       ...(issues.length ? ['', strong ? 'Minor suggestions:' : 'Top issues:', ...issues.map((i) => `- ${i.title}`)] : []),
       '',
       strong ? "I'd like a second opinion." : "I'd like help with these.",
     ].join('\n');
-    if (!message.value.trim() || message.value === message.dataset.prefill) {
-      message.value = text;
-      message.dataset.prefill = text;
-    }
     // A strong site isn't necessarily broken, so leave the service as it is.
-    if (service && !strong) service.value = 'Fix something';
+    return { message, service: strong ? null : 'Fix something' };
+  }
+
+  function prefillContact(host, result) {
+    fillContact(contactSummary(host, result));
   }
 
   form.addEventListener('submit', (e) => {

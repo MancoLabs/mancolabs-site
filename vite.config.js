@@ -12,6 +12,7 @@ const PAGES = {
   analemma: 'work/analemma/index.html',
   minicine: 'work/minicine/index.html',
   werla: 'work/werla/index.html',
+  tools: 'tools/index.html',
 };
 
 // Two HTML directives, expanded before Vite processes each page:

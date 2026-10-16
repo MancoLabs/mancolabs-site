@@ -5,7 +5,9 @@ root.dataset.ready = '';
 initHeader();
 initReveal();
 initContactForm();
+initPrefill();
 initCheckLoader();
+initTools();
 initStage();
 initWork();
 initScrollProgress();
@@ -21,6 +23,41 @@ function afterIdle(fn) {
   const go = () => idle(fn, { timeout: 3000 });
   if (document.readyState === 'complete') go();
   else addEventListener('load', go, { once: true });
+}
+
+// The email check and the paperwork calculator on /tools/. Both are small, so
+// they load right away rather than waiting for the page to go idle.
+function initTools() {
+  const email = document.querySelector('[data-tool="email"]');
+  const cost = document.querySelector('[data-tool="cost"]');
+  if (email) import('./tools/email-check.js').then((m) => m.initEmailCheck(email));
+  if (cost) import('./tools/cost.js').then((m) => m.initCost(cost));
+}
+
+// A free tool on another page sent its summary here (see contact-handoff.js).
+// Fill in the contact form with it, once, and never over the visitor's own words.
+function initPrefill() {
+  const message = document.getElementById('message');
+  if (!message) return;
+  let data = null;
+  try {
+    data = JSON.parse(sessionStorage.getItem('ml-prefill'));
+    sessionStorage.removeItem('ml-prefill');
+  } catch {
+    return;
+  }
+  if (!data?.message || Date.now() - data.at > 30 * 60 * 1000) return;
+  if (!message.value.trim()) {
+    message.value = data.message;
+    message.dataset.prefill = data.message;
+  }
+  const service = document.getElementById('service');
+  if (service && data.service) service.value = data.service;
+  if (location.hash !== '#contact') return;
+  // The browser's own jump to #contact resets focus, so wait until it has happened.
+  const focusName = () => requestAnimationFrame(() => document.getElementById('name')?.focus({ preventScroll: true }));
+  if (document.readyState === 'complete') focusName();
+  else addEventListener('load', focusName, { once: true });
 }
 
 function initWork() {
@@ -123,6 +160,11 @@ function initHeader() {
   if (!header) return;
   const toggle = header.querySelector('.menu-toggle');
   const links = header.querySelector('.navlinks');
+  // Mark the menu link for the page you're on (only whole pages, like /tools/).
+  for (const a of links.querySelectorAll('a')) {
+    const url = new URL(a.href);
+    if (!url.hash && url.pathname !== '/' && url.pathname === location.pathname) a.setAttribute('aria-current', 'page');
+  }
 
   const setOpen = (open) => {
     toggle.setAttribute('aria-expanded', String(open));

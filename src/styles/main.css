@@ -156,6 +156,7 @@ p { text-wrap: pretty; }
 .navlinks { list-style: none; display: flex; align-items: center; gap: 28px; }
 .navlinks a:not(.btn) { display: inline-block; padding-block: 10px; font-size: 0.94rem; font-weight: 500; color: var(--text-2); text-decoration: none; transition: color 0.2s; }
 .navlinks a:not(.btn):hover { color: var(--text); }
+.navlinks a[aria-current="page"] { color: var(--text); text-decoration: underline; text-decoration-color: var(--deco); text-underline-offset: 6px; }
 
 .menu-toggle {
   display: none;
@@ -495,6 +496,66 @@ main, .site-footer { position: relative; z-index: 1; }
 .issues-none { margin-top: 10px; color: var(--text-2); }
 .issues-intro { margin-top: 8px; color: var(--text-2); max-width: 56ch; }
 .check-results .btn { margin-top: 26px; }
+
+/* Disclosure sections inside results: accessibility details, raw email records. */
+.a11y, .mail-raw { margin-top: 26px; border-top: 1px solid var(--hairline); }
+.a11y summary, .mail-raw summary { min-height: 44px; padding-block: 12px; font-weight: 600; cursor: pointer; }
+.a11y summary:hover, .mail-raw summary:hover { text-decoration: underline; text-decoration-color: var(--deco); text-underline-offset: 0.2em; }
+.a11y-intro { margin-top: 4px; color: var(--text-2); }
+.a11y-list { margin-top: 16px; }
+.issues .a11y-where { margin-top: 4px; font-size: 0.92rem; }
+.a11y-note { margin-top: 18px; padding-left: 12px; border-left: 3px solid var(--hairline); font-size: 0.92rem; color: var(--text-2); }
+
+/* Home page: the way to the other free tools, under the website check. */
+.more-tools { margin-top: clamp(28px, 4vw, 44px); }
+.more-tools a { display: inline-block; padding-block: 10px; font-weight: 600; text-decoration-color: var(--deco); text-underline-offset: 0.2em; }
+.more-tools a:hover { text-decoration-color: currentColor; }
+
+/* ── FREE TOOLS PAGE (/tools/) ───────────── */
+.tool-jump { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.tool-jump a { display: inline-flex; align-items: center; min-height: 44px; padding: 0.5em 1.1em; border: 1.5px solid var(--border); border-radius: 999px; font-weight: 500; text-decoration: none; }
+.tool-jump a:hover { border-color: var(--text); }
+.tool { border-top: 1px solid var(--hairline); }
+.tool-grid { display: grid; gap: clamp(32px, 6vw, 80px); align-items: start; }
+@media (min-width: 961px) { .tool-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr); } }
+.tool h2 { font-size: clamp(2rem, 4vw, 2.9rem); margin-top: 14px; }
+.tool-copy > p:not(.eyebrow):not(.hint):not(.sr-only) { color: var(--text-2); font-size: 1.08rem; max-width: 46ch; margin-top: 18px; }
+.tool-side { padding: clamp(20px, 3vw, 28px); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.tool-side h3 { font-size: 1.05rem; }
+.tool-facts { margin-top: 14px; }
+.tool-facts dt { font-weight: 600; }
+.tool-facts dt:not(:first-child) { margin-top: 14px; }
+.tool-facts dd { margin-top: 2px; color: var(--text-2); }
+
+/* Email health check results */
+.mail-verdict { margin-top: 10px; color: var(--text-2); max-width: 56ch; }
+.mail-verdict strong { display: block; margin-bottom: 4px; font-size: 1.15rem; color: var(--text); }
+.mail-rows { list-style: none; display: grid; gap: 12px; margin-top: 20px; }
+.mail-row { padding: 14px 16px; border: 1px solid var(--border); border-left-width: 4px; border-radius: var(--radius); background: var(--surface); }
+.mail-row.is-good { border-left-color: var(--accent-text); }
+.mail-row.is-okay { border-left-color: var(--ink-soft); }
+.mail-row.is-poor { border-left-color: var(--text); }
+.mail-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; }
+.mail-row p { margin-top: 6px; color: var(--text-2); }
+.status-chip { padding: 0.15em 0.7em; border: 1px solid var(--border); border-radius: 999px; font-family: var(--mono); font-size: 0.8rem; color: var(--text-2); }
+.is-good .status-chip { color: var(--accent-text); border-color: currentColor; }
+.is-poor .status-chip { color: var(--text); border-color: currentColor; font-weight: 600; }
+.mail-raw dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin-top: 4px; font-size: 0.9rem; }
+.mail-raw dt { font-weight: 600; }
+.mail-raw dd { font-family: var(--mono); color: var(--text-2); overflow-wrap: anywhere; }
+@media (max-width: 480px) { .mail-raw dl { grid-template-columns: 1fr; } .mail-raw dd { margin-bottom: 8px; } }
+
+/* Paperwork cost calculator */
+.cost-form { display: grid; gap: 18px; max-width: 520px; margin-top: 28px; }
+.cost-form .hint { margin-top: 2px; }
+/* These labels are full sentences, so they read better in normal case. */
+.cost-form .field label { font-family: var(--sans); font-size: 1rem; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--text); }
+.cost-result { padding: clamp(22px, 4vw, 32px); border-radius: var(--radius); background: var(--band); }
+.cost-label { font-family: var(--mono); font-size: 0.8rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-text); }
+.cost-total { margin-top: 10px; font-size: clamp(2.2rem, 6vw, 3.2rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; }
+.cost-detail, .cost-automate { margin-top: 14px; color: var(--text-2); }
+.cost-automate { color: var(--text); font-weight: 500; }
+.cost-cta { margin-top: 22px; }
 
 /* The laptop beside the form. In 3D the real laptop takes its place. */
 .check-visual { margin: 0; aspect-ratio: 5 / 4; display: grid; place-items: center; }

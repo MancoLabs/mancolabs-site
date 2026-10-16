@@ -1,0 +1,41 @@
+<!-- The Free Website Check: used on the home page (with the 3D laptop) and on /tools/. -->
+    <div class="wrap check-grid">
+      <div class="check-copy reveal">
+        <p class="eyebrow">Free website check</p>
+        <h2 id="check-title">How does your website do on a phone?</h2>
+        <p>Type in your web address. I'll run Google's free PageSpeed test and explain what it finds in plain English. It usually takes under a minute.</p>
+        <!-- Without JavaScript this opens Google's own report in a new tab. -->
+        <form class="check-form" id="checkForm" action="https://pagespeed.web.dev/report" method="get" target="_blank" novalidate>
+          <label class="label" for="checkUrl">Your website address</label>
+          <div class="check-row">
+            <input class="input" id="checkUrl" name="url" type="text" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" placeholder="yourbusiness.com" aria-describedby="checkError checkHint" required />
+            <button class="btn" type="submit" data-magnetic>Check my site</button>
+          </div>
+          <p class="field-error" id="checkError" role="alert" hidden></p>
+          <p class="hint" id="checkHint">I don't store your address or results. The test runs on Google's PageSpeed service.</p>
+        </form>
+        <p class="sr-only" id="checkStatus" role="status" aria-live="polite"></p>
+        <div class="check-progress" id="checkProgress" aria-hidden="true" hidden>
+          <span class="cp-bar"></span>
+          <span class="cp-step"></span>
+          <span class="cp-time"></span>
+        </div>
+        <section class="check-results" id="checkResults" aria-labelledby="checkResultsTitle" hidden></section>
+        <button class="text-btn" type="button" id="checkSelf" hidden>Try it on this site too</button>
+      </div>
+      <figure class="check-visual reveal" data-anchor="check" aria-hidden="true">
+        <div class="cv-device">
+          <svg class="ill" viewBox="0 0 600 380" focusable="false">
+            <use href="#ill-laptop"/>
+            <rect class="ill-bar" x="102" y="34" width="396" height="270" rx="4"/>
+          </svg>
+          <div class="check-screen" data-state="idle">
+            <div class="cs-phone">
+              <div class="cs-skeleton"><span class="cs-domain">Your site here</span></div>
+              <img class="cs-shot" alt="" hidden />
+              <span class="cs-scan"></span>
+            </div>
+          </div>
+        </div>
+      </figure>
+    </div>

@@ -1,5 +1,5 @@
 // Google PageSpeed Insights (v5), mobile, all four categories.
-import { topIssues } from './issues.js';
+import { topIssues, a11yReport } from './issues.js';
 
 const ENDPOINT = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
 const CATEGORIES = ['PERFORMANCE', 'ACCESSIBILITY', 'BEST_PRACTICES', 'SEO'];
@@ -80,6 +80,7 @@ export async function runCheck(url, { signal } = {}) {
       seo: score('seo'),
     },
     issues: topIssues(lh),
+    accessibility: a11yReport(lh),
     screenshot: lh.audits['final-screenshot']?.details?.data || null,
     frames: (lh.audits['screenshot-thumbnails']?.details?.items || []).map((i) => i.data).filter(Boolean),
   };

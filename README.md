@@ -376,6 +376,8 @@ A visitor types an address. The page runs Google PageSpeed Insights (v5, mobile,
 - the top three issues in plain English, under "Top things to fix";
 - a "Want these fixed? Free consultation." button. It fills in the contact form with the address, scores, and issues, picks "Fix something" as the service, then moves to it.
 
+Under the list, a collapsed **Accessibility details** section shows every failing automated accessibility check, in plain English and grouped by issue, with how many places on the page each one affects and up to two readable examples ("Book now", never code). It comes from the same PageSpeed result, so it costs no extra request. It ends with a note that automated tests catch only some accessibility problems and that a full review includes testing by hand.
+
 When all four scores are 90 or above, the same list is framed as polish instead: the heading reads "Minor suggestions", a line says none of it is urgent, the button reads "Want a second opinion? Free consultation.", and the prefilled message asks for a second opinion without changing the service.
 
 **Files:**
@@ -383,8 +385,9 @@ When all four scores are 90 or above, the same list is framed as polish instead:
 | File | Role |
 |---|---|
 | `src/check/psi.js` | Cleans up the address, calls the API (90-second timeout), and turns failures into friendly error types |
-| `src/check/issues.js` | The plain-English dictionary and the ranking that picks the top three |
+| `src/check/issues.js` | The plain-English dictionary, the ranking that picks the top three, and `a11yReport()` for the accessibility details |
 | `src/check/check.js` | Form, progress, results, prefill, and the laptop screen |
+| `partials/check-tool.html` | The check's markup, shared by the home page and `/tools/` |
 
 **How the top three are picked:** each failing audit gets a rough "points it costs you" estimate. For performance metrics that's the metric's weight. For speed fixes it comes from Google's estimated time and size savings. For everything else it's the audit's share of its category. Related audits share a family (for example, all the image ones), and only the biggest of each family is shown. No AI is involved, so nothing is made up.
 
@@ -395,6 +398,8 @@ When all four scores are 90 or above, the same list is framed as polish instead:
 
 Titles and bodies can use the audit's numbers (see the `kb`, `ms`, and `secs` helpers). An audit with no entry falls back to Google's own title, but only when there aren't three explained issues to show.
 
+Accessibility checks that rarely make the top three have their entries in `MORE_A11Y`, which only the accessibility details use, so adding to it never changes the top three. In the details, checks whose titles read the same are grouped as one issue.
+
 **Behavior worth knowing:**
 - **Bad input:** addresses without `https://` are fine. Local network addresses get a clear "Google can't reach that" message.
 - **Errors:** rate limits, unreachable sites, Google errors, timeouts, no connection, and a rejected key each get a friendly message. A rejected key also logs a console warning.
@@ -403,6 +408,36 @@ Titles and bodies can use the audit's numbers (see the `kb`, `ms`, and `secs` he
 - **Laptop screen:** the screen shows a phone-shaped preview. While the test runs, it shows the visitor's domain with a scanning light. After, it replays the page's real loading frames, then shows the final screenshot. This works in 3D and in poster mode.
 - **Without JavaScript:** the form opens Google's own PageSpeed report in a new tab.
 - **Testing from your phone on your network:** add your computer's address (for example, `http://192.168.1.92:4173/*`) to the key's allowed websites in Google Cloud.
+
+## Free tools page
+
+`/tools/` (`tools/index.html`) puts three free tools in one place. It's in the main menu and the sitemap, and the home page links to it under the website check ("More free tools").
+
+1. **Website and accessibility check:** the same check as the home page, from the same partial, including the accessibility details. There's no 3D here: the laptop is the drawing, and its screen still shows the scan and the result.
+2. **Email health check** (`src/tools/email-check.js`): see below.
+3. **Paperwork cost calculator** (`src/tools/cost.js`): hours a week per person x people x hourly cost x 50 working weeks. It updates as you type, and the starting numbers (5 hours, 2 people, $25) are written into the page so the result shows without JavaScript too. Screen readers hear the new total once typing pauses.
+
+**"Free consultation" from another page:** the contact form only lives on the home page. On `/tools/`, each tool's button saves a short summary for that browser tab and opens `/#contact`, and the home page fills in the message and service (`src/contact-handoff.js`, read by `initPrefill` in `main.js`). It never overwrites anything the visitor already typed, and the saved summary is used once.
+
+### Email health check
+
+The visitor types a domain (or pastes an email address or web address; only the domain is used). The page looks up public DNS records through Cloudflare's DNS-over-HTTPS JSON service, falling back to Google's if Cloudflare can't be reached. Neither needs a key, and nothing is stored.
+
+| Record | Looked up at | Result |
+|---|---|---|
+| Mail servers (MX) | the domain | Names the email provider from the server names (`PROVIDERS`), or says the domain doesn't receive email |
+| SPF | the domain's TXT records | Missing, more than one, allows anyone (`+all`), unfinished (no `all`, or `?all`), too long (over 10 lookups), doesn't seem to include the provider, or good |
+| DMARC | `_dmarc.` + domain | Missing, has a mistake, monitoring only (`p=none`), partly on (`pct` under 100), or good (`quarantine` or `reject`) |
+| DKIM | `<name>._domainkey.` + domain, for about 30 common names (`SELECTORS`) | Found (and under which name), or "not found under common names". It never says "missing": services can use a custom name nobody can guess. |
+
+**Overall:** "Set up to stay out of the spam folder" needs a good SPF and an enforced DMARC. With neither, it's "Not set up". Anything between is "Partly set up". DKIM doesn't count against anyone, since it can't be confirmed from outside.
+
+**SPF follows its references:** `include:` and `redirect=` are followed the way inboxes do, up to the 10-lookup limit inboxes enforce. That's how it knows whether the provider is listed somewhere down the chain, and when a list is too long to work.
+
+**Behavior worth knowing:**
+- **Bad input:** a misspelled or made-up domain gets "That domain doesn't seem to exist." Local names like `.local` are rejected.
+- **The raw records** are under "Show the records we found", for anyone who wants to see exactly what was read.
+- **Screen readers:** they hear when results are ready, and focus moves to the results heading.
 
 ## Placeholders
 
