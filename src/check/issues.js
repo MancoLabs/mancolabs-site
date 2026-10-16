@@ -18,10 +18,16 @@ const totalMb = (a) => `${(a.numericValue / 1024 / 1024).toFixed(1)} MB`;
 
 const ENTRIES = {
   // ── Speed (the measured results) ──
+  // Over 20 seconds, the number is rarely how long visitors wait: a slideshow,
+  // carousel, or late image kept changing the biggest thing on screen.
   'largest-contentful-paint': {
     family: 'speed',
-    title: (a) => `The main content takes ${secs(a)} to show up on a phone`,
-    body: 'Many visitors give up on a page that takes more than a few seconds to appear.',
+    title: (a) => (a.numericValue > 20000
+      ? 'The test measured a very long load time'
+      : `The main content takes ${secs(a)} to show up on a phone`),
+    body: (a) => (a.numericValue > 20000
+      ? `Google's test measured ${secs(a)} before the main content settled. That's often caused by a slideshow, or images that keep changing or load late, after the page first shows up. Real visitors may see the page sooner, but it's worth a look.`
+      : 'Many visitors give up on a page that takes more than a few seconds to appear.'),
   },
   'first-contentful-paint': {
     family: 'speed',

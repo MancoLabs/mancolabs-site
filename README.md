@@ -398,6 +398,8 @@ When all four scores are 90 or above, the same list is framed as polish instead:
 
 Titles and bodies can use the audit's numbers (see the `kb`, `ms`, and `secs` helpers). An audit with no entry falls back to Google's own title, but only when there aren't three explained issues to show.
 
+When Largest Contentful Paint is over 20 seconds, the wording changes: the number is rarely how long visitors wait. It usually means a slideshow, or images that keep changing or load late, so the result says the test measured a very long time and that real visitors may see the page sooner.
+
 Accessibility checks that rarely make the top three have their entries in `MORE_A11Y`, which only the accessibility details use, so adding to it never changes the top three. In the details, checks whose titles read the same are grouped as one issue.
 
 **Behavior worth knowing:**
