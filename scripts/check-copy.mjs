@@ -2,7 +2,7 @@
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-const TARGETS = ['index.html', '404.html', 'work', 'tools', 'partials', 'src'];
+const TARGETS = ['index.html', '404.html', 'work', 'tools', 'launch', 'partials', 'src'];
 const TEXT_FILE = /\.(html|js|css|json)$/;
 const RULES = [
   { re: /—/g, name: 'em dash' },

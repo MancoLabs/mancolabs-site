@@ -13,6 +13,7 @@ const PAGES = {
   minicine: 'work/minicine/index.html',
   werla: 'work/werla/index.html',
   tools: 'tools/index.html',
+  launch: 'launch/index.html',
 };
 
 // Two HTML directives, expanded before Vite processes each page:

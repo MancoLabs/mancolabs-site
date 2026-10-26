@@ -411,6 +411,15 @@ Accessibility checks that rarely make the top three have their entries in `MORE_
 - **Without JavaScript:** the form opens Google's own PageSpeed report in a new tab.
 - **Testing from your phone on your network:** add your computer's address (for example, `http://192.168.1.92:4173/*`) to the key's allowed websites in Google Cloud.
 
+## AI app launch page
+
+`/launch/` (`launch/index.html`) sells one offer: taking a prototype someone built with AI and making it a live, secure web app. It's light on purpose: no 3D, and nothing new to load beyond the shared styles and the headline reveal every page has.
+
+- **Getting there:** "Launch your AI app" in the main menu (in place of "Website check", which is still on the home page and under Free tools; seven items don't fit at 881px), and a "Built something with AI? Launch your AI app" link in the home page's Build row.
+- **Contact:** "Book a free call" is the same Google Calendar booking link as the contact section. "or send a message" opens the home page's contact form with "Launch an AI-built app" picked in the service dropdown. Any link can do this with `data-contact-service` (and optionally `data-contact-message`); see `initContactLinks` in `src/main.js`. Without JavaScript it's a plain link to the form.
+- **Search:** its own title, description, and Open Graph tags (sharing the site's `og.jpg`), plus Service structured data with both offers and their starting prices. It's in the sitemap.
+- **Drafts:** content waiting on a client's approval lives in `drafts/`, which is gitignored, so it stays on your own machine and never reaches this public repository or the live site. Each draft says where it goes and what it needs.
+
 ## Free tools page
 
 `/tools/` (`tools/index.html`) puts three free tools in one place. It's in the main menu and the sitemap, and the home page links to it under the website check ("More free tools").

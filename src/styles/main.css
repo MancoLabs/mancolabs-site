@@ -511,6 +511,26 @@ main, .site-footer { position: relative; z-index: 1; }
 .more-tools a { display: inline-block; padding-block: 10px; font-weight: 600; text-decoration-color: var(--deco); text-underline-offset: 0.2em; }
 .more-tools a:hover { text-decoration-color: currentColor; }
 
+/* Home page, Build row: the way to the AI app launch page. */
+.stage-more { margin-top: 20px; color: var(--text-2); }
+.stage-more a { font-weight: 600; color: var(--text); text-decoration-color: var(--deco); text-underline-offset: 0.2em; }
+.stage-more a:hover { text-decoration-color: currentColor; }
+
+/* ── AI APP LAUNCH PAGE (/launch/) ───────── */
+.launch-sec { border-top: 1px solid var(--hairline); }
+.launch-offers { margin-top: 0; align-items: start; }
+.launch-offers .extra > p { margin-top: 2px; }
+.cta-alt { align-self: center; padding-block: 10px; font-weight: 600; text-decoration-color: var(--deco); text-underline-offset: 0.2em; }
+.cta-alt:hover { text-decoration-color: currentColor; }
+.steps { list-style: none; counter-reset: step; display: grid; gap: 18px; max-width: 760px; }
+.steps li { counter-increment: step; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; font-size: clamp(1.05rem, 2vw, 1.2rem); }
+.steps li::before { content: counter(step); display: grid; place-items: center; width: 42px; height: 42px; border: 1.5px solid var(--border); border-radius: 50%; font-family: var(--mono); font-weight: 600; color: var(--accent-text); }
+.faq { display: grid; gap: 28px 48px; max-width: 980px; }
+@media (min-width: 761px) { .faq { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.faq h3 { font-size: 1.15rem; }
+.faq p { margin-top: 6px; color: var(--text-2); max-width: 52ch; }
+.launch-end { margin-top: clamp(36px, 5vw, 56px); }
+
 /* ── FREE TOOLS PAGE (/tools/) ───────────── */
 .tool-jump { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
 .tool-jump a { display: inline-flex; align-items: center; min-height: 44px; padding: 0.5em 1.1em; border: 1.5px solid var(--border); border-radius: 999px; font-weight: 500; text-decoration: none; }

@@ -6,6 +6,7 @@ initHeader();
 initReveal();
 initContactForm();
 initPrefill();
+initContactLinks();
 initCheckLoader();
 initTools();
 initStage();
@@ -58,6 +59,18 @@ function initPrefill() {
   const focusName = () => requestAnimationFrame(() => document.getElementById('name')?.focus({ preventScroll: true }));
   if (document.readyState === 'complete') focusName();
   else addEventListener('load', focusName, { once: true });
+}
+
+// Links that open the contact form with a service picked, like "or send a
+// message" on /launch/ (data-contact-service, data-contact-message). Without
+// JavaScript they're plain links to the form.
+function initContactLinks() {
+  for (const a of document.querySelectorAll('a[data-contact-service]')) {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      import('./contact-handoff.js').then((m) => m.sendToContact({ message: a.dataset.contactMessage || '', service: a.dataset.contactService }));
+    });
+  }
 }
 
 function initWork() {
