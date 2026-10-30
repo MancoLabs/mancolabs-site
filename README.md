@@ -114,6 +114,8 @@ In `index.html`, inside `<section id="work">`. There's a commented-out card temp
 
 Cards tilt slightly toward the mouse and show a soft highlight (`src/work/tilt.js`). This is skipped on touch screens and with reduced motion.
 
+The grid is built for four cards: four across from 1440px wide (the grid grows past the page width to fit them, centered), two rows of two below that, and one per row on phones. Below 1440px, four across would squeeze the descriptions to under 30 characters a line. A fifth card would sit alone on a row, so revisit `.work-grid` in `main.css` when you add one. The card images' `sizes` attribute matches these widths.
+
 ### Before/after slider
 
 `src/work/before-after.js` provides an accessible comparison slider. A real range input sits over the two images, so it works with a keyboard (arrow keys), a screen reader, a mouse, and touch. No page uses it right now, because WERLA has no faithful "before" images. To use it, copy the commented `BEFORE/AFTER` snippet from the card template in `index.html` into a case study and point it at real screenshots. The script loads only on pages that contain `[data-before-after]`.

@@ -619,7 +619,18 @@ main, .site-footer { position: relative; z-index: 1; }
 
 /* ── WORK ────────────────────────────────── */
 .work { border-top: 1px solid var(--hairline); }
-.work-grid { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.work-grid { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+/* Four across only on wide screens, where each card keeps the line length three
+   across used to have. The grid grows past the page width to make room, centered
+   under the heading. Narrower screens get two rows of two, phones one per row. */
+@media (min-width: 1440px) {
+  .work-grid {
+    --grid-w: min(100vw - 80px, 1440px);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: var(--grid-w);
+    margin-inline: calc((100% - var(--grid-w)) / 2);
+  }
+}
 
 .work-card {
   position: relative;
@@ -883,7 +894,6 @@ main, .site-footer { position: relative; z-index: 1; }
   .stage { min-height: 0; }
   .stage-visual { order: -1; }
   .stage-visual, .check-visual, .assembly-anchor { max-width: 560px; }
-  .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 880px) {
