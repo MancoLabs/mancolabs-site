@@ -848,6 +848,7 @@ main, .site-footer { position: relative; z-index: 1; }
 .did { display: grid; gap: 26px; }
 .did h3 { font-size: 1.1rem; }
 .did .ticks { margin-top: 10px; color: var(--text-2); }
+.did .hint { margin-top: 8px; }
 .cs-note { margin-top: 18px; padding: 14px 16px; border-left: 3px solid var(--deco); background: var(--band); color: var(--text-2-on-band); max-width: 52ch; }
 
 .cs-next {

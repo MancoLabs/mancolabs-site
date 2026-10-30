@@ -12,6 +12,7 @@ const OUT = 'src/assets/work';
 // No WERLA "before": every Wayback capture before July 2026 is missing the old
 // site's navigation and cover stylesheets, so none shows the real old design.
 const SHOTS = [
+  { slug: 'chen', name: 'live', url: 'https://chennwla.org/' },
   { slug: 'analemma', name: 'live', url: 'https://analemma.us/' },
   // Narrower viewport: minicine.org's layout is fixed-width and leaves 1440px mostly empty.
   { slug: 'minicine', name: 'live', url: 'https://www.minicine.org/', desktopWidth: 1100 },

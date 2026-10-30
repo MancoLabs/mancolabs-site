@@ -9,6 +9,7 @@ const PARTIALS = resolve(ROOT, 'partials');
 const PAGES = {
   main: 'index.html',
   notFound: '404.html',
+  chen: 'work/chen/index.html',
   analemma: 'work/analemma/index.html',
   minicine: 'work/minicine/index.html',
   werla: 'work/werla/index.html',
