@@ -45,7 +45,7 @@ function open() {
   const boxes = el('div', 'dev-boxes');
   boxes.setAttribute('aria-hidden', 'true');
 
-  const panel = el('section', 'dev-panel');
+  const panel = el('section', 'dev-panel dark');
   panel.setAttribute('aria-label', 'Developer view');
   const rows = {};
   const title = el('p', 'dev-title', 'Developer view');

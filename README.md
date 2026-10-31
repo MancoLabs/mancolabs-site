@@ -144,19 +144,24 @@ WERLA has no before/after slider. Every Wayback Machine capture of werla.net fro
 
 ## Colors
 
-The brand palette in `src/styles/tokens.css` is unchanged from the original site. Never add new colors. Components use **roles** instead of palette colors directly, so every pairing passes WCAG AA:
+The brand palette in `src/styles/tokens.css` comes from the original site. Dark mode adds two colors of its own: `--night` (#1F2320, a charcoal grey with a slight green tint) for backgrounds, and `--accent-bright` (#88BF8E, a brighter version of the accent green) for buttons, links, and highlights. Don't add other colors. Components use **roles** instead of palette colors directly, so every pairing passes WCAG AA:
 
 | Role | Light | Dark | Use |
 |---|---|---|---|
+| `--bg` | paper | night | Page background |
+| `--surface` | paper | night 90%, paper 10% | Cards, form fields, panels |
+| `--band` | paper-2 | night 84%, paper 16% | Featured cards and tinted panels |
+| `--bg-dark` | ink | night | Laptop screen, About background, behind work card images, developer view |
 | `--text` | ink | paper | Body text, headings |
-| `--text-2` | accent-deep (4.85:1) | paper-3 | Secondary text, labels |
-| `--text-display` | ink-soft (3.61:1) | accent | **Large text only** (24px+, or 19px+ bold) |
-| `--accent-text` | accent-deep | accent | Small green text: prices, role labels |
-| `--field-border` | ink-soft | ink-faint | Form field outlines (3:1 rule for controls) |
-| `--focus` | accent-deep | accent | Keyboard focus rings |
-| `--deco` | accent | accent | Lines and icons, never text |
+| `--text-2` | accent-deep (4.85:1) | paper 75%, night 25% (8.8:1) | Secondary text, labels |
+| `--text-display` | ink-soft (3.61:1) | accent-bright | **Large text only** (24px+, or 19px+ bold) |
+| `--accent-text` | accent-deep | accent-bright (7.5:1) | Small green text: prices, role labels |
+| `--btn-bg` | ink | accent-bright | Buttons. The label is paper in light mode and night in dark mode (7.5:1). |
+| `--field-border` | ink-soft | paper 55%, night 45% | Form field outlines (3:1 rule for controls) |
+| `--focus` | accent-deep | accent-bright | Keyboard focus rings |
+| `--deco` | accent | accent-bright | Lines and icons, never text |
 
-- **`.dark`:** a section with this class (About) uses the dark roles. The whole site switches to them when the visitor's device is in dark mode.
+- **`.dark`:** a section with this class (About) uses dark green roles in light mode. When the visitor's device is in dark mode, the whole site, About included, uses the grey dark roles above.
 - **`.on-band`:** an element on the tinted `--band` background (the two service cards) gets this class so its secondary text stays readable.
 
 ## The 3D layer
@@ -269,7 +274,7 @@ Run `npm run posters` after you change the hero text, the hero layout, the color
 | Headline reveals | `src/anim/motion.js` | Section headings slide up line by line (GSAP SplitText) as they scroll in. Screen readers still get the whole heading. The hero headline uses a CSS-only entrance so it's never delayed. Headings already on screen when the script loads are left alone. |
 | Magnetic buttons | `src/anim/motion.js` | Any element with `data-magnetic` leans toward the mouse. Mouse and trackpad only. |
 | Scroll progress | `.scroll-progress` in `partials/header.html` | A 2px bar under the header. Driven by CSS scroll timelines where supported, and by a tiny scroll listener elsewhere (Firefox). |
-| About background | `src/three/about-backdrop.js` | Slow noise in the palette's dark greens with a soft glow near the cursor. It has its own canvas inside the section, rendered by the same worker. It's capped so the section's smallest text keeps at least 4.5:1 contrast. |
+| About background | `src/three/about-backdrop.js` | Slow noise between `--bg-dark` and `--glow` (dark greens in light mode, greys in dark mode) with a soft glow near the cursor. It has its own canvas inside the section, rendered by the same worker. It's capped so the section's smallest text keeps at least 4.5:1 contrast. |
 | Developer view | `src/devview.js` | Open it with the Konami code (up, up, down, down, left, right, left, right, B, A) or seven quick taps on the header logo on the home page. On the home page the logo scrolls to the top instead of reloading. It shows a 12-column grid (4 on phones), labeled component outlines, and live stats: page FPS, the renderer actually in use and its thread, whether the 3D loop is running or paused, 3D FPS, 3D frame time (95th percentile and worst), frames over 33 ms, draw calls, pixel ratio, LCP, CLS, which browser check matched (Firefox on phones gets the drawings), and the raw user agent. Escape or Close closes it. It loads only when triggered. |
 | 404 | `404.html`, `src/three/lost-scene.js` | One lost invoice floats over the page. Push it with the mouse, or tap near it on a phone, and it bounces off the screen edges. In poster mode it's a drawing. |
 

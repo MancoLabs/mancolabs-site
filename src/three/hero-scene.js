@@ -365,7 +365,7 @@ export class HeroScene {
     u.back.value.set(P.paper3);
     u.frame.value.set(P.frame);
     u.deck.value.set(P.base);
-    u.screenOff.value.set(P.ink);
+    u.screenOff.value.set(P.bgDark);
     u.accent.value.set(P.accent);
     u.accentDeep.value.set(P.accentDeep);
     u.paper.value.set(P.paper);
