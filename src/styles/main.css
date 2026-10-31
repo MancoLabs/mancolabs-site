@@ -477,7 +477,7 @@ main, .site-footer { position: relative; z-index: 1; }
 .results-note { margin-top: 6px; font-size: 0.88rem; color: var(--text-2); }
 .gauges { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 22px; }
 .gauge { --g-good: var(--accent-deep); --g-okay: var(--ink-soft); --g-poor: var(--ink); display: grid; justify-items: center; gap: 4px; text-align: center; }
-@media (prefers-color-scheme: dark) { .gauge { --g-good: var(--accent); --g-okay: var(--ink-faint); --g-poor: var(--paper); } }
+@media (prefers-color-scheme: dark) { .gauge { --g-good: var(--accent-bright); --g-okay: var(--ink-faint); --g-poor: var(--paper); } }
 .g-dial { position: relative; width: 100%; max-width: 104px; aspect-ratio: 1; }
 .g-dial svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 .g-track { fill: none; stroke: var(--hairline); stroke-width: 8; }
@@ -660,7 +660,7 @@ main, .site-footer { position: relative; z-index: 1; }
 }
 ::view-transition-group(*) { animation-duration: 0.45s; animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1); }
 .site-header { view-transition-name: site-header; }
-.work-thumb { aspect-ratio: 16 / 10; background: var(--ink); border-bottom: 1px solid var(--border); overflow: hidden; }
+.work-thumb { aspect-ratio: 16 / 10; background: var(--bg-dark); border-bottom: 1px solid var(--border); overflow: hidden; }
 .work-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
 .work-body { flex: 1; display: grid; align-content: start; gap: 10px; padding: 22px 24px 24px; }
 .work-role { font-family: var(--mono); font-size: 0.74rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-text); }
@@ -718,10 +718,10 @@ main, .site-footer { position: relative; z-index: 1; }
 /* ── DEVELOPER VIEW (Konami code) ─────────── */
 .dev-grid { position: fixed; inset: 0; z-index: 90; pointer-events: none; }
 .dev-grid-cols { height: 100%; display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; }
-.dev-grid-cols span { background: color-mix(in srgb, var(--accent) 14%, transparent); border-inline: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); }
+.dev-grid-cols span { background: color-mix(in srgb, var(--deco) 14%, transparent); border-inline: 1px solid color-mix(in srgb, var(--deco) 40%, transparent); }
 .dev-boxes { position: absolute; top: 0; left: 0; width: 100%; z-index: 91; pointer-events: none; }
-.dev-box { position: absolute; outline: 1px dashed var(--accent-deep); outline-offset: -1px; }
-.dev-box span { position: absolute; top: 0; left: 0; padding: 1px 5px; font: 500 10px/1.4 var(--mono); color: var(--paper); background: var(--accent-deep); white-space: nowrap; }
+.dev-box { position: absolute; outline: 1px dashed var(--accent-text); outline-offset: -1px; }
+.dev-box span { position: absolute; top: 0; left: 0; padding: 1px 5px; font: 500 10px/1.4 var(--mono); color: var(--bg); background: var(--accent-text); white-space: nowrap; }
 .dev-panel {
   position: fixed;
   left: 16px;
@@ -733,17 +733,17 @@ main, .site-footer { position: relative; z-index: 1; }
   border-radius: 8px;
   font-family: var(--mono);
   font-size: 0.78rem;
-  color: var(--paper);
-  background: color-mix(in srgb, var(--ink) 94%, transparent);
+  color: var(--text);
+  background: color-mix(in srgb, var(--bg-dark) 94%, transparent);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
-.dev-title { font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.dev-title { font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-text); margin-bottom: 8px; }
 .dev-panel dl { display: grid; grid-template-columns: auto auto; gap: 3px 16px; }
-.dev-panel dt { color: var(--paper-3); }
+.dev-panel dt { color: var(--text-2); }
 .dev-panel dd { text-align: right; font-variant-numeric: tabular-nums; }
-.dev-panel .dev-wide { grid-column: 1 / -1; text-align: left; overflow-wrap: anywhere; color: var(--paper-3); }
-.dev-close { margin-top: 10px; min-height: 32px; padding: 4px 10px; font: inherit; color: var(--ink); background: var(--paper); border: none; border-radius: 4px; cursor: pointer; }
-.dev-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dev-panel .dev-wide { grid-column: 1 / -1; text-align: left; overflow-wrap: anywhere; color: var(--text-2); }
+.dev-close { margin-top: 10px; min-height: 32px; padding: 4px 10px; font: inherit; color: var(--btn-text); background: var(--btn-bg); border: none; border-radius: 4px; cursor: pointer; }
+.dev-close:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 @media (max-width: 640px) {
   .dev-grid-cols { grid-template-columns: repeat(4, 1fr); gap: 16px; }
   .dev-grid-cols span:nth-child(n + 5) { display: none; }

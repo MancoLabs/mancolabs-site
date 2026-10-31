@@ -20,8 +20,8 @@ export class AboutBackdrop {
       aspect: uniform(width / Math.max(1, height)),
       pointer: uniform(new Vector2(0.5, 0.5)),
       glow: uniform(0),
-      ink: uniform(new Color(palette.ink)),
-      deep: uniform(new Color(palette.accentDeep)),
+      ink: uniform(new Color(palette.bgDark)),
+      deep: uniform(new Color(palette.glow)),
     };
     this.target = { x: 0.5, y: 0.5, on: 0 };
 
@@ -56,8 +56,8 @@ export class AboutBackdrop {
   }
 
   setPalette(P) {
-    this.u?.ink.value.set(P.ink);
-    this.u?.deep.value.set(P.accentDeep);
+    this.u?.ink.value.set(P.bgDark);
+    this.u?.deep.value.set(P.glow);
   }
 
   render(time, dt) {

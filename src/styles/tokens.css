@@ -1,6 +1,6 @@
 /* ── PALETTE ─────────────────────────────────
-   The brand colors. Unchanged from the original site.
-   Everything else (CSS, SVG, 3D) reads from these. */
+   The brand colors from the original site, plus two for dark mode
+   (--night, --accent-bright). Everything else (CSS, SVG, 3D) reads from these. */
 :root {
   --paper:       #F3F5F2;
   --paper-2:     #D0E4CC;
@@ -12,6 +12,9 @@
   --accent-deep: #4A7550;
   --line:        rgba(26, 36, 32, 0.1);
   --line-strong: rgba(26, 36, 32, 0.18);
+  /* Dark mode only: a grey background, and a brighter green that stands out on it. */
+  --night:         #1F2320;
+  --accent-bright: #88BF8E;
   --radius: 4px;
   --maxw: 1140px;
   --sans: "Inter", "Inter Fallback", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -23,6 +26,7 @@
    on --paper: ink 14.5, accent-deep 4.85, ink-soft 3.61 (large text only)
    on --paper-2: ink 11.9
    on --ink: paper 14.5, paper-3 10.0, accent 6.2, ink-faint 6.5
+   on --night: paper 14.5, accent-bright 7.5; on the dark --band: accent-bright 4.6
    --text-display is for large text only (24px+, or 19px+ bold). */
 :root {
   --bg: var(--paper);
@@ -47,11 +51,13 @@
   --shadow: rgba(26, 36, 32, 0.08);
   --ill-frame: var(--ink);
   --ill-base: color-mix(in srgb, var(--ink) 82%, var(--paper));
+  --bg-dark: var(--ink);
+  --glow: var(--accent-deep);
   color-scheme: light;
 }
 
-/* Dark roles. Used by .dark sections, and site-wide when the OS is in dark mode.
-   Surfaces are mixed from palette colors, the same way --line is. */
+/* Dark roles for .dark sections (About) in light mode. In dark mode the block
+   below takes over. Surfaces are mixed from palette colors, the same way --line is. */
 .dark {
   --bg: var(--ink);
   --surface: color-mix(in srgb, var(--ink) 90%, var(--paper));
@@ -78,30 +84,34 @@
   color-scheme: dark;
 }
 
+/* Dark mode: grey backgrounds, green as the accent. Covers .dark sections too,
+   so the About section matches the rest of the page. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: var(--ink);
-    --surface: color-mix(in srgb, var(--ink) 90%, var(--paper));
-    --band: color-mix(in srgb, var(--ink) 84%, var(--accent-deep));
+  :root, .dark {
+    --bg-dark: var(--night);
+    --glow: color-mix(in srgb, var(--night) 50%, var(--paper));
+    --bg: var(--night);
+    --surface: color-mix(in srgb, var(--night) 90%, var(--paper));
+    --band: color-mix(in srgb, var(--night) 84%, var(--paper));
     --text: var(--paper);
-    --text-2: var(--paper-3);
-    --text-display: var(--accent);
-    --accent-text: var(--accent);
-    --text-2-on-band: var(--paper-3);
-    --text-display-on-band: var(--accent);
+    --text-2: color-mix(in srgb, var(--paper) 75%, var(--night));
+    --text-display: var(--accent-bright);
+    --accent-text: var(--accent-bright);
+    --text-2-on-band: color-mix(in srgb, var(--paper) 75%, var(--night));
+    --text-display-on-band: var(--accent-bright);
     --border: rgba(243, 245, 242, 0.22);
     --hairline: rgba(243, 245, 242, 0.12);
-    --field-border: var(--ink-faint);
-    --focus: var(--accent);
-    --deco: var(--accent);
-    --btn-bg: var(--paper);
-    --btn-text: var(--ink);
-    --btn-hover: var(--accent);
-    --btn-hover-text: var(--ink);
-    --header-bg: rgba(26, 36, 32, 0.88);
+    --field-border: color-mix(in srgb, var(--paper) 55%, var(--night));
+    --focus: var(--accent-bright);
+    --deco: var(--accent-bright);
+    --btn-bg: var(--accent-bright);
+    --btn-text: var(--night);
+    --btn-hover: var(--paper);
+    --btn-hover-text: var(--night);
+    --header-bg: color-mix(in srgb, var(--night) 88%, transparent);
     --shadow: rgba(0, 0, 0, 0.32);
-    --ill-frame: color-mix(in srgb, var(--ink) 72%, var(--paper));
-    --ill-base: color-mix(in srgb, var(--ink) 60%, var(--paper));
+    --ill-frame: color-mix(in srgb, var(--night) 72%, var(--paper));
+    --ill-base: color-mix(in srgb, var(--night) 60%, var(--paper));
     color-scheme: dark;
   }
 }
