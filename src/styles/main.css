@@ -496,6 +496,7 @@ main, .site-footer { position: relative; z-index: 1; }
 .issues-none { margin-top: 10px; color: var(--text-2); }
 .issues-intro { margin-top: 8px; color: var(--text-2); max-width: 56ch; }
 .check-results .btn { margin-top: 26px; }
+.results-gov { margin-top: 22px; font-size: 0.95rem; color: var(--text-2); }
 
 /* Disclosure sections inside results: accessibility details, raw email records. */
 .a11y, .mail-raw { margin-top: 26px; border-top: 1px solid var(--hairline); }
@@ -517,6 +518,7 @@ main, .site-footer { position: relative; z-index: 1; }
 .stage-more a:hover { text-decoration-color: currentColor; }
 
 /* ── AI APP LAUNCH PAGE (/launch/) ───────── */
+/* The care plan (/care/) and government (/government/) pages reuse these too. */
 .launch-sec { border-top: 1px solid var(--hairline); }
 .launch-offers { margin-top: 0; align-items: start; }
 .launch-offers .extra > p { margin-top: 2px; }
@@ -530,6 +532,20 @@ main, .site-footer { position: relative; z-index: 1; }
 .faq h3 { font-size: 1.15rem; }
 .faq p { margin-top: 6px; color: var(--text-2); max-width: 52ch; }
 .launch-end { margin-top: clamp(36px, 5vw, 56px); }
+
+/* ── GOVERNMENT PAGE (/government/) ──────── */
+.page-prose { display: grid; gap: 18px; max-width: 68ch; }
+.page-prose > p:not(.hint) { color: var(--text-2); font-size: 1.08rem; }
+.page-prose .hint + .hint { margin-top: -10px; }
+.deadlines { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 6px 0; }
+.deadlines > div { display: flex; flex-direction: column; gap: 8px; padding: 20px 22px; background: var(--band); border: 1px solid var(--border); border-radius: var(--radius); }
+.deadlines dt { color: var(--text-2-on-band); }
+.deadlines dd { margin: 0; margin-top: auto; font-size: clamp(1.4rem, 3vw, 1.75rem); font-weight: 700; letter-spacing: -0.02em; }
+@media (max-width: 640px) { .deadlines { grid-template-columns: 1fr; } }
+.step-note { display: block; margin-top: 8px; font-size: 0.95rem; color: var(--text-2); }
+.steps-after { margin-top: 28px; font-family: var(--mono); font-weight: 500; color: var(--accent-text); }
+.gov-why { display: grid; justify-items: start; gap: 28px; max-width: 68ch; }
+.gov-why .ticks { font-size: 1.08rem; }
 
 /* ── FREE TOOLS PAGE (/tools/) ───────────── */
 .tool-jump { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }

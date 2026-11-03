@@ -54,6 +54,7 @@ Node 22.12 or newer.
 | `npm run check:copy` | Fails if site copy contains em or en dashes |
 | `npm run screenshots` | Recaptures the work screenshots from the live sites (uses your installed Chrome) |
 | `npm run posters` | Rebuilds the site, then renders the hero posters and `public/og.jpg` from the real 3D scene |
+| `npm run capability` | Renders `print/capability-statement.html` to `public/capability-statement.pdf` (one US Letter page, or it fails) |
 
 ## Project structure
 
@@ -61,6 +62,9 @@ Node 22.12 or newer.
 index.html                 Home page
 404.html                   Not-found page (Cloudflare Pages serves it automatically)
 work/<slug>/index.html     One case study page per project
+launch/, tools/, care/, government/
+                           The AI app launch page, free tools, care plan, and government pages
+print/                     Source for the capability statement PDF (not part of the site build)
 partials/                  Shared HTML: head.html, header.html, footer.html, laptop-sprite.html,
                            hero-poster.html (generated)
 src/main.js                Menu, scroll reveals, contact form, and the trigger that loads the 3D
@@ -75,7 +79,7 @@ src/styles/fonts.css       Self-hosted fonts and size-matched fallbacks
 src/styles/main.css        Everything else
 src/assets/work/           Work screenshots (generated, see "Screenshots")
 public/                    Copied as-is: logo.png, brand/, fonts/, robots.txt, sitemap.xml, _headers
-scripts/                   check-copy.mjs, capture-screenshots.mjs, render-posters.mjs
+scripts/                   check-copy.mjs, capture-screenshots.mjs, render-posters.mjs, render-capability.mjs
 vite.config.js             Page list and the two HTML directives below
 ```
 
@@ -95,7 +99,7 @@ vite.config.js             Page list and the two HTML directives below
 All services live in `index.html` inside `<section id="services">`, as plain HTML:
 
 - **Fix, Build, Automate**: each is an `<li class="stage">` with a title, a `<ul class="prices">`, one sentence, and a checklist. The picture next to each one is decorative.
-- **Free consultation** and **Website care plan**: the two `<article class="extra">` cards below.
+- **Free consultation** and **Website care plan**: the two `<article class="extra">` cards below. The care plan card links to `/care/`, which has the full list; keep the price on both in step.
 
 Change prices by editing the `<li>` inside `<ul class="prices">`. Write "$50 an hour", not "$50/hr", so it reads well aloud.
 
@@ -426,6 +430,18 @@ Accessibility checks that rarely make the top three have their entries in `MORE_
 - **Contact:** "Book a free call" is the same Google Calendar booking link as the contact section. "or send a message" opens the home page's contact form with "Launch an AI-built app" picked in the service dropdown. Any link can do this with `data-contact-service` (and optionally `data-contact-message`); see `initContactLinks` in `src/main.js`. Without JavaScript it's a plain link to the form.
 - **Search:** its own title, description, and Open Graph tags (sharing the site's `og.jpg`), plus Service structured data with both offers and their starting prices. It's in the sitemap.
 - **Drafts:** content waiting on a client's approval lives in `drafts/`, which is gitignored, so it stays on your own machine and never reaches this public repository or the live site. Each draft says where it goes and what it needs.
+
+## Care plan page
+
+`/care/` (`care/index.html`) is the full page for the $50 a month website care plan, built like `/launch/` and sharing its styles. "Sign up" opens the home page's contact form with "Website care plan" picked (`data-contact-service`, the same handler as `/launch/`). There's no payment on the site. It's linked from the care plan card on the home page and from the footer, and it's in the sitemap.
+
+## Government page and capability statement
+
+`/government/` (`government/index.html`) is for Louisiana towns, parishes, school boards, and other public bodies facing the ADA Title II web rule. It's linked from the footer and from every Free Website Check result ("What the ADA web rule means for you").
+
+- **Keep the rule section current.** The deadlines (April 26, 2027 and April 26, 2028) come from the Justice Department's April 2026 extension, which is being challenged in court. Check the [ADA.gov fact sheet](https://www.ada.gov/resources/2024-03-08-web-rule/) before relying on the dates, and change the "Last updated" date (and its `datetime`) whenever you recheck them.
+
+The capability statement lives at `/capability-statement.pdf` and is linked from `/government/` and the footer. Edit `print/capability-statement.html`, then run `npm run capability`. The script renders the PDF with your installed Chrome at US Letter size, tags it for screen readers, and refuses to write it if the content spills onto a second page. Commit the regenerated `public/capability-statement.pdf`. Never put an EIN or SSN on it.
 
 ## Free tools page
 

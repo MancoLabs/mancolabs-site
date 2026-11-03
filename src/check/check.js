@@ -265,6 +265,7 @@ export function initCheck(section) {
       ...intro,
       list,
       a11yDetails(result.accessibility),
+      h('p', { class: 'results-gov' }, 'Run a website for a town, parish, or school board? ', h('a', { class: 'text-link', href: '/government/', text: 'What the ADA web rule means for you' }), '.'),
       cta,
     );
   }

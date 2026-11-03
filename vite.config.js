@@ -15,6 +15,8 @@ const PAGES = {
   werla: 'work/werla/index.html',
   tools: 'tools/index.html',
   launch: 'launch/index.html',
+  care: 'care/index.html',
+  government: 'government/index.html',
 };
 
 // Two HTML directives, expanded before Vite processes each page:

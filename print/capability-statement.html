@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Manco Labs LLC Capability Statement</title>
+<meta name="description" content="Manco Labs LLC capability statement: websites, web apps, and accessibility. Shreveport, Louisiana." />
+<meta name="author" content="Manco Labs LLC" />
+<!-- Source for public/capability-statement.pdf. Not part of the site build.
+     Render with: npm run capability (US Letter, must stay one page). -->
+<link rel="stylesheet" href="/src/styles/fonts.css" />
+<link rel="stylesheet" href="/src/styles/tokens.css" />
+<style>
+  /* Always the light palette: this is a printed page. */
+  :root {
+    color-scheme: light;
+    --bg: var(--paper); --band: var(--paper-2); --text: var(--ink); --text-2: var(--accent-deep);
+    --border: var(--line-strong); --rule: var(--accent);
+  }
+  @page { size: Letter; margin: 0.5in 0.55in; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: var(--sans); font-size: 10pt; line-height: 1.42; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; }
+  main { flex: 1; }
+  /* The page box minus the @page margins, so the footer sits at the bottom. */
+  /* White in print: the page margins can't take the paper tint, and plain white prints cleanly. */
+  @media print { body { min-height: 9.98in; background: #fff; } }
+  @media screen { body { width: 8.5in; min-height: 11in; padding: 0.5in 0.55in; margin: 24px auto; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15); } }
+  a { color: inherit; text-decoration: none; }
+  ul { list-style: none; }
+
+  .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding-bottom: 14px; border-bottom: 2px solid var(--rule); }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand svg { width: 46px; height: 46px; flex: none; }
+  h1 { font-size: 23pt; line-height: 1; font-weight: 700; letter-spacing: -0.03em; }
+  .tagline { margin-top: 6px; font-size: 10.5pt; color: var(--text-2); }
+  .doc { font-family: var(--mono); font-weight: 500; font-size: 9pt; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-2); text-align: right; }
+
+  .intro { margin-top: 14px; font-size: 11pt; line-height: 1.4; max-width: 62ch; }
+
+  .cols { display: grid; grid-template-columns: minmax(0, 1fr) 2.45in; gap: 0.3in; margin-top: 16px; }
+  h2 { font-family: var(--mono); font-size: 8.4pt; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-2); margin-bottom: 7px; }
+  section + section { margin-top: 15px; }
+
+  .list li { position: relative; padding-left: 13px; }
+  .list li + li { margin-top: 3px; }
+  .list li::before { content: ""; position: absolute; left: 1px; top: 0.6em; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+
+  .work li + li { margin-top: 9px; }
+  .work h3 { font-size: 10pt; font-weight: 700; letter-spacing: -0.01em; }
+  .work h3 a { font-family: var(--mono); font-weight: 500; font-size: 8.4pt; color: var(--text-2); margin-left: 6px; letter-spacing: 0; }
+  .work .who { color: var(--text-2); font-size: 8.8pt; }
+  .work p + p { margin-top: 2px; }
+
+  .side { background: var(--band); border-radius: 6px; padding: 14px 15px; font-size: 8.8pt; align-self: start; }
+  .side h2 { color: var(--text); }
+  .side dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; }
+  .side dt { font-weight: 600; }
+  .side p + p { margin-top: 1px; }
+  .codes li { display: grid; grid-template-columns: 0.62in minmax(0, 1fr); gap: 4px; }
+  .codes li + li { margin-top: 2px; }
+  .codes .code { font-family: var(--mono); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  .foot { margin-top: 18px; padding-top: 9px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-family: var(--mono); font-size: 8pt; color: var(--text-2); }
+</style>
+</head>
+<body>
+  <header class="head">
+    <div class="brand">
+      <svg viewBox="287 41 106 109" fill="none" role="img" aria-label="Manco Labs logo">
+        <path d="M 308,112 C 320,121 358,104 373,112 L 386,138 Q 389,145 377,145 L 303,145 Q 291,145 295,138 Z" fill="#7AAD80" opacity="0.4"/>
+        <path d="M 323,45 L 323,80 L 295,138 Q 291,145 303,145 L 377,145 Q 389,145 386,138 L 357,80 L 357,45" stroke="#7AAD80" stroke-width="8" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <h1>Manco Labs LLC</h1>
+        <p class="tagline">Websites, web apps, and accessibility</p>
+      </div>
+    </div>
+    <p class="doc">Capability Statement</p>
+  </header>
+
+  <main>
+    <p class="intro">Manco Labs designs, builds, and maintains websites and web applications, with accessibility built in from the start.</p>
+
+    <div class="cols">
+      <div class="main">
+        <section aria-labelledby="comp">
+          <h2 id="comp">Core competencies</h2>
+          <ul class="list">
+            <li>Website design and development</li>
+            <li>Web application development</li>
+            <li>Website accessibility audits and remediation (WCAG 2.1/2.2 AA)</li>
+            <li>CMS upgrades and migrations (WordPress, Drupal)</li>
+            <li>Website maintenance and support</li>
+            <li>Speed and performance optimization</li>
+            <li>API integrations and automation</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="diff">
+          <h2 id="diff">Differentiators</h2>
+          <ul class="list">
+            <li>Local and responsive</li>
+            <li>Accessibility built in, not bolted on</li>
+            <li>Plain-English reporting</li>
+            <li>Clients own everything: code, content, and accounts</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="past">
+          <h2 id="past">Past performance</h2>
+          <ul class="work">
+            <li>
+              <h3>minicine? <a href="https://www.minicine.org">minicine.org</a></h3>
+              <p class="who">Shreveport microcinema and community stage</p>
+              <p>Upgraded the site from Drupal 8 to Drupal 11, checked all 543 pages, and switched over with no downtime. Built a calendar event search, then expanded it into a sitewide search with matching terms highlighted in the results.</p>
+            </li>
+            <li>
+              <h3>CHEN <a href="https://chennwla.org/">chennwla.org</a></h3>
+              <p class="who">Community Healthcare Education Network, a Northwest Louisiana nonprofit</p>
+              <p>Rebuilt the site from scratch to move it off Weebly, with online donations, event tickets, and membership sign-ups. 100 accessibility score in Google PageSpeed Insights (October 2026).</p>
+            </li>
+            <li>
+              <h3>WERLA <a href="https://werla.net/">werla.net</a></h3>
+              <p class="who">Wildlife Education and Rehabilitation of Louisiana (volunteer work)</p>
+              <p>Fixed site email that had never been sending and cut image sizes 86 to 93 percent, then built a new custom WordPress theme. Mobile PageSpeed performance rose from 45 to 97.</p>
+            </li>
+            <li>
+              <h3>Analemma <a href="https://analemma.us/">analemma.us</a></h3>
+              <p class="who">A collection of experimental photographic work by Elizabeth House Evans</p>
+              <p>Designed and built the site, and keep it secure and up to date.</p>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <aside class="side" aria-label="Company data and codes">
+        <section aria-labelledby="co">
+          <h2 id="co">Company data</h2>
+          <dl>
+            <dt>Name</dt><dd>Manco Labs LLC</dd>
+            <dt>Location</dt><dd>Shreveport, Louisiana</dd>
+            <dt>Founded</dt><dd>2026</dd>
+            <dt>Owner</dt><dd>Ethan Manco</dd>
+          </dl>
+        </section>
+
+        <section aria-labelledby="ct">
+          <h2 id="ct">Contact</h2>
+          <p>Ethan Manco, Owner</p>
+          <p><a href="mailto:ethan@mancolabs.dev">ethan@mancolabs.dev</a></p>
+          <p><a href="tel:+13186424582">(318) 642-4582</a></p>
+          <p><a href="https://mancolabs.dev/">mancolabs.dev</a></p>
+        </section>
+
+        <section aria-labelledby="naics">
+          <h2 id="naics">NAICS codes</h2>
+          <ul class="codes">
+            <li><span class="code">541511</span><span>Custom Computer Programming Services</span></li>
+            <li><span class="code">541512</span><span>Computer Systems Design Services</span></li>
+            <li><span class="code">541519</span><span>Other Computer Related Services</span></li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="unspsc">
+          <h2 id="unspsc">UNSPSC codes</h2>
+          <ul class="codes">
+            <li><span class="code">81110000</span><span>Computer services</span></li>
+            <li><span class="code">81111500</span><span>Software or hardware engineering</span></li>
+            <li><span class="code">81111700</span><span>Management information systems MIS</span></li>
+            <li><span class="code">81111900</span><span>Information retrieval systems</span></li>
+            <li><span class="code">81112000</span><span>Data services</span></li>
+            <li><span class="code">81112100</span><span>Internet services</span></li>
+            <li><span class="code">81112200</span><span>Software maintenance and support</span></li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="reg">
+          <h2 id="reg">Registrations</h2>
+          <p>Louisiana state vendor (LaGov / LaPAC)</p>
+          <p>Vendor number V31034083101</p>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <span>Manco Labs LLC · Shreveport, Louisiana · mancolabs.dev</span>
+    <span>Updated November 2026</span>
+  </footer>
+</body>
+</html>
