@@ -22,16 +22,17 @@
 <!-- @include header.html -->
 
 <main id="main">
-  <!-- The booking calendar loads with the page here, since booking is all this page is for.
-       Everywhere else, "Book a free call" links open it in a dialog instead (src/booking.js). -->
+  <!-- The booking calendar loads as soon as this page has shown, since booking is all it's for
+       (initBookPage in src/main.js; the <noscript> copy covers no JavaScript). Everywhere else,
+       "Book a free call" links open it in a dialog instead (src/booking.js). -->
   <section class="book-page" aria-labelledby="book-title">
     <div class="wrap">
       <div class="book-head">
         <h1 id="book-title">Book a free <span class="keep">30-minute call</span></h1>
         <a class="cta-alt" href="/#contact">or send a message instead</a>
       </div>
-      <div class="book-frame">
-        <iframe src="%BOOKING_URL%" title="Booking calendar: pick a time for a free 30-minute call with Manco Labs"></iframe>
+      <div class="book-frame" data-src="%BOOKING_URL%" data-title="Booking calendar: pick a time for a free 30-minute call with Manco Labs">
+        <noscript><iframe src="%BOOKING_URL%" title="Booking calendar: pick a time for a free 30-minute call with Manco Labs"></iframe></noscript>
       </div>
     </div>
   </section>

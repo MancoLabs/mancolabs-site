@@ -578,6 +578,7 @@ main, .site-footer { position: relative; z-index: 1; }
 .book-head .keep { white-space: nowrap; } /* never "30-" on one line and "minute" on the next */
 .book-frame { margin-top: clamp(16px, 2.5vw, 26px); height: clamp(640px, calc(100svh - 150px), 1000px); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: #fff; }
 .book-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+.book-frame > noscript { display: block; height: 100%; }
 /* Phones: the calendar runs edge to edge and fills the screen below the header. */
 @media (max-width: 640px) {
   .book-frame { height: calc(100svh - 72px); margin-inline: calc(50% - 50vw); border-inline: 0; border-radius: 0; }

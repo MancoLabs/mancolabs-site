@@ -8,6 +8,7 @@ initContactForm();
 initPrefill();
 initContactLinks();
 initBooking();
+initBookPage();
 initCheckLoader();
 initTools();
 initStage();
@@ -85,6 +86,21 @@ function initBooking() {
       import('./booking.js').then((m) => m.openBooking(a)).catch(() => { location.href = a.href; });
     });
   }
+}
+
+// /book/: the calendar is added once the page itself has loaded, so Google's
+// much heavier page doesn't hold up this one's first paint on a slow phone.
+function initBookPage() {
+  const box = document.querySelector('.book-frame[data-src]');
+  if (!box) return;
+  const add = () => {
+    const frame = document.createElement('iframe');
+    frame.title = box.dataset.title;
+    frame.src = box.dataset.src;
+    box.append(frame);
+  };
+  if (document.readyState === 'complete') add();
+  else addEventListener('load', add, { once: true });
 }
 
 function initWork() {
