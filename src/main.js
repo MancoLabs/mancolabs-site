@@ -7,6 +7,7 @@ initReveal();
 initContactForm();
 initPrefill();
 initContactLinks();
+initBooking();
 initCheckLoader();
 initTools();
 initStage();
@@ -69,6 +70,19 @@ function initContactLinks() {
     a.addEventListener('click', (e) => {
       e.preventDefault();
       import('./contact-handoff.js').then((m) => m.sendToContact({ message: a.dataset.contactMessage || '', service: a.dataset.contactService }));
+    });
+  }
+}
+
+// "Book a free call" links (data-booking) open the booking calendar in a dialog
+// on the same page (src/booking.js), which loads only on click. Without
+// JavaScript, or opened in a new tab, they're plain links to /book/.
+function initBooking() {
+  for (const a of document.querySelectorAll('a[data-booking]')) {
+    a.addEventListener('click', (e) => {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      import('./booking.js').then((m) => m.openBooking(a)).catch(() => { location.href = a.href; });
     });
   }
 }

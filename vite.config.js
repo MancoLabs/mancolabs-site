@@ -6,6 +6,11 @@ import { fileURLToPath } from 'node:url';
 const ROOT = fileURLToPath(new URL('.', import.meta.url));
 const PARTIALS = resolve(ROOT, 'partials');
 
+// The Google Calendar booking page (appointment schedule). The only place it's
+// set: pages get it as %BOOKING_URL% (the /book/ embed), and src/booking.js as
+// __BOOKING_URL__ (the booking dialog).
+const BOOKING_URL = 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ09Tt_ucjDKf7oiy8Qgpe10qV1UOmH8xZRYv9msWshFyRZvGLJq3le7yLuntfP9VLUhS3PyLoel?gv=true';
+
 const PAGES = {
   main: 'index.html',
   notFound: '404.html',
@@ -17,6 +22,7 @@ const PAGES = {
   launch: 'launch/index.html',
   care: 'care/index.html',
   government: 'government/index.html',
+  book: 'book/index.html',
 };
 
 // Two HTML directives, expanded before Vite processes each page:
@@ -24,6 +30,7 @@ const PAGES = {
 //   <!-- @picture src="work/x/live-desktop" widths="480,800" sizes="..." alt="..." -->
 //     becomes a <picture> with AVIF and WebP sources from src/assets/.
 //     Any other attributes (width, height, loading, class...) go on the <img>.
+// Plus %BOOKING_URL%, replaced with the booking page address above.
 function htmlTemplating() {
   const include = /<!--\s*@include\s+([\w.-]+)\s*-->/g;
   const picture = /<!--\s*@picture\s+([\s\S]*?)-->/g;
@@ -43,7 +50,8 @@ function htmlTemplating() {
   const render = (html) =>
     html
       .replace(include, (_, file) => render(readFileSync(resolve(PARTIALS, file), 'utf8')))
-      .replace(picture, expandPicture);
+      .replace(picture, expandPicture)
+      .replaceAll('%BOOKING_URL%', BOOKING_URL);
 
   return {
     name: 'html-templating',
@@ -60,6 +68,7 @@ function htmlTemplating() {
 export default defineConfig({
   appType: 'mpa',
   plugins: [htmlTemplating()],
+  define: { __BOOKING_URL__: JSON.stringify(BOOKING_URL) },
   build: {
     rolldownOptions: {
       input: Object.fromEntries(Object.entries(PAGES).map(([name, file]) => [name, resolve(ROOT, file)])),

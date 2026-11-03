@@ -62,8 +62,8 @@ Node 22.12 or newer.
 index.html                 Home page
 404.html                   Not-found page (Cloudflare Pages serves it automatically)
 work/<slug>/index.html     One case study page per project
-launch/, tools/, care/, government/
-                           The AI app launch page, free tools, care plan, and government pages
+launch/, tools/, care/, government/, book/
+                           The AI app launch page, free tools, care plan, government, and booking pages
 print/                     Source for the capability statement PDF (not part of the site build)
 partials/                  Shared HTML: head.html, header.html, footer.html, laptop-sprite.html,
                            hero-poster.html (generated)
@@ -427,9 +427,20 @@ Accessibility checks that rarely make the top three have their entries in `MORE_
 `/launch/` (`launch/index.html`) sells one offer: taking a prototype someone built with AI and making it a live, secure web app. It's light on purpose: no 3D, and nothing new to load beyond the shared styles and the headline reveal every page has.
 
 - **Getting there:** "Launch your AI app" in the main menu (in place of "Website check", which is still on the home page and under Free tools; seven items don't fit at 881px), and a "Built something with AI? Launch your AI app" link in the home page's Build row.
-- **Contact:** "Book a free call" is the same Google Calendar booking link as the contact section. "or send a message" opens the home page's contact form with "Launch an AI-built app" picked in the service dropdown. Any link can do this with `data-contact-service` (and optionally `data-contact-message`); see `initContactLinks` in `src/main.js`. Without JavaScript it's a plain link to the form.
+- **Contact:** "Book a free call" opens the booking calendar (see "Booking calls" below). "or send a message" opens the home page's contact form with "Launch an AI-built app" picked in the service dropdown. Any link can do this with `data-contact-service` (and optionally `data-contact-message`); see `initContactLinks` in `src/main.js`. Without JavaScript it's a plain link to the form.
 - **Search:** its own title, description, and Open Graph tags (sharing the site's `og.jpg`), plus Service structured data with both offers and their starting prices. It's in the sitemap.
 - **Drafts:** content waiting on a client's approval lives in `drafts/`, which is gitignored, so it stays on your own machine and never reaches this public repository or the live site. Each draft says where it goes and what it needs.
+
+## Booking calls
+
+Every "Book a free call" link (the contact section, `/launch/`, `/care/`, and `/government/`) is a plain link to `/book/` with a `data-booking` attribute. Add the attribute to any new booking link and it works the same way.
+
+- **Click:** `initBooking` in `src/main.js` loads `src/booking.js`, which opens a native `<dialog>` with Google's booking page in an iframe. Nothing from Google (script, iframe, or cookies) loads until that first click, so page speed is untouched. The calendar stays loaded after that, so reopening is instant.
+- **The dialog:** focus moves to its Close button, Escape or Close or a click on the dimmed backdrop closes it, and focus goes back to the link that opened it. On phones (640px and narrower) it fills the screen.
+- **Escape inside the calendar:** once focus is inside Google's page, keys belong to Google's frame, and browsers don't pass Escape up to the dialog. Shift+Tab from the calendar lands on Close, and Escape works from there.
+- **`/book/`** (`book/index.html`) shows the calendar on its own page and loads it right away, since that's all the page is for. It's where the links go without JavaScript, or when opened in a new tab. It's in the sitemap but not the main menu.
+- **The booking address** is set once, as `BOOKING_URL` in `vite.config.js`. The build puts it into `/book/` (`%BOOKING_URL%`) and `src/booking.js` (`__BOOKING_URL__`).
+- **The site sends no Content Security Policy.** If you add one, allow `https://calendar.google.com` in `frame-src`.
 
 ## Care plan page
 
