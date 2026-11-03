@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Upwork cover</title>
+<!-- Upwork Project Catalog cover. Not part of the site build. Render with: node marketing/upwork/render.mjs -->
+<link rel="stylesheet" href="/src/styles/fonts.css" />
+<link rel="stylesheet" href="/src/styles/tokens.css" />
+<style>
+  :root {
+    --panel: var(--paper-2);
+    --win: var(--paper);
+    --win-bar: color-mix(in srgb, var(--paper-2) 55%, var(--paper));
+    --ui: var(--ink);
+    --ui-faint: var(--ink-faint);
+    --good: var(--accent-text);
+    --pencil: var(--ink);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --panel: var(--surface);
+      --win: var(--bg);
+      --win-bar: var(--band);
+      --ui: var(--paper);
+      --ui-faint: color-mix(in srgb, var(--paper) 40%, var(--night));
+    }
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1600px; height: 1200px; overflow: hidden; }
+  body { position: relative; background: var(--bg); color: var(--text); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+
+  h1 { position: absolute; left: 90px; top: 84px; font-size: 156px; line-height: 1.0; font-weight: 700; letter-spacing: -0.04em; white-space: nowrap; }
+  h1 em { font-style: italic; font-weight: 400; color: var(--text-display); }
+  .sub { position: absolute; left: 98px; top: 430px; font-family: var(--mono); font-weight: 500; font-size: 42px; letter-spacing: 0.01em; color: var(--text-2); }
+
+  .panel { position: absolute; left: 64px; right: 64px; top: 552px; bottom: 64px; border-radius: 32px; background: var(--panel); }
+  .art { position: absolute; inset: 0; }
+</style>
+</head>
+<body>
+  <h1>Your AI-built app,<br /><em>live and secure.</em></h1>
+  <p class="sub">Logins · Database · Hosting · Handoff</p>
+
+  <div class="panel"></div>
+  <svg class="art" id="art" viewBox="0 0 1600 1200" width="1600" height="1200" aria-hidden="true"></svg>
+
+<script>
+// Seeded random, so every render draws the same sketch.
+let seed = 7;
+const rand = () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+const j = (r) => (rand() * 2 - 1) * r;
+const NS = 'http://www.w3.org/2000/svg';
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.append(e); return e; };
+
+// A pencil line: drawn twice with small wobbles, like a quick sketch.
+function roughLine(g, x1, y1, x2, y2, o = {}) {
+  const w = o.w ?? 3.4, col = o.col ?? 'var(--pencil)', op = o.op ?? 0.72, passes = o.passes ?? 2;
+  for (let p = 0; p < passes; p++) {
+    const len = Math.hypot(x2 - x1, y2 - y1), r = Math.min(3.5, len / 40) + 0.8;
+    const mx = x1 + (x2 - x1) * (0.45 + j(0.1)), my = y1 + (y2 - y1) * (0.45 + j(0.1));
+    const nx = -(y2 - y1) / len, ny = (x2 - x1) / len, bow = j(len / 60 + 1.2);
+    el('path', { d: `M ${x1 + j(r)} ${y1 + j(r)} Q ${mx + nx * bow} ${my + ny * bow} ${x2 + j(r)} ${y2 + j(r)}`, fill: 'none', stroke: col, 'stroke-width': w, 'stroke-linecap': 'round', opacity: op, 'stroke-dasharray': o.dash ?? 'none' }, g);
+  }
+}
+function roughRect(g, x, y, w, h, o = {}) {
+  const ov = 6;
+  roughLine(g, x - ov * rand(), y, x + w + ov * rand(), y, o);
+  roughLine(g, x + w, y - ov * rand(), x + w, y + h + ov * rand(), o);
+  roughLine(g, x + w + ov * rand(), y + h, x - ov * rand(), y + h, o);
+  roughLine(g, x, y + h + ov * rand(), x, y - ov * rand(), o);
+}
+function hatch(g, x, y, w, h, o = {}) {
+  for (let k = -h; k < w; k += 16) {
+    const x1 = Math.max(x, x + k), y1 = x + k < x ? y - k : y;
+    const x2 = Math.min(x + w, x + k + h), y2 = x + k + h > x + w ? y + (x + w - (x + k)) : y + h;
+    roughLine(g, x1 + 3, y1 + 3, x2 - 3, y2 - 3, { w: 2.6, passes: 1, op: 0.5, ...o });
+  }
+}
+function squiggle(g, x, y, len, o = {}) {
+  let d = '';
+  for (let i = 0; i <= 30; i++) { const px = x + (len * i) / 30, py = y + Math.sin(i * 1.15 + (o.ph ?? 0)) * (o.amp ?? 5) + Math.sin(i * 0.4) * 2; d += (i ? ' L ' : 'M ') + px.toFixed(1) + ' ' + py.toFixed(1); }
+  el('path', { d, fill: 'none', stroke: o.col ?? 'var(--pencil)', 'stroke-width': o.w ?? 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: o.op ?? 0.6 }, g);
+}
+
+const art = document.getElementById('art');
+const defs = el('defs', {}, art);
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+const f = el('filter', { id: 'sheet', x: '-20%', y: '-20%', width: '140%', height: '150%' }, defs);
+el('feDropShadow', { dx: 0, dy: 10, stdDeviation: 12, 'flood-color': 'black', 'flood-opacity': dark ? 0.4 : 0.16 }, f);
+const fw = el('filter', { id: 'win', x: '-20%', y: '-20%', width: '140%', height: '150%' }, defs);
+el('feDropShadow', { dx: 0, dy: 18, stdDeviation: 22, 'flood-color': 'black', 'flood-opacity': dark ? 0.45 : 0.14 }, fw);
+
+// ── Left: the rough prototype, a pencil sketch on paper with a sticky note.
+{
+  const back = el('g', { transform: 'translate(150 676) rotate(5 230 200)' }, art);
+  el('rect', { x: 0, y: 0, width: 440, height: 380, fill: 'var(--paper)', filter: 'url(#sheet)' }, back);
+  for (let i = 0; i < 6; i++) el('rect', { x: 300, y: 60 + i * 44, width: 110, height: 9, rx: 4.5, fill: 'var(--ink)', opacity: 0.18 }, back);
+
+  const g = el('g', { transform: 'translate(118 650) rotate(-4 240 210)' }, art);
+  el('rect', { x: 0, y: 0, width: 480, height: 420, fill: 'var(--paper)', filter: 'url(#sheet)' }, g);
+  // nav bar
+  roughRect(g, 30, 30, 420, 54);
+  el('circle', { cx: 60, cy: 57, r: 13, fill: 'none', stroke: 'var(--pencil)', 'stroke-width': 3.2, opacity: 0.7 }, g);
+  squiggle(g, 88, 57, 90, { amp: 3, w: 3.4 });
+  squiggle(g, 330, 57, 46, { amp: 3, w: 3.4, ph: 2 });
+  squiggle(g, 392, 57, 36, { amp: 3, w: 3.4, ph: 4 });
+  // image placeholder with an X
+  roughRect(g, 30, 110, 236, 156);
+  roughLine(g, 36, 116, 260, 260, { op: 0.45 });
+  roughLine(g, 260, 116, 36, 260, { op: 0.45 });
+  // text lines, one crossed out
+  squiggle(g, 294, 126, 150, { w: 4.4 });
+  squiggle(g, 294, 160, 120, { ph: 1.4 });
+  squiggle(g, 294, 194, 136, { ph: 2.7 });
+  roughLine(g, 286, 196, 438, 190, { w: 3, op: 0.65, passes: 1 });
+  // a hatched button
+  roughRect(g, 294, 224, 128, 44);
+  hatch(g, 294, 224, 128, 44, { col: 'var(--accent-deep)' });
+  // the unfinished part: a dashed box with a big question mark
+  roughRect(g, 30, 296, 420, 94, { dash: '14 12', op: 0.6 });
+  el('path', { d: 'M 214 326 C 214 306 250 304 250 324 C 250 338 232 338 232 354', fill: 'none', stroke: 'var(--pencil)', 'stroke-width': 5.5, 'stroke-linecap': 'round', opacity: 0.75 }, g);
+  el('circle', { cx: 232, cy: 372, r: 4.5, fill: 'var(--pencil)', opacity: 0.75 }, g);
+  // an AI sparkle doodle
+  const sp = el('g', { transform: 'translate(410 350)' }, g);
+  el('path', { d: 'M 0 -24 Q 3 -3 24 0 Q 3 3 0 24 Q -3 3 -24 0 Q -3 -3 0 -24 Z', fill: 'none', stroke: 'var(--accent-deep)', 'stroke-width': 3.6, 'stroke-linejoin': 'round', opacity: 0.85 }, sp);
+
+  // sticky note, same look as the hero's
+  const s = el('g', { transform: 'translate(494 604) rotate(9 85 85)' }, art);
+  el('rect', { x: 0, y: 0, width: 170, height: 170, fill: 'var(--paper-2)', filter: 'url(#sheet)' }, s);
+  el('rect', { x: 0, y: 0, width: 170, height: 24, fill: 'var(--paper-3)' }, s);
+  squiggle(s, 24, 64, 118, { col: 'var(--accent-deep)', op: 1, w: 6, amp: 6 });
+  squiggle(s, 24, 102, 86, { col: 'var(--accent-deep)', op: 1, w: 6, amp: 6, ph: 1 });
+  squiggle(s, 24, 140, 104, { col: 'var(--accent-deep)', op: 1, w: 6, amp: 6, ph: 2 });
+}
+
+// ── Middle: the arrow.
+{
+  const g = el('g', { transform: 'translate(676 846)' }, art);
+  el('path', { d: 'M 0 10 C 60 -22 130 -22 186 6', fill: 'none', stroke: 'var(--good)', 'stroke-width': 14, 'stroke-linecap': 'round' }, g);
+  el('path', { d: 'M 150 -26 L 192 8 L 140 26', fill: 'none', stroke: 'var(--good)', 'stroke-width': 14, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+}
+
+// ── Right: the finished app, clean and live.
+{
+  const X = 912, Y = 652, W = 600, H = 436;
+  const g = el('g', { transform: `translate(${X} ${Y})` }, art);
+  el('rect', { x: 0, y: 0, width: W, height: H, rx: 22, fill: 'var(--win)', filter: 'url(#win)' }, g);
+  const clip = el('clipPath', { id: 'wc' }, defs); el('rect', { x: 0, y: 0, width: W, height: H, rx: 22 }, clip);
+  const c = el('g', { 'clip-path': 'url(#wc)' }, g);
+  // title bar with an address pill and lock
+  el('rect', { x: 0, y: 0, width: W, height: 62, fill: 'var(--win-bar)' }, c);
+  [32, 56, 80].forEach((cx) => el('circle', { cx, cy: 31, r: 7.5, fill: 'var(--ui-faint)', opacity: 0.7 }, c));
+  el('rect', { x: 118, y: 14, width: 360, height: 34, rx: 17, fill: 'var(--win)' }, c);
+  const lock = el('g', { transform: 'translate(138 15) scale(1.3)' }, c);
+  el('path', { d: 'M 4 10 V 7 A 7 7 0 0 1 18 7 V 10', fill: 'none', stroke: 'var(--good)', 'stroke-width': 3.2, 'stroke-linecap': 'round' }, lock);
+  el('rect', { x: 0, y: 10, width: 22, height: 15, rx: 3.5, fill: 'var(--good)' }, lock);
+  el('rect', { x: 180, y: 26, width: 150, height: 10, rx: 5, fill: 'var(--ui-faint)', opacity: 0.8 }, c);
+  // sidebar
+  el('rect', { x: 0, y: 62, width: 138, height: H - 62, fill: 'var(--win-bar)', opacity: 0.6 }, c);
+  el('rect', { x: 26, y: 88, width: 30, height: 30, rx: 8, fill: 'var(--accent)' }, c);
+  el('rect', { x: 18, y: 144, width: 102, height: 30, rx: 8, fill: 'var(--good)', opacity: 0.18 }, c);
+  [0, 1, 2, 3].forEach((i) => el('rect', { x: 30, y: 154 + i * 44, width: i === 0 ? 70 : 56 + (i % 2) * 18, height: 10, rx: 5, fill: i === 0 ? 'var(--good)' : 'var(--ui-faint)', opacity: i === 0 ? 1 : 0.8 }, c));
+  // header with a signed-in user
+  el('rect', { x: 166, y: 92, width: 180, height: 18, rx: 9, fill: 'var(--ui)' }, c);
+  el('rect', { x: 166, y: 122, width: 250, height: 10, rx: 5, fill: 'var(--ui-faint)', opacity: 0.8 }, c);
+  el('circle', { cx: 554, cy: 108, r: 20, fill: 'var(--accent)' }, c);
+  el('circle', { cx: 554, cy: 102, r: 7, fill: 'var(--paper)' }, c);
+  el('path', { d: 'M 542 120 Q 554 106 566 120 Z', fill: 'var(--paper)' }, c);
+  // data table
+  const T = 162;
+  el('rect', { x: 166, y: T, width: 408, height: 1.5, fill: 'var(--ui-faint)', opacity: 0.5 }, c);
+  for (let i = 0; i < 4; i++) {
+    const ry = T + 26 + i * 58;
+    el('circle', { cx: 184, cy: ry + 10, r: 14, fill: 'var(--paper-3)' }, c);
+    el('rect', { x: 212, y: ry + 1, width: 130 - (i % 3) * 22, height: 10, rx: 5, fill: 'var(--ui)', opacity: 0.75 }, c);
+    el('rect', { x: 212, y: ry + 19, width: 84, height: 8, rx: 4, fill: 'var(--ui-faint)', opacity: 0.8 }, c);
+    el('rect', { x: 380, y: ry + 5, width: 70, height: 10, rx: 5, fill: 'var(--ui-faint)', opacity: 0.8 }, c);
+    el('circle', { cx: 552, cy: ry + 10, r: 7, fill: 'var(--good)' }, c);
+    if (i < 3) el('rect', { x: 166, y: ry + 42, width: 408, height: 1.5, fill: 'var(--ui-faint)', opacity: 0.35 }, c);
+  }
+}
+</script>
+
+<!-- The Live badge sits on top of the window's corner. -->
+<style>
+  .live { position: absolute; left: 1276px; top: 610px; display: flex; align-items: center; gap: 14px; height: 76px; padding: 0 32px 0 26px; border-radius: 38px; background: var(--accent-text); color: var(--bg); font-size: 40px; font-weight: 700; letter-spacing: -0.01em; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18); }
+  .live i { width: 20px; height: 20px; border-radius: 50%; background: var(--bg); box-shadow: 0 0 0 6px color-mix(in srgb, var(--bg) 35%, transparent); }
+</style>
+<div class="live"><i></i>Live</div>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Google Business Profile cover</title>
+<!-- Google Business Profile cover. Not part of the site build.
+     Render with: node marketing/google/render.mjs  (?shape=wide is 1920x1080, ?shape=square is 1200x1200).
+     Google crops covers differently on phones and computers, so everything that
+     matters sits inside the center 60% (.safe); only the paper scene reaches the edges. -->
+<link rel="stylesheet" href="/src/styles/fonts.css" />
+<link rel="stylesheet" href="/src/styles/tokens.css" />
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: var(--w); height: var(--h); overflow: hidden; }
+  body { position: relative; background: var(--paper); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+
+  .scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+  /* Calms the papers behind the text and laptop, so the middle reads cleanly. */
+  .calm { position: absolute; inset: 0; background: radial-gradient(ellipse 50% 50% at 50% 50%, var(--paper) 0 62%, color-mix(in srgb, var(--paper) 70%, transparent) 80%, transparent 100%); }
+
+  .safe { position: absolute; left: 20%; top: 20%; width: 60%; height: 60%; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .brand { display: flex; align-items: center; gap: calc(var(--u) * 0.42); font-weight: 650; font-size: calc(var(--u) * 1.15); letter-spacing: -0.02em; }
+  .brand svg { width: calc(var(--u) * 1.5); height: calc(var(--u) * 1.5); }
+  h1 { margin-top: calc(var(--u) * 0.7); font-weight: 700; line-height: 1.02; letter-spacing: -0.035em; white-space: nowrap; }
+  .where { margin-top: calc(var(--u) * 0.55); font-family: var(--mono); font-weight: 500; font-size: calc(var(--u) * 1.05); letter-spacing: 0.02em; color: var(--accent-deep); }
+  .art { margin-top: calc(var(--u) * 0.8); flex: 1; min-height: 0; width: 100%; }
+  .art svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+  /* The site's flat illustration colors (poster mode), light mode. */
+  .ill-frame { fill: var(--ink); }
+  .ill-base { fill: color-mix(in srgb, var(--ink) 82%, var(--paper)); }
+  .ill-notch { fill: var(--ink); }
+  .ill-cam { fill: var(--ink-soft); }
+  .ill-shadow { fill: rgba(26, 36, 32, 0.08); }
+  .ill-screen { fill: var(--paper); }
+  .ill-bar { fill: var(--paper-2); }
+  .ill-ink { fill: var(--ink); }
+  .ill-muted { fill: var(--paper-3); }
+  .ill-accent { fill: var(--accent); }
+  .ill-btn { fill: var(--accent-deep); }
+  .ill-block { fill: var(--paper-3); }
+  .ill-card { fill: var(--paper-2); stroke: var(--paper-3); stroke-width: 1; }
+  .ill-card-lift { fill: var(--paper); stroke: var(--accent-deep); stroke-width: 1.5; }
+  .ill-dot { fill: var(--paper-3); }
+  .sheet { fill: #FBFCFA; stroke: rgba(26, 36, 32, 0.12); stroke-width: 1; }
+  .sheet-line { fill: rgba(26, 36, 32, 0.32); }
+  .sheet-line-soft { fill: rgba(26, 36, 32, 0.16); }
+  .sheet-bar { fill: var(--accent-deep); }
+  .note { fill: var(--paper-3); }
+  .note-top { fill: var(--accent); opacity: 0.35; }
+  .squig { fill: none; stroke: var(--accent-deep); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.8; }
+  .trail { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 2 9; opacity: 0.9; }
+</style>
+</head>
+<body>
+  <img class="scene" id="scene" alt="" />
+  <div class="calm"></div>
+
+  <div class="safe">
+    <div class="brand">
+      <svg viewBox="287 41 106 109" fill="none" aria-hidden="true">
+        <path d="M 308,112 C 320,121 358,104 373,112 L 386,138 Q 389,145 377,145 L 303,145 Q 291,145 295,138 Z" fill="#7AAD80" opacity="0.4"/>
+        <path d="M 323,45 L 323,80 L 295,138 Q 291,145 303,145 L 377,145 Q 389,145 386,138 L 357,80 L 357,45" stroke="#7AAD80" stroke-width="8" stroke-linejoin="round"/>
+      </svg>
+      Manco Labs
+    </div>
+    <h1 id="headline"></h1>
+    <p class="where">Shreveport-Bossier</p>
+    <div class="art">
+      <!-- The laptop and website are the site's Build illustration; papers and sticky notes drift in from both sides. -->
+      <svg viewBox="-150 -10 900 390" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+        <defs>
+          <clipPath id="screen"><rect x="102" y="34" width="396" height="270" rx="4"/></clipPath>
+          <pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse"><circle class="ill-dot" cx="2" cy="2" r="1.2"/></pattern>
+          <g id="sheet">
+            <rect class="sheet" x="0" y="0" width="64" height="84" rx="2"/>
+            <rect class="sheet-line" x="9" y="11" width="30" height="4" rx="2"/>
+            <rect class="sheet-line-soft" x="9" y="22" width="46" height="3" rx="1.5"/>
+            <rect class="sheet-line-soft" x="9" y="30" width="40" height="3" rx="1.5"/>
+            <rect class="sheet-line-soft" x="9" y="38" width="44" height="3" rx="1.5"/>
+            <rect class="sheet-line-soft" x="9" y="46" width="34" height="3" rx="1.5"/>
+            <rect class="sheet-line-soft" x="9" y="54" width="42" height="3" rx="1.5"/>
+            <rect class="sheet-bar" x="9" y="68" width="20" height="6" rx="1.5"/>
+          </g>
+          <g id="note">
+            <rect class="note" x="0" y="0" width="62" height="62" rx="1.5"/>
+            <rect class="note-top" x="0" y="0" width="62" height="10" rx="1.5"/>
+            <path class="squig" d="M9 24q4-5 8 0t8 0 8 0 8 0 8 0 8 0"/>
+            <path class="squig" d="M9 36q4-5 8 0t8 0 8 0 8 0 8 0"/>
+            <path class="squig" d="M9 48q4-5 8 0t8 0 8 0 8 0"/>
+          </g>
+        </defs>
+
+        <!-- Trails: the papers' paths into the screen. -->
+        <path class="trail" d="M-112 60 C -30 40, 40 70, 128 120"/>
+        <path class="trail" d="M-96 250 C -20 250, 50 220, 122 196"/>
+        <path class="trail" d="M712 40 C 630 30, 560 70, 474 116"/>
+        <path class="trail" d="M700 268 C 630 270, 560 236, 480 204"/>
+
+        <!-- Left: a sheet and a sticky note, getting smaller as they near the screen. -->
+        <use href="#sheet" transform="translate(-140 6) rotate(-14 32 42) scale(1.05)"/>
+        <use href="#note" transform="translate(-58 92) rotate(11 31 31) scale(0.8)"/>
+        <use href="#sheet" transform="translate(-122 190) rotate(9 32 42) scale(0.95)"/>
+        <use href="#note" transform="translate(30 150) rotate(-8 31 31) scale(0.55)"/>
+        <!-- Right -->
+        <use href="#note" transform="translate(660 -6) rotate(12 31 31) scale(1.05)"/>
+        <use href="#sheet" transform="translate(578 84) rotate(-10 32 42) scale(0.78)"/>
+        <use href="#note" transform="translate(662 210) rotate(-15 31 31) scale(0.95)"/>
+        <use href="#sheet" transform="translate(520 160) rotate(7 32 42) scale(0.52)"/>
+
+        <!-- The laptop, showing a clean website. -->
+        <ellipse class="ill-shadow" cx="300" cy="356" rx="262" ry="9"/>
+        <path class="ill-base" d="M44 318h512l14 16c4 6 1 12-8 12H38c-9 0-12-6-8-12z"/>
+        <rect class="ill-notch" x="262" y="318" width="76" height="6" rx="3"/>
+        <rect class="ill-frame" x="88" y="16" width="424" height="302" rx="16"/>
+        <circle class="ill-cam" cx="300" cy="26" r="2.5"/>
+        <g clip-path="url(#screen)">
+          <rect class="ill-screen" x="102" y="34" width="396" height="270"/>
+          <rect x="102" y="34" width="396" height="270" fill="url(#dots)"/>
+          <rect class="ill-bar" x="102" y="34" width="396" height="26"/>
+          <circle class="ill-accent" cx="120" cy="47" r="5"/>
+          <rect class="ill-ink" x="132" y="44" width="44" height="6" rx="3"/>
+          <rect class="ill-muted" x="392" y="44" width="22" height="6" rx="3"/>
+          <rect class="ill-muted" x="422" y="44" width="22" height="6" rx="3"/>
+          <rect class="ill-muted" x="452" y="44" width="28" height="6" rx="3"/>
+          <rect class="ill-ink" x="124" y="84" width="150" height="13" rx="3"/>
+          <rect class="ill-ink" x="124" y="103" width="104" height="13" rx="3"/>
+          <rect class="ill-muted" x="124" y="128" width="140" height="6" rx="3"/>
+          <rect class="ill-muted" x="124" y="140" width="120" height="6" rx="3"/>
+          <rect class="ill-btn" x="124" y="158" width="62" height="18" rx="3"/>
+          <rect class="ill-block" x="298" y="80" width="178" height="104" rx="3"/>
+          <rect class="ill-card" x="124" y="204" width="110" height="80" rx="3"/>
+          <rect class="ill-card" x="245" y="204" width="110" height="80" rx="3"/>
+          <rect class="ill-card" x="366" y="204" width="110" height="80" rx="3"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+<script>
+  // ?shape=wide (1920x1080) or ?shape=square (1200x1200); ?headline=long or short.
+  const q = new URLSearchParams(location.search);
+  const square = q.get('shape') === 'square';
+  const [W, H] = square ? [1200, 1200] : [1920, 1080];
+  const root = document.documentElement.style;
+  root.setProperty('--w', W + 'px');
+  root.setProperty('--h', H + 'px');
+  root.setProperty('--u', (square ? 30 : 30) + 'px');
+  document.getElementById('scene').src = `scene-${square ? 'square' : 'wide'}.png`;
+
+  const LINES = {
+    long: { wide: ['Fix, build, and automate', "your business's website", 'and software.'], square: ['Fix, build, and', 'automate your', "business's website", 'and software.'] },
+    short: { wide: ['Websites and software', 'that work for', 'your business.'], square: ['Websites and', 'software that', 'work for your', 'business.'] },
+  };
+  const lines = LINES[q.get('headline') === 'short' ? 'short' : 'long'][square ? 'square' : 'wide'];
+  const h1 = document.getElementById('headline');
+  h1.innerHTML = lines.map((l) => l.replace(/&/g, '&amp;').replace(/</g, '&lt;')).join('<br>');
+
+  // Make the headline as large as the safe area's width allows, capped so the laptop keeps room.
+  document.fonts.ready.then(() => {
+    const safe = document.querySelector('.safe').getBoundingClientRect();
+    let size = 200;
+    h1.style.fontSize = size + 'px';
+    const fit = () => h1.scrollWidth <= safe.width && h1.getBoundingClientRect().height <= safe.height * (square ? 0.48 : 0.44);
+    while (!fit() && size > 20) { size -= 1; h1.style.fontSize = size + 'px'; }
+    document.documentElement.dataset.headlinePx = size;
+    document.documentElement.dataset.ready = 'true';
+  });
+</script>
+</body>
+</html>
