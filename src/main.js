@@ -88,19 +88,31 @@ function initBooking() {
   }
 }
 
-// /book/: the calendar is added once the page itself has loaded, so Google's
-// much heavier page doesn't hold up this one's first paint on a slow phone.
+// /book/: the calendar is added right after this page's first paint, so
+// Google's much heavier page can't hold that paint up on a slow phone. (This
+// small page can fire "load" before it paints, so load alone isn't enough.)
 function initBookPage() {
   const box = document.querySelector('.book-frame[data-src]');
   if (!box) return;
+  let added = false;
   const add = () => {
+    if (added) return;
+    added = true;
     const frame = document.createElement('iframe');
     frame.title = box.dataset.title;
     frame.src = box.dataset.src;
     box.append(frame);
   };
-  if (document.readyState === 'complete') add();
-  else addEventListener('load', add, { once: true });
+  try {
+    new PerformanceObserver((list, observer) => {
+      if (!list.getEntriesByName('first-contentful-paint').length) return;
+      observer.disconnect();
+      setTimeout(add, 0);
+    }).observe({ type: 'paint', buffered: true });
+  } catch {
+    // no paint timing: the fallback below still adds it
+  }
+  setTimeout(add, 2000);
 }
 
 function initWork() {
