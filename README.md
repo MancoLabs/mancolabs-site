@@ -288,6 +288,12 @@ Run `npm run posters` after you change the hero text, the hero layout, the color
 
 Inter (variable) and DM Sans 400/500, Latin subsets, self-hosted in `public/fonts/` under the SIL Open Font License. `fonts.css` also defines Arial-based fallbacks tuned to each font's measurements, so the page doesn't jump when the fonts load. Font files are cached as immutable (`public/_headers`), so rename the file if you ever replace one.
 
+## Google Business Profile
+
+The home page's structured data (the `ProfessionalService` block in `index.html`) has to match the Google Business Profile exactly: the name "Manco Labs", the phone (318) 642-4582, and the area served (Shreveport and Bossier City). Change both together. It's a service-area business, so the address has the city only, never a street. `sameAs` lists the Google profile, and the founder (Ethan Manco) has his LinkedIn in his own `sameAs`.
+
+"Review us on Google" (`https://g.page/r/CRGy4V9hXg2rEBM/review`) is in the footer and the contact section.
+
 ## Contact form
 
 The contact form posts to Web3Forms, the same as before. JS sends the fields as JSON and shows the result inline. Without JS, the form falls back to a normal POST. The access key in the HTML is meant to be public.
