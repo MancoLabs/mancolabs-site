@@ -35,7 +35,8 @@
   .tagline { margin-top: 6px; font-size: 10.5pt; color: var(--text-2); }
   .doc { font-family: var(--mono); font-weight: 500; font-size: 9pt; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-2); text-align: right; }
 
-  .intro { margin-top: 14px; font-size: 11pt; line-height: 1.4; max-width: 62ch; }
+  /* The intro sits atop the main column, so the sidebar starts right under the header. */
+  .intro { margin-bottom: 15px; font-size: 11pt; line-height: 1.4; }
 
   .cols { display: grid; grid-template-columns: minmax(0, 1fr) 2.45in; gap: 0.3in; margin-top: 16px; }
   h2 { font-family: var(--mono); font-size: 8.4pt; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-2); margin-bottom: 7px; }
@@ -79,10 +80,10 @@
   </header>
 
   <main>
-    <p class="intro">Manco Labs designs, builds, and maintains websites and web applications, with accessibility built in from the start.</p>
-
     <div class="cols">
       <div class="main">
+        <p class="intro">Manco Labs designs, builds, and maintains websites and web applications, with accessibility built in from the start.</p>
+
         <section aria-labelledby="comp">
           <h2 id="comp">Core competencies</h2>
           <ul class="list">
@@ -171,6 +172,15 @@
             <li><span class="code">81112000</span><span>Data services</span></li>
             <li><span class="code">81112100</span><span>Internet services</span></li>
             <li><span class="code">81112200</span><span>Software maintenance and support</span></li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="cert">
+          <h2 id="cert">Certifications</h2>
+          <p>Louisiana Economic Development:</p>
+          <ul class="list">
+            <li>Hudson Initiative Small Entrepreneurship (SE)</li>
+            <li>Small and Emerging Business Development (SEBD) Program</li>
           </ul>
         </section>
 
