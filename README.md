@@ -118,7 +118,7 @@ In `index.html`, inside `<section id="work">`. There's a commented-out card temp
 
 Cards tilt slightly toward the mouse and show a soft highlight (`src/work/tilt.js`). This is skipped on touch screens and with reduced motion.
 
-The grid is built for four cards: four across from 1440px wide (the grid grows past the page width to fit them, centered), two rows of two below that, and one per row on phones. Below 1440px, four across would squeeze the descriptions to under 30 characters a line. A fifth card would sit alone on a row, so revisit `.work-grid` in `main.css` when you add one. The card images' `sizes` attribute matches these widths.
+The grid holds five cards. The first card's `<li>` has the `work-feature` class (CHEN), so it fills the top row: screenshot beside the text from 1000px wide, stacked like the others under that. The other four sit below it: four across from 1440px wide (the grid grows past the page width to fit them, centered), two rows of two below that, and one per row on phones. No card is ever alone on a row from 320px to 1920px. Below 1440px, four across would squeeze the descriptions to under 30 characters a line. Adding or removing a card changes that math, so revisit `.work-grid` and `.work-feature` in `main.css` when you do. The card images' `sizes` attributes match these widths; the featured card has its own.
 
 ### Before/after slider
 

@@ -17,6 +17,8 @@ const SHOTS = [
   // Narrower viewport: minicine.org's layout is fixed-width and leaves 1440px mostly empty.
   { slug: 'minicine', name: 'live', url: 'https://www.minicine.org/', desktopWidth: 1100 },
   { slug: 'werla', name: 'live', url: 'https://werla.net/' },
+  // The home page as it first loads: no Bandcamp player until someone presses play.
+  { slug: 'graffiti-grimoire', name: 'live', url: 'https://graffitigrimoire.com/' },
 ];
 
 const DESKTOP = { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 };

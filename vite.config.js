@@ -18,6 +18,7 @@ const PAGES = {
   analemma: 'work/analemma/index.html',
   minicine: 'work/minicine/index.html',
   werla: 'work/werla/index.html',
+  graffitiGrimoire: 'work/graffiti-grimoire/index.html',
   tools: 'tools/index.html',
   launch: 'launch/index.html',
   care: 'care/index.html',

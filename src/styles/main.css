@@ -684,6 +684,16 @@ main, .site-footer { position: relative; z-index: 1; }
     margin-inline: calc((100% - var(--grid-w)) / 2);
   }
 }
+/* Five cards: the featured one (CHEN) fills the top row, so the other four sit
+   below as two rows of two, or four across on wide screens, and no card is ever
+   alone on a row. Screenshot beside the text from 1000px; stacked under that. */
+@media (min-width: 641px) { .work-feature { grid-column: 1 / -1; } }
+@media (min-width: 1000px) {
+  .work-feature .work-card { flex-direction: row; }
+  .work-feature .work-thumb { flex: 0 0 56%; border-bottom: 0; border-right: 1px solid var(--border); }
+  .work-feature .work-body { align-content: center; padding: 32px 40px; }
+  .work-feature h3 { font-size: 1.9rem; }
+}
 
 .work-card {
   position: relative;
