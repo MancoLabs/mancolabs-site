@@ -120,6 +120,15 @@ Cards tilt slightly toward the mouse and show a soft highlight (`src/work/tilt.j
 
 The grid holds five cards. The first card's `<li>` has the `work-feature` class (CHEN), so it fills the top row: screenshot beside the text from 1000px wide, stacked like the others under that. The other four sit below it: four across from 1440px wide (the grid grows past the page width to fit them, centered), two rows of two below that, and one per row on phones. No card is ever alone on a row from 320px to 1920px. Below 1440px, four across would squeeze the descriptions to under 30 characters a line. Adding or removing a card changes that math, so revisit `.work-grid` and `.work-feature` in `main.css` when you do. The card images' `sizes` attributes match these widths; the featured card has its own.
 
+### Reviews
+
+The homepage's "What clients say." section (`<section id="reviews">` in `index.html`, right after the work grid) lists client reviews, with a "Read more reviews on Google" link under it. To add one:
+
+1. Copy the commented review template at the end of the `.quotes` list and fill it in. The grid fits any number: as many columns as fit at 340px or wider, one per row on phones.
+2. Add the same review to its project's case study, in the "What they said" block above "Next project" (copy it from `work/minicine/`).
+
+Use the client's exact wording. You can trim a long review with an ellipsis (…), but never reword it. Never put a person's name on a review; credit the business or project. There's no review or rating structured data, on purpose.
+
 ### Before/after slider
 
 `src/work/before-after.js` provides an accessible comparison slider. A real range input sits over the two images, so it works with a keyboard (arrow keys), a screen reader, a mouse, and touch. No page uses it right now, because WERLA has no faithful "before" images. To use it, copy the commented `BEFORE/AFTER` snippet from the card template in `index.html` into a case study and point it at real screenshots. The script loads only on pages that contain `[data-before-after]`.

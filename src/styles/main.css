@@ -936,6 +936,33 @@ main, .site-footer { position: relative; z-index: 1; }
 }
 .cs-next p { font-size: 1.15rem; font-weight: 600; max-width: 36ch; }
 
+/* ── REVIEWS ─────────────────────────────── */
+/* One figure.quote per review: in the homepage's .quotes list, and on its case study
+   inside .cs-body.cs-quote. The list fits any number: as many columns as fit at
+   340px or wider, one per row on phones. */
+.reviews { border-top: 1px solid var(--hairline); }
+.quotes { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 24px; }
+.quote {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin: 0;
+  padding: clamp(24px, 3.5vw, 36px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.quote blockquote { flex: 1; margin: 0; font-size: clamp(1.08rem, 1.6vw, 1.22rem); line-height: 1.55; }
+/* An opening quote mark, hidden from screen readers (the "/ ''" part). */
+.quote blockquote::before { content: "\201C"; content: "\201C" / ""; display: block; height: 0.55em; font-size: 3.4rem; line-height: 1; color: var(--accent-text); }
+.quote figcaption { display: grid; justify-items: start; gap: 6px; }
+/* Names keep their own case (minicine? is lowercase). */
+.quote-who { font-weight: 600; }
+.quote figcaption .text-link { font-size: 0.92rem; font-weight: 500; }
+.quotes-more { margin-top: 28px; font-size: 0.95rem; }
+.cs-quote .quote { height: auto; }
+
 /* ── 404 ─────────────────────────────────── */
 .lost { min-height: calc(100svh - 72px - 130px); display: grid; align-items: center; padding-block: 64px; }
 .lost-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(28px, 5vw, 72px); align-items: center; }
