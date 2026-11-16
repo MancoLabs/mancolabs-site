@@ -522,11 +522,11 @@ The visitor types a domain (or pastes an email address or web address; only the 
    | `code` | GitHub repo address ("Code") |
    | `alt` | Describes the still, which is the first frame of the loop |
 
-2. Run `npm run lab-previews -- <slug>`. It opens the live demo in Chrome at 1440 by 900, records about 8 seconds, and writes to `src/assets/lab/<slug>/`:
+2. Run `npm run lab-previews -- <slug>`. It opens the live demo in Chrome, records about 8 seconds at 1440 by 900, and writes to `src/assets/lab/<slug>/`:
    - `still-480/800/1200.avif` and `.webp`: the loop's first frame.
-   - `loop.webm` (AV1) and `loop.mp4` (H.264), 960 by 600, muted. The last half second fades into the first, so the loop has no seam.
+   - `loop.mp4` (H.264) and `loop.webm` (AV1), 960 by 600, muted. The last half second fades into the first, so the loop has no seam. The AV1 file is dropped when it isn't smaller than the MP4 (fine noise like pixel stars can do that), and the page then offers just the MP4.
 
-   A project that moves on its own needs nothing more. To click or move something on camera, add a recipe for its slug to `RECIPES` in `scripts/capture-lab-previews.mjs`. Needs ffmpeg with libsvtav1 and libx264 on your PATH.
+   A project that moves on its own needs nothing more. To click or move something on camera, add a recipe for its slug to `RECIPES` in `scripts/capture-lab-previews.mjs`. A recipe can also zoom in on a narrow app with a smaller 16:10 `viewport` (Earcade uses 1024 by 640), run a script before the page's own (`init`; Earcade seeds `Math.random` so its round asks the same questions every time), and throw a take away by returning false from `play` (Earcade records again unless the round shows both a right answer and a miss). Needs ffmpeg with libsvtav1 and libx264 on your PATH.
 3. Rebuild. A project with no loop yet shows just its still.
 
 **How the loops behave** (`src/lab/previews.js`):

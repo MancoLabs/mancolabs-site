@@ -5,7 +5,7 @@
 import { chromium } from 'playwright-core';
 import sharp from 'sharp';
 import { execFileSync } from 'node:child_process';
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const PROJECTS = JSON.parse(await readFile('lab/projects.json', 'utf8'));
@@ -17,9 +17,15 @@ const FADE_S = 0.6; // the end crossfades into the start, so the loop has no vis
 const VIDEO = { width: 960, height: 600 };
 const STILL_WIDTHS = [480, 800, 1200];
 
+// Replaces Math.random with a fixed sequence, for demos that pick things at random.
+const SEEDED_RANDOM = `(() => { let s = 1234567; Math.random = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; })();`;
+
 // What each demo does on camera. `play(page, ms)` runs while recording, for `ms`
-// milliseconds; `prepare(page)` runs before. A project with no recipe is simply
-// loaded and recorded, which suits anything that moves on its own.
+// milliseconds, and can return false to throw the take away and record again;
+// `prepare(page)` runs before. Optional: `viewport` (a smaller 16:10 size zooms in
+// on a narrow app; frames still come out at 1440 by 900), `init` (a script run
+// before the page's own), and `reload`. A project with no recipe is simply loaded
+// and recorded, which suits anything that moves on its own.
 const RECIPES = {
   // The default beat playing, with its step sequencer open over the playlist.
   steplab: {
@@ -71,6 +77,35 @@ const RECIPES = {
       await figureEight(page, ms, 0, 1, [0.22, 0.55, 0.82]);
     },
   },
+  // An Intervals round at Beginner, zoomed in on the game's column: two right
+  // answers, then a miss that shows the right one and "Hear yours". The seeded
+  // Math.random makes the round ask the same questions every time; a take
+  // without both a right answer and a miss is recorded again.
+  earcade: {
+    viewport: { width: 1024, height: 640 },
+    init: SEEDED_RANDOM,
+    async prepare(page) {
+      await page.getByRole('button', { name: /^Intervals/ }).click();
+      await page.getByRole('button', { name: /^Beginner/ }).click();
+    },
+    async play(page, ms) {
+      const end = Date.now() + ms;
+      let right = 0, wrong = 0;
+      for (let q = 0; q < 3; q++) {
+        if (q) await page.keyboard.press('Enter'); // next question
+        // If the notes didn't play by themselves, press Play.
+        const play = page.locator('button[data-act="main"]', { hasText: /^\s*Play\s*$/i });
+        if (await play.isVisible().catch(() => false)) await play.click();
+        await page.waitForTimeout(1000); // the two notes play
+        await page.locator('button[data-choice="m3"]').click();
+        await page.waitForTimeout(150);
+        if (await page.locator('button[data-choice].is-wrong').count()) wrong++; else right++;
+        if (q < 2) await page.waitForTimeout(1400);
+      }
+      await page.waitForTimeout(Math.max(end - Date.now(), 0));
+      return right > 0 && wrong > 0;
+    },
+  },
 };
 
 // Moves the mouse around a figure eight, one lap per `cycleMs`, from fraction
@@ -96,35 +131,55 @@ if (!projects.length) throw new Error(`No project matches ${only.join(', ')}. Sl
 
 const browser = await chromium.launch({ channel: 'chrome' });
 
-for (const project of projects) {
-  const recipe = RECIPES[project.slug] ?? {};
-  const raw = path.join(RAW, project.slug);
-  await rm(raw, { recursive: true, force: true });
-  await mkdir(path.join(raw, 'frames'), { recursive: true });
-
-  const context = await browser.newContext({ viewport: VIEW, deviceScaleFactor: 1, reducedMotion: 'no-preference' });
+// Records one take with the DevTools screencast: every frame Chrome paints, with
+// its time. Returns null when the recipe throws the take away.
+async function record(project, recipe) {
+  const viewport = recipe.viewport ?? VIEW;
+  const context = await browser.newContext({ viewport, deviceScaleFactor: VIEW.width / viewport.width, reducedMotion: 'no-preference' });
+  if (recipe.init) await context.addInitScript(recipe.init);
   const page = await context.newPage();
   await page.goto(project.demo, { waitUntil: 'load', timeout: 60_000 });
   await page.evaluate(() => document.fonts?.ready);
   await page.waitForTimeout(1000);
   await recipe.prepare?.(page);
 
-  // Record with the DevTools screencast: every frame Chrome paints, with its time.
   const cdp = await context.newCDPSession(page);
   const frames = [];
+  let gotFirst;
+  const firstFrame = new Promise((resolve) => (gotFirst = resolve));
   cdp.on('Page.screencastFrame', ({ data, metadata, sessionId }) => {
     frames.push({ data, t: metadata.timestamp });
+    gotFirst();
     cdp.send('Page.screencastFrameAck', { sessionId }).catch(() => {});
   });
   await cdp.send('Page.startScreencast', { format: 'jpeg', quality: 92, maxWidth: VIEW.width, maxHeight: VIEW.height });
+  // A still screen paints nothing new, so start the clock only once the first frame is in.
+  await Promise.race([firstFrame, page.waitForTimeout(3000)]);
   // A demo that starts on load is reloaded once the camera is rolling.
   if (recipe.reload) await page.reload({ waitUntil: 'load' });
   const t0 = Date.now() / 1000;
-  if (recipe.play) await recipe.play(page, RECORD_S * 1000);
+  let good = true;
+  if (recipe.play) good = (await recipe.play(page, RECORD_S * 1000)) !== false;
   else await page.waitForTimeout(RECORD_S * 1000);
   const t1 = Math.max(Date.now() / 1000, t0 + RECORD_S);
   await cdp.send('Page.stopScreencast');
   await context.close();
+  return good ? { frames, t0, t1 } : null;
+}
+
+for (const project of projects) {
+  const recipe = RECIPES[project.slug] ?? {};
+  const raw = path.join(RAW, project.slug);
+  await rm(raw, { recursive: true, force: true });
+  await mkdir(path.join(raw, 'frames'), { recursive: true });
+
+  let take = null;
+  for (let attempt = 1; attempt <= 5 && !take; attempt++) {
+    take = await record(project, recipe);
+    if (!take) console.log(`${project.slug}: take ${attempt} didn't show what the recipe wants, recording again`);
+  }
+  if (!take) throw new Error(`${project.slug}: no usable take in 5 tries`);
+  const { frames, t0, t1 } = take;
 
   // Keep the frames from t0 on (a reload paints a blank page first), each shown
   // until the next one arrived.
@@ -157,6 +212,9 @@ for (const project of projects) {
   const scale = `scale=${VIDEO.width}:${VIDEO.height}:flags=lanczos`;
   ffmpeg('-i', loop, '-vf', scale, '-c:v', 'libsvtav1', '-crf', '40', '-preset', '5', '-g', '300', '-pix_fmt', 'yuv420p', '-an', path.join(dir, 'loop.webm'));
   ffmpeg('-i', loop, '-vf', scale, '-c:v', 'libx264', '-crf', '27', '-preset', 'slow', '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', path.join(dir, 'loop.mp4'));
+  // AV1 is usually smaller; when it isn't (fine noise like pixel stars), keep just the MP4.
+  const [webm, mp4] = await Promise.all(['loop.webm', 'loop.mp4'].map((f) => stat(path.join(dir, f))));
+  if (webm.size >= mp4.size) await rm(path.join(dir, 'loop.webm'));
 
   // The still is the loop's first frame, so nothing jumps when the video takes over.
   const still = path.join(raw, 'still.png');

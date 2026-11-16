@@ -59,10 +59,12 @@ function htmlTemplating() {
   const labProject = (p, i) => {
     const dir = `lab/${p.slug}`;
     const hasLoop = existsSync(resolve(ROOT, 'src/assets', dir, 'loop.mp4'));
+    // The capture script drops the AV1 version when it isn't smaller than the MP4.
+    const hasAv1 = existsSync(resolve(ROOT, 'src/assets', dir, 'loop.webm'));
     const still = expandPicture('', `src="${dir}/still" widths="480,800,1200" sizes="(min-width: 1140px) 595px, (min-width: 900px) calc(55vw - 32px), calc(100vw - 40px)" alt="${esc(p.alt)}" width="1440" height="900"${i === 0 ? ' loading="eager"' : ''}`);
     const loop = hasLoop
       ? `<video class="lab-loop" muted loop playsinline preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1" width="960" height="600">` +
-        `<source src="/src/assets/${dir}/loop.webm" type='video/webm; codecs="av01.0.04M.08"'>` +
+        (hasAv1 ? `<source src="/src/assets/${dir}/loop.webm" type='video/webm; codecs="av01.0.04M.08"'>` : '') +
         `<source src="/src/assets/${dir}/loop.mp4" type='video/mp4; codecs="avc1.64001F"'></video>` +
         `<button class="lab-toggle" type="button" data-name="${esc(p.name)}" aria-label="Pause the ${esc(p.name)} preview" hidden>` +
         `<svg class="i-pause" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><rect x="2.5" y="1.5" width="3" height="11" rx="0.5"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.5"/></svg>` +

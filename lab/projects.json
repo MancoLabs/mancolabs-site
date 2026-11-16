@@ -2,7 +2,7 @@
   {
     "slug": "steplab",
     "name": "Steplab",
-    "description": "A simple beat maker in your browser, laid out like FL Studio with the same shortcuts so what you learn carries over to FL Studio: make drum loops and melodies, then arrange them into a song.",
+    "description": "A simple beat maker in your browser, laid out like FL Studio with the same shortcuts, so what you learn carries over: make drum loops and melodies, then arrange them into a song.",
     "demo": "https://ethanmanco.github.io/steplab/",
     "code": "https://github.com/ethanmanco/steplab",
     "alt": "Steplab playing a beat: patterns and channels on the left, and a playlist of drum, bass, hook, and pad clips on the right."
@@ -30,5 +30,13 @@
     "demo": "https://ethanmanco.github.io/cursor-playground/",
     "code": "https://github.com/ethanmanco/cursor-playground",
     "alt": "A glowing comet and rainbow paint trailing a cursor across a starry purple sky, with fireworks and constellations."
+  },
+  {
+    "slug": "earcade",
+    "name": "Earcade",
+    "description": "An 8-bit ear and theory trainer for your phone: name intervals, chords, and scale degrees by ear, or find notes on the fretboard, in quick rounds of 10.",
+    "demo": "https://ethanmanco.github.io/earcade/",
+    "code": "https://github.com/ethanmanco/earcade",
+    "alt": "An Earcade Intervals round on a pixel art space background: question 1 of 10 asks you to name the interval, with four answer buttons below."
   }
 ]
