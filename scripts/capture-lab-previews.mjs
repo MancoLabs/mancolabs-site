@@ -27,15 +27,20 @@ const SEEDED_RANDOM = `(() => { let s = 1234567; Math.random = () => { s = (s * 
 // before the page's own), and `reload`. A project with no recipe is simply loaded
 // and recorded, which suits anything that moves on its own.
 const RECIPES = {
-  // The default beat playing, with its step sequencer open over the playlist.
+  // The main screen with the K-pop chorus example playing: its fullest playlist,
+  // over the starfield.
   steplab: {
     async prepare(page) {
       await page.getByRole('button', { name: /click to start/i }).click();
-      await page.waitForTimeout(600);
-      await page.getByRole('button', { name: 'Edit Beat' }).click();
-      await page.waitForTimeout(600);
+      await page.waitForTimeout(500);
+      await page.getByRole('button', { name: /^Examples$/ }).click();
+      await page.getByRole('button', { name: 'Load K-pop chorus' }).click();
+      await page.waitForTimeout(500);
       await page.getByRole('button', { name: /^play$/i }).first().click();
-      await page.waitForTimeout(1500);
+      await page.mouse.move(1300, 860); // off the buttons, so nothing shows a hover
+      // The "Loaded K-pop chorus" note fades out first.
+      await page.getByText(/Loaded K-pop chorus/).waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
+      await page.waitForTimeout(500);
     },
   },
   // The default scale playing; each dot lights up as it sounds. Play again when it ends.

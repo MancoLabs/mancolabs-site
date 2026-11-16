@@ -5,7 +5,7 @@
     "description": "A simple beat maker in your browser, laid out like FL Studio with the same shortcuts, so what you learn carries over: make drum loops and melodies, then arrange them into a song.",
     "demo": "https://ethanmanco.github.io/steplab/",
     "code": "https://github.com/ethanmanco/steplab",
-    "alt": "Steplab playing a beat: patterns and channels on the left, and a playlist of drum, bass, hook, and pad clips on the right."
+    "alt": "Steplab playing its K-pop chorus example: patterns and channels on the left, and a playlist of string, chord, drum, 808, and hook clips above a starfield."
   },
   {
     "slug": "sixline",
