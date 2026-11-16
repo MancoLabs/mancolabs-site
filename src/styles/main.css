@@ -834,6 +834,7 @@ main, .site-footer { position: relative; z-index: 1; }
 .about h2 { font-size: clamp(2rem, 4vw, 2.9rem); margin-top: 16px; }
 .about-bio p:not(.eyebrow) { color: var(--text-2); font-size: 1.08rem; margin-top: 18px; max-width: 54ch; }
 .about-bio strong { color: var(--text); font-weight: 600; }
+.about-links { display: flex; flex-wrap: wrap; gap: 6px 24px; }
 .about-links a { color: var(--text); text-underline-offset: 3px; }
 .about-links a:hover { text-decoration-thickness: 2px; }
 .about-stack-label { margin-top: 34px; }
@@ -962,6 +963,42 @@ main, .site-footer { position: relative; z-index: 1; }
 .quote figcaption .text-link { font-size: 0.92rem; font-weight: 500; }
 .quotes-more { margin-top: 28px; font-size: 0.95rem; }
 .cs-quote .quote { height: auto; }
+
+/* ── LAB (/lab/, cards from lab/projects.json) ── */
+.lab-gh { margin-top: 22px; font-weight: 500; }
+.lab { padding-top: clamp(8px, 2vw, 24px); }
+.lab-list { list-style: none; display: grid; gap: clamp(56px, 8vw, 96px); }
+.lab-item { display: grid; gap: 22px; scroll-margin-top: 96px; }
+/* One row per project: the preview beside the text, on alternating sides. */
+@media (min-width: 900px) {
+  .lab-item { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: center; gap: clamp(36px, 5vw, 64px); }
+  .lab-item:nth-child(even) { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+  .lab-item:nth-child(even) .lab-media { order: 2; }
+}
+.lab-media { position: relative; aspect-ratio: 16 / 10; background: var(--bg-dark); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.lab-media img, .lab-media video { width: 100%; height: 100%; object-fit: cover; }
+/* The loop (src/lab/previews.js) sits on the still and shows once it plays. */
+.lab-media video { position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s; }
+.lab-media.is-live video { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .lab-media video { transition: none; } }
+/* Pause and play: light on dark, with a two-tone focus ring that shows on any screenshot. */
+.lab-toggle {
+  position: absolute; right: 10px; bottom: 10px; z-index: 1;
+  display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+  border-radius: 999px; border: 1px solid color-mix(in srgb, var(--paper) 50%, transparent);
+  background: color-mix(in srgb, var(--ink) 82%, transparent); color: var(--paper);
+  cursor: pointer; transition: background-color 0.2s;
+}
+.lab-toggle:hover { background: var(--ink); }
+.lab-toggle:focus-visible { outline: 3px solid var(--paper); outline-offset: 0; box-shadow: 0 0 0 6px var(--ink); }
+.lab-toggle svg { width: 14px; height: 14px; fill: currentColor; }
+.lab-toggle .i-play, .lab-media[data-wanted="false"] .lab-toggle .i-pause { display: none; }
+.lab-media[data-wanted="false"] .lab-toggle .i-play { display: block; }
+.lab-body { display: grid; justify-items: start; gap: 14px; }
+.lab-name { font-size: clamp(1.6rem, 3vw, 2.1rem); }
+.lab-desc { color: var(--text-2); font-size: 1.05rem; max-width: 46ch; }
+.lab-links { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 22px; margin-top: 4px; }
+.lab-links .text-link { padding-block: 10px; font-weight: 600; }
 
 /* ── 404 ─────────────────────────────────── */
 .lost { min-height: calc(100svh - 72px - 130px); display: grid; align-items: center; padding-block: 64px; }

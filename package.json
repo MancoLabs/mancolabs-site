@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "check:copy": "node scripts/check-copy.mjs",
     "screenshots": "node scripts/capture-screenshots.mjs",
+    "lab-previews": "node scripts/capture-lab-previews.mjs",
     "posters": "node scripts/render-posters.mjs",
     "capability": "node scripts/render-capability.mjs"
   },

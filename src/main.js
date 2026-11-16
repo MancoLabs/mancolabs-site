@@ -119,6 +119,8 @@ function initWork() {
   const cards = document.querySelectorAll('.work-card');
   if (cards.length) import('./work/tilt.js').then((m) => m.initTilt(cards));
   if (document.querySelector('[data-before-after]')) import('./work/before-after.js').then((m) => m.initBeforeAfter());
+  const previews = document.querySelectorAll('[data-lab-preview]');
+  if (previews.length) import('./lab/previews.js').then((m) => m.initLabPreviews(previews));
 }
 
 // A slim bar under the header. Browsers with CSS scroll timelines drive it in

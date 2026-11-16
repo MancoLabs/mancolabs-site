@@ -1,0 +1,34 @@
+[
+  {
+    "slug": "steplab",
+    "name": "Steplab",
+    "description": "A simple beat maker in your browser, laid out like FL Studio with the same shortcuts so what you learn carries over to FL Studio: make drum loops and melodies, then arrange them into a song.",
+    "demo": "https://ethanmanco.github.io/steplab/",
+    "code": "https://github.com/ethanmanco/steplab",
+    "alt": "Steplab playing a beat: patterns and channels on the left, and a playlist of drum, bass, hook, and pad clips on the right."
+  },
+  {
+    "slug": "sixline",
+    "name": "Sixline",
+    "description": "A guitar fretboard for people who read tab: pick a chord, scale, or arpeggio in any key to see it on the neck, hear it, and read it as tab.",
+    "demo": "https://ethanmanco.github.io/sixline/",
+    "code": "https://github.com/ethanmanco/sixline",
+    "alt": "Sixline showing the A minor pentatonic scale on a guitar neck, with a finger number on each note and the tab below."
+  },
+  {
+    "slug": "pocket-pixels",
+    "name": "Pocket Pixels",
+    "description": "8-bit Texas Hold'em for your phone: play computer opponents with their own styles, or send friends a link to your table, with play chips only.",
+    "demo": "https://ethanmanco.github.io/pocket-pixels/",
+    "code": "https://github.com/ethanmanco/pocket-pixels",
+    "alt": "A Pocket Pixels hand on a pixel art poker table in space, with four computer opponents and your two cards at the bottom."
+  },
+  {
+    "slug": "cursor-playground",
+    "name": "Cursor Playground",
+    "description": "Pick from 35 colorful cursor effects, stack as many as you like, tweak them, and share a link to what you made.",
+    "demo": "https://ethanmanco.github.io/cursor-playground/",
+    "code": "https://github.com/ethanmanco/cursor-playground",
+    "alt": "A glowing comet and rainbow paint trailing a cursor across a starry purple sky, with fireworks and constellations."
+  }
+]
