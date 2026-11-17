@@ -1,5 +1,13 @@
 [
   {
+    "slug": "insert-rhyme",
+    "name": "Insert Rhyme",
+    "description": "Free 8-bit freestyle rap practice. Pick a beat, watch the ball bounce across each bar, and land your rhymes on the bright blocks. No accounts, no ads, nothing to pay for, and nothing leaves your device.",
+    "demo": "https://ethanmanco.github.io/insert-rhyme/",
+    "code": "https://github.com/ethanmanco/insert-rhyme",
+    "alt": "Insert Rhyme playing the Bap Boom beat at 90 BPM: a ball bounces across a bar of four blocks toward the rhyme word smug on the bright fourth block, with the next rhyme words (effect, suspect, phrased) waiting in the bars below."
+  },
+  {
     "slug": "steplab",
     "name": "Steplab",
     "description": "A simple beat maker in your browser, laid out like FL Studio with the same shortcuts, so what you learn carries over: make drum loops and melodies, then arrange them into a song.",

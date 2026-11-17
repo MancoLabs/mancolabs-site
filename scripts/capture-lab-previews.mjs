@@ -24,9 +24,54 @@ const SEEDED_RANDOM = `(() => { let s = 1234567; Math.random = () => { s = (s * 
 // milliseconds, and can return false to throw the take away and record again;
 // `prepare(page)` runs before. Optional: `viewport` (a smaller 16:10 size zooms in
 // on a narrow app; frames still come out at 1440 by 900), `init` (a script run
-// before the page's own), and `reload`. A project with no recipe is simply loaded
-// and recorded, which suits anything that moves on its own.
+// before the page's own), `reload`, `loop`, and `cut`. With `loop` (seconds;
+// `prepare` can set it), the loop is exactly that long and comes from the end of
+// the recording, so a demo with a beat can keep time across the seam; `play` then
+// decides where the recording ends, after at least `ms`. With `cut`, the loop
+// goes straight from its last frame to its first instead of crossfading. A
+// project with no recipe is simply loaded and recorded, which suits anything that
+// moves on its own.
 const RECIPES = {
+  // The default beat (Bap Boom, 90 BPM) after the four-beat count in, zoomed in on
+  // the game's column: the ball bounces across the four blocks of each bar, with
+  // the rhyme words waiting on the bright blocks below. The words come from a deck
+  // seeded with Date.now() when the page loads, so a fixed first value deals the
+  // same words every time. The loop is exactly three bars, so the ball keeps the
+  // beat across the seam, and it cuts on a bar line, where the rows jump to the
+  // next bar anyway.
+  'insert-rhyme': {
+    viewport: { width: 1024, height: 640 },
+    cut: true,
+    init: `(() => { const now = Date.now; let first = true; Date.now = () => (first ? ((first = false), 1767225600000) : now()); })();`,
+    async prepare(page) {
+      await page.getByRole('button', { name: /press start/i }).click();
+      // Press start starts the beat, and Play turns into Stop; press Play if it didn't.
+      const playing = await page.getByRole('button', { name: 'Stop', exact: true }).waitFor({ timeout: 2000 }).then(() => true, () => false);
+      if (!playing) await page.getByRole('button', { name: 'Play', exact: true }).click();
+      await page.mouse.move(1000, 620); // off the game's column, so nothing shows a hover
+      const bpm = Number(await page.getByRole('slider', { name: /tempo/i }).inputValue());
+      this.bar = 240_000 / bpm; // ms
+      this.loop = (3 * this.bar) / 1000;
+      // Bar 1 starts when the caption turns from COUNT IN to LINE 1 (timed on the
+      // camera's clock).
+      this.bar1 = await page.evaluate(() => new Promise((resolve) => {
+        const tick = () => (/^LINE/.test(document.querySelector('.stage .caption')?.textContent ?? '')
+          ? resolve(new Date().getTime())
+          : requestAnimationFrame(tick));
+        tick();
+      }));
+    },
+    async play(page, ms) {
+      // End on a bar line (the camera's frames show the page about 50 ms late),
+      // with time before the loop for the camera to settle, so the cut lands on
+      // the frame where the rows jump to the next bar.
+      const start = Date.now();
+      let end = this.bar1 + 50;
+      while (end < start + Math.max(ms, this.loop * 1000 + 300) + 50) end += this.bar;
+      await page.waitForTimeout(end - Date.now() - 30);
+      while (Date.now() < end); // timers can fire a frame late, so wait out the end exactly
+    },
+  },
   // The main screen with the K-pop chorus example playing: its fullest playlist,
   // over the starfield.
   steplab: {
@@ -187,8 +232,14 @@ for (const project of projects) {
   const { frames, t0, t1 } = take;
 
   // Keep the frames from t0 on (a reload paints a blank page first), each shown
-  // until the next one arrived.
-  const first = frames.findLastIndex((f) => f.t <= t0 + 0.05);
+  // until the next one arrived. A `loop` recipe keeps only the end of the
+  // recording, from the frame on screen at `from`, so the loop comes out exactly
+  // as long as asked (and the first moments of a recording, which can run a
+  // frame or two ahead, stay out of it).
+  const span = recipe.loop && recipe.loop + (recipe.cut ? 0 : FADE_S);
+  const from = span ? t1 - span : t0;
+  if (from < t0) throw new Error(`${project.slug}: the recording is shorter than the ${span}s the loop needs`);
+  const first = frames.findLastIndex((f) => f.t <= (span ? from : t0 + 0.05));
   const kept = frames.slice(Math.max(first, 0)).filter((f) => f.t < t1);
   if (kept.length < 20) throw new Error(`${project.slug}: only ${kept.length} frames recorded`);
   let list = '';
@@ -196,20 +247,24 @@ for (const project of projects) {
     const file = `f${String(i).padStart(5, '0')}.jpg`;
     await writeFile(path.join(raw, 'frames', file), Buffer.from(f.data, 'base64'));
     const next = kept[i + 1]?.t ?? t1;
-    list += `file 'frames/${file}'\nduration ${Math.max(next - Math.max(f.t, t0), 0.001).toFixed(4)}\n`;
+    list += `file 'frames/${file}'\nduration ${Math.max(next - Math.max(f.t, from), 0.001).toFixed(4)}\n`;
   }
   list += `file 'frames/f${String(kept.length - 1).padStart(5, '0')}.jpg'\n`;
   await writeFile(path.join(raw, 'frames.txt'), list);
 
   // 30 fps master, then the loop: drop the first FADE_S seconds and crossfade the
   // last FADE_S seconds into them, so the last frame leads straight into the first.
+  // With `cut`, the first FADE_S seconds move to the end instead: the loop cuts
+  // from the master's last frame to its first, and starts FADE_S in.
   const master = path.join(raw, 'master.mp4');
   const loop = path.join(raw, 'loop.mp4');
-  ffmpeg('-f', 'concat', '-safe', '0', '-i', path.join(raw, 'frames.txt'), '-fps_mode', 'cfr', '-r', '30', '-c:v', 'libx264', '-crf', '10', '-preset', 'veryfast', '-pix_fmt', 'yuv420p', master);
+  const length = span ? ['-t', span.toFixed(4)] : [];
+  ffmpeg('-f', 'concat', '-safe', '0', '-i', path.join(raw, 'frames.txt'), '-fps_mode', 'cfr', '-r', '30', ...length, '-c:v', 'libx264', '-crf', '10', '-preset', 'veryfast', '-pix_fmt', 'yuv420p', master);
   const dur = Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', master]).toString());
-  const offset = (dur - 2 * FADE_S).toFixed(3);
+  if (span && Math.abs(dur - span) > 0.02) throw new Error(`${project.slug}: the master is ${dur}s, not ${span}s`);
+  const join = recipe.cut ? 'concat=n=2:v=1:a=0' : `xfade=transition=fade:duration=${FADE_S}:offset=${(dur - 2 * FADE_S).toFixed(3)}`;
   ffmpeg('-i', master, '-filter_complex',
-    `[0:v]split[x][y];[x]trim=start=${FADE_S},setpts=PTS-STARTPTS[a];[y]trim=end=${FADE_S},setpts=PTS-STARTPTS[b];[a][b]xfade=transition=fade:duration=${FADE_S}:offset=${offset}[v]`,
+    `[0:v]split[x][y];[x]trim=start=${FADE_S},setpts=PTS-STARTPTS[a];[y]trim=end=${FADE_S},setpts=PTS-STARTPTS[b];[a][b]${join}[v]`,
     '-map', '[v]', '-c:v', 'libx264', '-crf', '10', '-preset', 'veryfast', '-pix_fmt', 'yuv420p', loop);
 
   const dir = path.join(OUT, project.slug);
