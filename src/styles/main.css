@@ -939,10 +939,11 @@ main, .site-footer { position: relative; z-index: 1; }
 
 /* ── REVIEWS ─────────────────────────────── */
 /* One figure.quote per review: in the homepage's .quotes list, and on its case study
-   inside .cs-body.cs-quote. The list fits any number: as many columns as fit at
-   340px or wider, one per row on phones. */
+   inside .cs-body.cs-quote. The list is set for three reviews: one per row until all
+   three fit side by side, so none is ever left alone on a row. */
 .reviews { border-top: 1px solid var(--hairline); }
-.quotes { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 24px; }
+.quotes { list-style: none; display: grid; gap: 24px; }
+@media (min-width: 1000px) { .quotes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .quote {
   height: 100%;
   display: flex;
