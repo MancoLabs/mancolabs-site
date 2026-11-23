@@ -28,10 +28,51 @@ const SEEDED_RANDOM = `(() => { let s = 1234567; Math.random = () => { s = (s * 
 // `prepare` can set it), the loop is exactly that long and comes from the end of
 // the recording, so a demo with a beat can keep time across the seam; `play` then
 // decides where the recording ends, after at least `ms`. With `cut`, the loop
-// goes straight from its last frame to its first instead of crossfading. A
+// goes straight from its last frame to its first instead of crossfading. `play`
+// can also list stretches to leave out in `this.skip`, as [from, to] in seconds on
+// Date.now()'s clock (a map loading its tiles, say): the video holds the frame
+// before the stretch, then shows the stretch's last frame from `to` on. A
 // project with no recipe is simply loaded and recorded, which suits anything that
 // moves on its own.
 const RECIPES = {
+  // The national map of scored roads beside the ranked list, then a click on the
+  // top road, which turns the list into its score card and flies the map to the
+  // road. The video stays on the national map from the click until the map's idle
+  // event (no camera moving, every tile drawn), so it never shows a half-drawn map,
+  // then cuts to the road. The loop cuts back to the national map at its seam.
+  'sunday-line': {
+    viewport: { width: 1280, height: 800 },
+    cut: true,
+    async prepare(page) {
+      await page.mouse.move(640, 25); // the empty middle of the header, so nothing shows a hover
+      // The page doesn't expose its MapLibre map; find it through React's fiber tree.
+      await page.waitForFunction(() => {
+        const el = document.querySelector('.maplibregl-map');
+        const key = el && Object.keys(el).find((k) => k.startsWith('__reactFiber$'));
+        for (let f = key && el[key]; f; f = f.return) {
+          for (let h = f.memoizedState; h && typeof h === 'object'; h = h.next) {
+            if (typeof h.memoizedState?.current?.flyTo === 'function') return (window.__labMap = h.memoizedState.current);
+          }
+        }
+        return false;
+      }, null, { timeout: 30_000 });
+      const top = page.locator('li button.road').first();
+      await top.waitFor();
+      await mapIdle(page);
+      console.log(`sunday-line: the top road is ${(await top.innerText()).replace(/\s+/g, ' ')}`);
+    },
+    async play(page, ms) {
+      this.skip = [];
+      await page.waitForTimeout(1200);
+      const from = Date.now() / 1000;
+      await page.locator('li button.road').first().evaluate((b) => b.click()); // no hover, no focus ring
+      await page.waitForFunction(() => window.__labMap.isMoving(), null, { timeout: 2000 }).catch(() => {});
+      await mapIdle(page);
+      await page.waitForTimeout(300); // the camera's frames show the page a little late
+      this.skip.push([from, Date.now() / 1000]);
+      await page.waitForTimeout(Math.max(ms - (Date.now() / 1000 - from) * 1000 - 1200, 4000));
+    },
+  },
   // The default beat (Bap Boom, 90 BPM) after the four-beat count in, zoomed in on
   // the game's column: the ball bounces across the four blocks of each bar, with
   // the rhyme words waiting on the bright blocks below. The words come from a deck
@@ -172,6 +213,17 @@ async function figureEight(page, cycleMs, from, to, clicks) {
   }
 }
 
+// Waits for the map in window.__labMap to go idle: no camera moving, every tile
+// loaded, every fade done.
+function mapIdle(page) {
+  return page.evaluate(() => new Promise((resolve, reject) => {
+    const map = window.__labMap;
+    const timer = setTimeout(() => reject(new Error('the map never finished drawing')), 20_000);
+    map.once('idle', () => { clearTimeout(timer); resolve(); });
+    map.triggerRepaint();
+  }));
+}
+
 // SVT_LOG=1: the AV1 encoder prints errors only.
 const ffmpeg = (...args) => execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', ...args], { stdio: 'inherit', env: { ...process.env, SVT_LOG: '1' } });
 
@@ -240,7 +292,13 @@ for (const project of projects) {
   const from = span ? t1 - span : t0;
   if (from < t0) throw new Error(`${project.slug}: the recording is shorter than the ${span}s the loop needs`);
   const first = frames.findLastIndex((f) => f.t <= (span ? from : t0 + 0.05));
-  const kept = frames.slice(Math.max(first, 0)).filter((f) => f.t < t1);
+  let kept = frames.slice(Math.max(first, 0)).filter((f) => f.t < t1);
+  for (const [a, b] of recipe.skip ?? []) {
+    const inside = kept.filter((f) => f.t >= a && f.t < b);
+    kept = kept.filter((f) => f.t < a || f.t >= b);
+    const after = kept.findIndex((f) => f.t >= b);
+    if (inside.length) kept.splice(after < 0 ? kept.length : after, 0, { ...inside.at(-1), t: b });
+  }
   if (kept.length < 20) throw new Error(`${project.slug}: only ${kept.length} frames recorded`);
   let list = '';
   for (const [i, f] of kept.entries()) {
