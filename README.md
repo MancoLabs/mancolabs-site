@@ -521,6 +521,7 @@ The visitor types a domain (or pastes an email address or web address; only the 
    | `demo` | Live demo address ("Try it") |
    | `code` | GitHub repo address ("Code") |
    | `alt` | Describes the still, which is the first frame of the loop |
+   | `toggle` | Optional. The corner for the pause and play button: `bottom-right` (the default), `bottom-left`, `top-right`, or `top-left`. Use it when the button would cover something in the app (Sunday Line's is `bottom-left`, off its orange "+" button). |
 
 2. Run `npm run lab-previews -- <slug>`. It opens the live demo in Chrome, records about 8 seconds at 1440 by 900, and writes to `src/assets/lab/<slug>/`:
    - `still-480/800/1200.avif` and `.webp`: the loop's first frame.

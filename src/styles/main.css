@@ -989,6 +989,8 @@ main, .site-footer { position: relative; z-index: 1; }
   background: color-mix(in srgb, var(--ink) 82%, transparent); color: var(--paper);
   cursor: pointer; transition: background-color 0.2s;
 }
+.lab-toggle[data-corner^="top"] { top: 10px; bottom: auto; }
+.lab-toggle[data-corner$="left"] { left: 10px; right: auto; }
 .lab-toggle:hover { background: var(--ink); }
 .lab-toggle:focus-visible { outline: 3px solid var(--paper); outline-offset: 0; box-shadow: 0 0 0 6px var(--ink); }
 .lab-toggle svg { width: 14px; height: 14px; fill: currentColor; }

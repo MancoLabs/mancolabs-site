@@ -56,8 +56,12 @@ function htmlTemplating() {
   // One <li> per project: the still from src/assets/lab/<slug>/ (npm run
   // lab-previews), with its loop on top when there is one. The loop has
   // preload="none", so nothing downloads until src/lab/previews.js plays it.
+  const CORNERS = ['bottom-right', 'bottom-left', 'top-right', 'top-left'];
   const labProject = (p, i) => {
     const dir = `lab/${p.slug}`;
+    // `toggle` moves the pause and play button off something in the app (bottom right by default).
+    const corner = p.toggle ?? 'bottom-right';
+    if (!CORNERS.includes(corner)) throw new Error(`lab/projects.json: ${p.slug} has toggle "${corner}"; use one of ${CORNERS.join(', ')}`);
     const hasLoop = existsSync(resolve(ROOT, 'src/assets', dir, 'loop.mp4'));
     // The capture script drops the AV1 version when it isn't smaller than the MP4.
     const hasAv1 = existsSync(resolve(ROOT, 'src/assets', dir, 'loop.webm'));
@@ -66,7 +70,7 @@ function htmlTemplating() {
       ? `<video class="lab-loop" muted loop playsinline preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1" width="960" height="600">` +
         (hasAv1 ? `<source src="/src/assets/${dir}/loop.webm" type='video/webm; codecs="av01.0.04M.08"'>` : '') +
         `<source src="/src/assets/${dir}/loop.mp4" type='video/mp4; codecs="avc1.64001F"'></video>` +
-        `<button class="lab-toggle" type="button" data-name="${esc(p.name)}" aria-label="Pause the ${esc(p.name)} preview" hidden>` +
+        `<button class="lab-toggle" type="button"${corner === 'bottom-right' ? '' : ` data-corner="${corner}"`} data-name="${esc(p.name)}" aria-label="Pause the ${esc(p.name)} preview" hidden>` +
         `<svg class="i-pause" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><rect x="2.5" y="1.5" width="3" height="11" rx="0.5"/><rect x="8.5" y="1.5" width="3" height="11" rx="0.5"/></svg>` +
         `<svg class="i-play" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M3.5 1.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L4.4 1.3a.6.6 0 0 0-.9.5z"/></svg></button>`
       : '';

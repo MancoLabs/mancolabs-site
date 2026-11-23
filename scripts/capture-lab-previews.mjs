@@ -39,10 +39,13 @@ const RECIPES = {
   // top road, which turns the list into its score card and flies the map to the
   // road. The video stays on the national map from the click until the map's idle
   // event (no camera moving, every tile drawn), so it never shows a half-drawn map,
-  // then cuts to the road. The loop cuts back to the national map at its seam.
+  // then cuts to the road. All roads flies the map back out, and the loop
+  // crossfades from there into its start. All roads comes back to a slightly
+  // different view than a fresh load, so the whole run is rehearsed before the
+  // camera rolls: the recording starts on the view All roads returns to, and the
+  // two ends match. The rehearsal also caches the tiles.
   'sunday-line': {
     viewport: { width: 1280, height: 800 },
-    cut: true,
     async prepare(page) {
       await page.mouse.move(640, 25); // the empty middle of the header, so nothing shows a hover
       // The page doesn't expose its MapLibre map; find it through React's fiber tree.
@@ -60,17 +63,35 @@ const RECIPES = {
       await top.waitFor();
       await mapIdle(page);
       console.log(`sunday-line: the top road is ${(await top.innerText()).replace(/\s+/g, ' ')}`);
+      await this.open(page);
+      await this.back(page);
     },
-    async play(page, ms) {
-      this.skip = [];
-      await page.waitForTimeout(1200);
-      const from = Date.now() / 1000;
+    // Clicks the top road and waits for the map to fly there and finish drawing.
+    async open(page) {
       await page.locator('li button.road').first().evaluate((b) => b.click()); // no hover, no focus ring
       await page.waitForFunction(() => window.__labMap.isMoving(), null, { timeout: 2000 }).catch(() => {});
       await mapIdle(page);
+    },
+    // Clicks All roads and waits for the map to fly back out and finish drawing.
+    async back(page) {
+      await page.getByRole('button', { name: /All roads/ }).evaluate((b) => b.click());
+      await page.waitForFunction(() => window.__labMap.isMoving(), null, { timeout: 2000 }).catch(() => {});
+      await mapIdle(page);
+      await page.locator('li button.road').nth(1).waitFor(); // the full list is back
+    },
+    async play(page, ms) {
+      const start = Date.now();
+      const at = (t) => page.waitForTimeout(Math.max(start + t - Date.now(), 0));
+      this.skip = [];
+      await at(1200);
+      const from = Date.now() / 1000;
+      await this.open(page);
       await page.waitForTimeout(300); // the camera's frames show the page a little late
       this.skip.push([from, Date.now() / 1000]);
-      await page.waitForTimeout(Math.max(ms - (Date.now() / 1000 - from) * 1000 - 1200, 4000));
+      await at(Math.max(5200, Date.now() - start + 2500)); // the score card, for at least 2.5 seconds
+      await this.back(page);
+      // A second and more of the national map at the end, so the crossfade joins two still frames.
+      await at(Math.max(ms, Date.now() - start + 1300));
     },
   },
   // The default beat (Bap Boom, 90 BPM) after the four-beat count in, zoomed in on

@@ -5,6 +5,7 @@
     "description": "Find great local driving roads and organize meets with your car or bike group.",
     "demo": "https://sundayline.app",
     "code": "https://github.com/ethanmanco/sunday-line",
+    "toggle": "bottom-left",
     "alt": "Sunday Line's map of the United States, dotted with driving roads colored by score, beside a ranked list led by State Highway 256 (TX 256) with an overall score of 88."
   },
   {
